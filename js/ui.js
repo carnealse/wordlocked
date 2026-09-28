@@ -302,7 +302,7 @@ const WIN_LINES = [
   'You cracked the combination.',
   'The vault doors swing open.',
   'The tumblers clicked into place.',
-  'That's the sound of mastery.',
+  "That's the sound of mastery.",
   'Combination confirmed.',
 ]
 
