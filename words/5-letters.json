@@ -2,7 +2,6 @@
   {"word": "BLAZE", "hint": "Noun / Verb"},
   {"word": "CRIMP", "hint": "Verb / Noun"},
   {"word": "DRAWL", "hint": "Verb / Noun"},
-  {"word": "EXPEL", "hint": "Verb"},
   {"word": "FLINT", "hint": "Noun"},
   {"word": "GROUT", "hint": "Noun / Verb"},
   {"word": "HOIST", "hint": "Verb / Noun"},
@@ -18,5 +17,6 @@
   {"word": "RELIC", "hint": "Noun"},
   {"word": "STOMP", "hint": "Verb / Noun"},
   {"word": "TRYST", "hint": "Noun"},
-  {"word": "UNFURL", "hint": "Verb"}
+  {"word": "WALTZ", "hint": "Noun / Verb"},
+  {"word": "EXPEL", "hint": "Verb"}
 ]
