@@ -10,7 +10,7 @@ import { storage } from './storage.js'
 import {
   getState, MAX,
   initState, restoreState, setDialPosition,
-  setWheelsAndPositions, applyGuess, advanceLevel,
+  applyGuess, advanceLevel,
   recordLevelResult, setStatus,
 } from './state.js'
 import {
@@ -18,7 +18,7 @@ import {
   updateDialDisplay, animateCrack, animateShackleOpen,
   resetShackle, animateShake, flashCorrectDials,
   showToast, buildAndShowEndModal, startCountdownTimer,
-  openModal, closeModal, renderStats as uiRenderStats,
+  openModal, closeModal, navigateEndPage,
 } from './ui.js'
 import { recordResult, loadStats, renderStats } from './stats.js'
 import { buildShareText, copyToClipboard } from './share.js'
@@ -34,15 +34,14 @@ export async function boot() {
   const todayStr = getTodayUTC()
   const dayIndex = getDayIndex(todayStr)
 
-  const wordObjs = await loadWords(dayIndex, todayStr)
+  const wordObjs = await loadWords(todayStr)
   const words    = wordObjs.map(o => o.word.toUpperCase())
   const hints    = wordObjs.map(o => o.hint)
 
-  const saved = storage.get(STORAGE_DAILY)
+  const saved    = storage.get(STORAGE_DAILY)
   const isSameDay = saved?.todayStr === todayStr
 
   if (isSameDay) {
-    // Rebuild wheels (not persisted — deterministic so we can always rebuild)
     const wheels    = buildWheelsForWord(words[saved.level], dayIndex, saved.level)
     const positions = saved.positions?.length === wheels.length
       ? saved.positions
@@ -63,16 +62,17 @@ export async function boot() {
   renderAll()
   bindEvents()
 
-  if (getState().status !== 'playing') {
+  const { status } = getState()
+  if (status === 'won' || status === 'lost') {
     setTimeout(() => {
-      buildAndShowEndModal(getState().status === 'won')
+      buildAndShowEndModal(status === 'won')
       startCountdownTimer()
     }, 300)
   }
 }
 
 // ── WORD LOADING ──────────────────────────────────────────────────
-async function loadWords(dayIndex, todayStr) {
+async function loadWords(todayStr) {
   const [bank4, bank5, bank6] = await Promise.all([
     fetch('words/4-letters.json').then(r => r.json()),
     fetch('words/5-letters.json').then(r => r.json()),
@@ -85,10 +85,6 @@ async function loadWords(dayIndex, todayStr) {
 }
 
 // ── INITIAL POSITIONS ─────────────────────────────────────────────
-/**
- * Sets starting positions to random-but-not-correct letters,
- * so the player has something to do from the first view.
- */
 function defaultPositions(wheels, word, dayIndex, levelIdx) {
   const seed = hashStr(`pos-${dayIndex}-${levelIdx}`)
   const rng  = mulberry32(seed)
@@ -144,7 +140,7 @@ function handleSwipeMove(e, dialIdx) {
   }
 }
 
-function handleSwipeEnd(_e, _dialIdx) {
+function handleSwipeEnd() {
   _swipe.active = false
 }
 
@@ -181,7 +177,6 @@ async function submitGuess() {
   const target = words[level]
   const guess  = wheels.map((wheel, i) => wheel[positions[i]])
 
-  // Evaluate per-position correctness
   const correctMask = guess.map((letter, i) => letter === target[i])
   const { allCorrect, outOfGuesses } = applyGuess(correctMask)
 
@@ -194,7 +189,6 @@ async function submitGuess() {
     await animateShackleOpen()
 
     if (level < 2) {
-      // Advance to next lock
       const nextLevel  = level + 1
       const nextWord   = words[nextLevel]
       const { dayIndex } = getState()
@@ -208,7 +202,6 @@ async function submitGuess() {
       renderAll()
       showToast('LOCK CRACKED — NEXT LEVEL')
     } else {
-      // All 3 cracked
       setStatus('won')
       persist()
       const stats = recordResult(true, getState().guessesUsed)
@@ -243,11 +236,10 @@ async function submitGuess() {
 // ── PERSIST ───────────────────────────────────────────────────────
 function persist() {
   const { todayStr, dayIndex, level, guessesUsed, levelGuessStart,
-          positions, correct, results, status, words, hints } = getState()
+          positions, correct, results, status } = getState()
   storage.set(STORAGE_DAILY, {
     todayStr, dayIndex, level, guessesUsed, levelGuessStart,
     positions, correct, results, status,
-    // Don't persist words/hints — reloaded from JSON on boot
   })
 }
 
@@ -261,40 +253,31 @@ async function handleShare() {
 
 // ── EVENTS ────────────────────────────────────────────────────────
 function bindEvents() {
-  // Header
   document.getElementById('btn-how').addEventListener('click', () => openModal('modal-how'))
   document.getElementById('btn-stats').addEventListener('click', () => {
     renderStats(loadStats(), null)
     openModal('modal-stats')
   })
 
-  // Close — both X buttons and overlay click
   document.querySelectorAll('[data-close]').forEach(btn =>
     btn.addEventListener('click', () => closeModal(btn.dataset.close))
   )
+
   document.querySelectorAll('.modal-overlay').forEach(overlay =>
     overlay.addEventListener('click', e => {
       if (e.target === overlay) closeModal(overlay.id)
     })
   )
 
-  // Submit
   document.getElementById('submit-btn').addEventListener('click', submitGuess)
 
-  // Share — both locations
   document.querySelectorAll('[data-action="share"]').forEach(btn =>
     btn.addEventListener('click', handleShare)
   )
 
-  // End modal nav
-  document.getElementById('end-prev').addEventListener('click', () =>
-    import('./ui.js').then(m => m.navigateEndPage(-1))
-  )
-  document.getElementById('end-next').addEventListener('click', () =>
-    import('./ui.js').then(m => m.navigateEndPage(1))
-  )
+  document.getElementById('end-prev').addEventListener('click', () => navigateEndPage(-1))
+  document.getElementById('end-next').addEventListener('click', () => navigateEndPage(1))
 
-  // Keyboard
   document.addEventListener('keydown', handleKeyDown)
 }
 
