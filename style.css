@@ -310,68 +310,57 @@ button {
 
 /* ── DIALS ──────────────────────────────────────────────────────── */
 /* ── LOCK INNER LAYOUT ──────────────────────────────────────────── */
-/* Mirrors the physical layout: [arrows-left] [dials] [arrows-right] */
+/* [arrow-col LEFT] [dials RIGHT — wide] */
 .lock__inner {
   display: flex;
   flex-direction: row;
   align-items: stretch;
   gap: 10px;
-  position: relative;
 }
 
-/* ── ARROW COLUMNS ───────────────────────────────────────────────── */
+/* ── ARROW COLUMN (left side) ────────────────────────────────────── */
 .lock__arrows {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
   gap: 4px;
   flex-shrink: 0;
 }
 
+/* Each dial gets a pair of ‹ › buttons stacked vertically */
+.arrow-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
 .arrow-btn {
-  width: 44px;
-  height: 52px;
+  flex: 1;
+  width: 48px;
+  min-height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #3a3a50 0%, #22222e 100%);
+  background: linear-gradient(180deg, #3a3a52 0%, #22222e 100%);
   border: 1px solid var(--c-border);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--c-text-muted);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 400;
   line-height: 1;
   transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
-.arrow-btn:hover  { background: linear-gradient(180deg, #484860 0%, #2e2e40 100%); color: var(--c-text); }
-.arrow-btn:active { transform: scale(0.90); }
+.arrow-btn:hover  { background: linear-gradient(180deg, #484862 0%, #2e2e40 100%); color: var(--c-text); }
+.arrow-btn:active { transform: scale(0.92); }
 
-/* ── DIALS COLUMN ────────────────────────────────────────────────── */
+/* ── DIALS COLUMN (right side, wide) ────────────────────────────── */
 .lock__dials {
   display: flex;
   flex-direction: column;
   gap: 4px;
   flex: 1;
-  position: relative;
-}
-
-/* ── RED INDICATOR LINE ──────────────────────────────────────────── */
-/* Absolutely positioned over the center of the dial stack */
-.lock__indicator {
-  position: absolute;
-  left: 0;
-  right: 0;
-  /* Vertically centered within lock__inner */
-  top: 50%;
-  height: 2px;
-  transform: translateY(-50%);
-  background: var(--c-red, #ef4444);
-  opacity: 0.85;
-  pointer-events: none;
-  z-index: 10;
-  box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
 }
 
 /* ── INDIVIDUAL DIAL ─────────────────────────────────────────────── */
