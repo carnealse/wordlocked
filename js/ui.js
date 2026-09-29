@@ -35,19 +35,13 @@ export function closeModal(id) {
 }
 
 // ── GUESS PIPS ────────────────────────────────────────────────────
-// Shows per-level guesses (resets each level)
 export function renderPips() {
-  const { guessesUsed, results } = getState()
-
-  // Use last completed level's tries if done, else current level's guessesUsed
-  const displayCount = guessesUsed
-
+  const { guessesUsed } = getState()
   document.querySelectorAll('.pip').forEach((pip, i) => {
     pip.className = 'pip'
-    if (i < displayCount) pip.classList.add('pip--used')
+    if (i < guessesUsed) pip.classList.add('pip--used')
   })
-
-  const rem = MAX - displayCount
+  const rem = MAX - guessesUsed
   document.getElementById('guess-remaining').textContent =
     `${rem} ${rem === 1 ? 'guess' : 'guesses'} left`
 }
@@ -55,21 +49,16 @@ export function renderPips() {
 // ── STAGE CHIPS ───────────────────────────────────────────────────
 export function renderStages() {
   const { level, results, status } = getState()
-
   for (let i = 0; i < 3; i++) {
     const chip = document.getElementById(`stage-${i}`)
     const lock = chip.querySelector('.stage-lock')
     chip.className = 'stage-chip'
-
     if (results[i]?.solved) {
-      chip.classList.add('stage-chip--done')
-      lock.textContent = '🔓'
+      chip.classList.add('stage-chip--done'); lock.textContent = '🔓'
     } else if (results[i] && !results[i].solved) {
-      chip.classList.add('stage-chip--failed')
-      lock.textContent = '🔒'
+      chip.classList.add('stage-chip--failed'); lock.textContent = '🔒'
     } else if (i === level && status === 'playing') {
-      chip.classList.add('stage-chip--active')
-      lock.textContent = '🔒'
+      chip.classList.add('stage-chip--active'); lock.textContent = '🔒'
     } else {
       lock.textContent = '🔒'
     }
@@ -84,92 +73,123 @@ export function renderHint() {
 
 // ── DIALS ─────────────────────────────────────────────────────────
 /**
- * Full re-render of the dials.
- * Layout: vertical stack — each dial is a horizontal row of [▲] [letter] [▼]
+ * Renders tumbler-style dials.
+ * Each dial shows 3 letters: prev (top), current (center), next (bottom).
+ * Left/right arrow buttons live in the side columns (#arrows-left / #arrows-right).
+ * The red indicator line is pure CSS — positioned over the center row.
  */
-export function renderDials(onSpinUp, onSpinDown, onSwipeStart, onSwipeMove, onSwipeEnd) {
+export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, onSwipeEnd) {
   const { wheels, positions, correct } = getState()
-  const row = document.getElementById('dials-row')
-  row.innerHTML = ''
+
+  const dialsEl  = document.getElementById('dials-row')
+  const leftEl   = document.getElementById('arrows-left')
+  const rightEl  = document.getElementById('arrows-right')
+
+  dialsEl.innerHTML = ''
+  leftEl.innerHTML  = ''
+  rightEl.innerHTML = ''
 
   wheels.forEach((wheel, i) => {
-    const letter    = wheel[positions[i]]
+    const pos    = positions[i]
+    const len    = wheel.length
+    const prev   = wheel[(pos - 1 + len) % len]
+    const cur    = wheel[pos]
+    const next   = wheel[(pos + 1) % len]
     const isCorrect = correct[i]
 
-    const dialRow = document.createElement('div')
-    dialRow.className = 'dial-row'
+    // Dial
+    const dial = document.createElement('div')
+    dial.className = `dial${isCorrect ? ' dial--correct' : ''}`
+    dial.id        = `dial-${i}`
+    dial.dataset.dial = i
+    dial.setAttribute('role', 'spinbutton')
+    dial.setAttribute('aria-label', `Dial ${i + 1}: ${cur}`)
+    dial.setAttribute('tabindex', '0')
+    dial.setAttribute('touch-action', 'none')
 
-    dialRow.innerHTML = `
-      <button class="dial-btn dial-btn--up"
-              data-dial="${i}"
-              aria-label="Advance dial ${i + 1} up"
-              tabindex="-1">▲</button>
+    dial.innerHTML = `
+      <span class="dial__letter dial__letter--ghost">${prev}</span>
+      <span class="dial__letter dial__letter--active">${cur}</span>
+      <span class="dial__letter dial__letter--ghost">${next}</span>`
 
-      <div class="dial-window${isCorrect ? ' dial-window--correct' : ''}"
-           id="dial-${i}"
-           data-dial="${i}"
-           role="spinbutton"
-           aria-label="Dial ${i + 1}: ${letter}"
-           tabindex="0">
-        <div class="dial-strip">
-          <span class="dial-letter">${letter}</span>
-        </div>
-      </div>
+    // Swipe events on dial
+    dial.addEventListener('pointerdown',   e => onSwipeStart(e, i))
+    dial.addEventListener('pointermove',   e => onSwipeMove(e, i))
+    dial.addEventListener('pointerup',     e => onSwipeEnd(e, i))
+    dial.addEventListener('pointercancel', e => onSwipeEnd(e, i))
 
-      <button class="dial-btn dial-btn--dn"
-              data-dial="${i}"
-              aria-label="Advance dial ${i + 1} down"
-              tabindex="-1">▼</button>`
+    dialsEl.appendChild(dial)
 
-    row.appendChild(dialRow)
-  })
+    // Left arrow
+    const lBtn = document.createElement('button')
+    lBtn.className = 'arrow-btn arrow-btn--left'
+    lBtn.dataset.dial = i
+    lBtn.setAttribute('aria-label', `Dial ${i + 1} left`)
+    lBtn.setAttribute('tabindex', '-1')
+    lBtn.textContent = '‹'
+    lBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinLeft(i) })
+    leftEl.appendChild(lBtn)
 
-  // Attach events
-  row.querySelectorAll('.dial-btn--up').forEach(btn =>
-    btn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinUp(parseInt(btn.dataset.dial)) })
-  )
-  row.querySelectorAll('.dial-btn--dn').forEach(btn =>
-    btn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinDown(parseInt(btn.dataset.dial)) })
-  )
-  row.querySelectorAll('.dial-window').forEach(win => {
-    win.addEventListener('pointerdown',   e => onSwipeStart(e, parseInt(win.dataset.dial)))
-    win.addEventListener('pointermove',   e => onSwipeMove(e,  parseInt(win.dataset.dial)))
-    win.addEventListener('pointerup',     e => onSwipeEnd(e,   parseInt(win.dataset.dial)))
-    win.addEventListener('pointercancel', e => onSwipeEnd(e,   parseInt(win.dataset.dial)))
+    // Right arrow
+    const rBtn = document.createElement('button')
+    rBtn.className = 'arrow-btn arrow-btn--right'
+    rBtn.dataset.dial = i
+    rBtn.setAttribute('aria-label', `Dial ${i + 1} right`)
+    rBtn.setAttribute('tabindex', '-1')
+    rBtn.textContent = '›'
+    rBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinRight(i) })
+    rightEl.appendChild(rBtn)
   })
 }
 
 /**
- * Incremental dial update — no full re-render needed on spin.
+ * Incremental dial update after a spin.
+ * Replaces the three visible letters and re-applies correct state.
  */
-export function updateDialDisplay(dialIdx, letter, correct, dir) {
-  const win = document.getElementById(`dial-${dialIdx}`)
-  if (!win) return
+export function updateDialDisplay(dialIdx, dir) {
+  const { wheels, positions, correct } = getState()
+  const wheel = wheels[dialIdx]
+  const pos   = positions[dialIdx]
+  const len   = wheel.length
+  const prev  = wheel[(pos - 1 + len) % len]
+  const cur   = wheel[pos]
+  const next  = wheel[(pos + 1) % len]
 
-  const strip = win.querySelector('.dial-strip')
-  strip.style.transition = 'none'
-  strip.style.transform  = `translateY(${dir > 0 ? '-' : ''}30%)`
-  strip.style.opacity    = '0'
+  const dial = document.getElementById(`dial-${dialIdx}`)
+  if (!dial) return
+
+  const isCorrect = correct[dialIdx]
+
+  // Animate the strip
+  const letters = dial.querySelectorAll('.dial__letter')
+  const dy = dir > 0 ? '-33%' : '33%'
+
+  dial.style.transition = 'none'
+  dial.style.transform  = `translateY(${dy})`
+  dial.style.opacity    = '0.6'
 
   requestAnimationFrame(() => {
-    strip.querySelector('.dial-letter').textContent = letter
-    win.setAttribute('aria-label', `Dial ${dialIdx + 1}: ${letter}`)
+    letters[0].textContent = prev
+    letters[1].textContent = cur
+    letters[2].textContent = next
+    dial.setAttribute('aria-label', `Dial ${dialIdx + 1}: ${cur}`)
+
     requestAnimationFrame(() => {
-      strip.style.transition = 'transform 0.1s ease, opacity 0.08s ease'
-      strip.style.transform  = 'translateY(0)'
-      strip.style.opacity    = '1'
+      dial.style.transition = 'transform 0.1s ease, opacity 0.08s ease'
+      dial.style.transform  = 'translateY(0)'
+      dial.style.opacity    = '1'
     })
   })
 
-  win.classList.toggle('dial-window--correct', correct)
+  dial.classList.toggle('dial--correct', isCorrect)
 }
 
 export function animateCrack() {
-  document.querySelectorAll('.dial-window').forEach((win, i) => {
+  document.querySelectorAll('.dial').forEach((dial, i) => {
     setTimeout(() => {
-      win.classList.add('dial-window--pop')
-      win.addEventListener('animationend', () =>
-        win.classList.remove('dial-window--pop'), { once: true })
+      dial.classList.add('dial--pop')
+      dial.addEventListener('animationend', () =>
+        dial.classList.remove('dial--pop'), { once: true })
     }, i * 60)
   })
 }
@@ -195,7 +215,7 @@ export function animateShake() {
 export function flashCorrectDials() {
   const { correct } = getState()
   correct.forEach((isCorrect, i) => {
-    if (isCorrect) document.getElementById(`dial-${i}`)?.classList.add('dial-window--correct')
+    if (isCorrect) document.getElementById(`dial-${i}`)?.classList.add('dial--correct')
   })
 }
 
@@ -272,7 +292,7 @@ export function buildAndShowEndModal(won) {
     : FAIL_PAGES.map((p, i) => ({
         ...p,
         answerWord: i === 0 ? (words[results.filter(r => r.solved).length] ?? words[level]) : null,
-        answerHint: i === 0 ? (hints[results.filter(r => r.solved).length]  ?? hints[level])  : null,
+        answerHint: i === 0 ? (hints[results.filter(r => r.solved).length] ?? hints[level]) : null,
       }))
 
   _endPageIdx = 0
@@ -298,7 +318,6 @@ function _renderEndPages() {
     html += '</div>'
     return html
   }).join('')
-
   _renderEndNav()
 }
 
