@@ -310,32 +310,34 @@ button {
 
 /* ── DIALS ──────────────────────────────────────────────────────── */
 /* ── LOCK INNER LAYOUT ──────────────────────────────────────────── */
+/* Left: fixed-width button column. Right: drums fill remaining space */
 .lock__inner {
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: 10px;
+  gap: 8px;
+  width: 100%;
 }
 
-/* ── BUTTON COLUMN (left) ────────────────────────────────────────── */
+/* ── BUTTON COLUMN ───────────────────────────────────────────────── */
 .lock__btns {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  width: 108px;     /* exactly 2 buttons × 50px + 4px gap + 4px slack */
 }
 
-/* One ‹ › pair per dial row */
 .btn-pair {
   display: flex;
   flex-direction: row;
   gap: 4px;
-  flex: 1;
+  height: 54px;
 }
 
 .drum-btn {
-  width: 52px;
-  flex: 1;
+  flex: 0 0 52px;   /* fixed width — never shrinks or grows */
+  height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -348,29 +350,28 @@ button {
   line-height: 1;
   transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
-  min-height: 52px;
 }
 
 .drum-btn:hover  { background: linear-gradient(180deg, #383854 0%, #222238 100%); color: var(--c-text); }
 .drum-btn:active { transform: scale(0.92); }
 
-/* ── DRUM COLUMN (right) ─────────────────────────────────────────── */
+/* ── DRUM COLUMN ─────────────────────────────────────────────────── */
 .lock__drums {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 1;
+  flex: 1 1 0;      /* fill all remaining space */
+  min-width: 0;
 }
 
-/* Individual drum window */
+/* Individual drum window — horizontal tumbler */
 .drum {
-  flex: 1;
-  min-height: 52px;
+  width: 100%;
+  height: 54px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 0;
+  justify-content: space-around;
   position: relative;
   overflow: hidden;
   background: linear-gradient(180deg, #06060e 0%, #0e0e1c 50%, #06060e 100%);
@@ -392,66 +393,59 @@ button {
     0 0 20px var(--c-green-glow);
 }
 
-/* Ghost letters — fixed width, flanking center */
+/* Ghost letters */
 .drum__ghost {
-  width: 28%;
+  flex: 1;
   text-align: center;
   font-size: 15px;
   font-weight: 700;
   font-family: 'Courier New', monospace;
-  color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.22);
   pointer-events: none;
-  flex-shrink: 0;
   position: relative;
   z-index: 1;
 }
 
 /* Active center letter */
 .drum__active {
-  width: 44%;
+  flex: 1;
   text-align: center;
   font-size: 28px;
   font-weight: 900;
   font-family: 'Courier New', monospace;
   color: var(--c-text);
   pointer-events: none;
-  flex-shrink: 0;
   position: relative;
   z-index: 1;
 }
 
 .drum--correct .drum__active { color: var(--c-green); }
-.drum--correct .drum__ghost  { color: rgba(34,197,94,0.25); }
+.drum--correct .drum__ghost  { color: rgba(34,197,94,0.3); }
 
-/* Left fade overlay */
+/* Fade overlays — left and right edges */
 .drum__fade--l {
   position: absolute;
   top: 0; bottom: 0; left: 0;
-  width: 32%;
-  background: linear-gradient(to right, rgba(6,6,14,0.96) 0%, transparent 100%);
+  width: 30%;
+  background: linear-gradient(to right, rgba(6,6,14,0.95) 0%, transparent 100%);
   pointer-events: none;
   z-index: 2;
 }
 
-/* Right fade overlay */
 .drum__fade--r {
   position: absolute;
   top: 0; bottom: 0; right: 0;
-  width: 32%;
-  background: linear-gradient(to left, rgba(6,6,14,0.96) 0%, transparent 100%);
+  width: 30%;
+  background: linear-gradient(to left, rgba(6,6,14,0.95) 0%, transparent 100%);
   pointer-events: none;
   z-index: 2;
 }
 
-/* Pop animation */
+/* Pop animation on crack */
 .drum--pop { animation: drum-pop 0.3s var(--ease-spring); }
 
 @keyframes drum-pop {
   0%   { transform: scale(1); }
-  50%  { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
   50%  { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
