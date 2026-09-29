@@ -310,139 +310,139 @@ button {
 
 /* ── DIALS ──────────────────────────────────────────────────────── */
 /* ── LOCK INNER LAYOUT ──────────────────────────────────────────── */
-/* Stacked rows. Each row: [<] [>] | [letter window] */
-.lock__dials {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-}
-
-/* One horizontal dial row */
-.dial-row {
+.lock__inner {
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: 5px;
-  height: 52px;
+  gap: 10px;
 }
 
-/* ── CONTROL BUTTONS ─────────────────────────────────────────────── */
-.dial-ctrl {
-  width: 40px;
-  height: 100%;
+/* ── BUTTON COLUMN (left) ────────────────────────────────────────── */
+.lock__btns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* One ‹ › pair per dial row */
+.btn-pair {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  flex: 1;
+}
+
+.drum-btn {
+  width: 52px;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #2e2e42 0%, #1a1a28 100%);
+  background: linear-gradient(180deg, #2a2a40 0%, #181828 100%);
   border: 1px solid var(--c-border);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--c-text-muted);
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 300;
   line-height: 1;
-  flex-shrink: 0;
   transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.08),
-    inset 0 -1px 0 rgba(0,0,0,0.4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+  min-height: 52px;
 }
 
-.dial-ctrl:hover  { background: linear-gradient(180deg, #3e3e58 0%, #262636 100%); color: var(--c-text); }
-.dial-ctrl:active { transform: scale(0.90); }
+.drum-btn:hover  { background: linear-gradient(180deg, #383854 0%, #222238 100%); color: var(--c-text); }
+.drum-btn:active { transform: scale(0.92); }
 
-/* ── LETTER WINDOW ───────────────────────────────────────────────── */
-.dial-window {
-  flex: 1;
-  height: 100%;
+/* ── DRUM COLUMN (right) ─────────────────────────────────────────── */
+.lock__drums {
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+/* Individual drum window */
+.drum {
+  flex: 1;
+  min-height: 52px;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg,
-    #0a0a12 0%,
-    #14141f 25%,
-    #1c1c2c 50%,
-    #14141f 75%,
-    #0a0a12 100%
-  );
+  background: linear-gradient(180deg, #06060e 0%, #0e0e1c 50%, #06060e 100%);
   border: 2px solid var(--c-border-2);
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  position: relative;
-  box-shadow:
-    inset 0 3px 10px rgba(0,0,0,0.8),
-    inset 0 -3px 10px rgba(0,0,0,0.8);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), inset 0 -2px 8px rgba(0,0,0,0.8);
   transition: border-color var(--t-base), box-shadow var(--t-base);
+  gap: 10px;
 }
 
-/* Top and bottom fade gradients for depth */
-.dial-window::before,
-.dial-window::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0;
-  height: 35%;
-  pointer-events: none;
-  z-index: 2;
-}
-.dial-window::before {
-  top: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
-}
-.dial-window::after {
-  bottom: 0;
-  background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
-}
-
-.dial-window--correct {
+.drum--correct {
   border-color: var(--c-green);
   box-shadow:
-    inset 0 3px 10px rgba(0,0,0,0.8),
-    0 0 12px var(--c-green-glow),
-    0 0 24px var(--c-green-glow);
+    inset 0 2px 8px rgba(0,0,0,0.8),
+    0 0 10px var(--c-green-glow),
+    0 0 20px var(--c-green-glow);
 }
 
-/* Three letters: ghost / active / ghost */
-.dial-window__ghost,
-.dial-window__active {
-  width: 100%;
-  text-align: center;
+/* Ghost letters flanking the active center */
+.drum__ghost {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  color: rgba(255,255,255,0.15);
   pointer-events: none;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  flex-shrink: 0;
   z-index: 1;
 }
 
-.dial-window__ghost {
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.18);
-  letter-spacing: 1px;
-}
-
-.dial-window__active {
-  font-size: 26px;
-  font-weight: 800;
+/* Active center letter */
+.drum__active {
+  font-size: 28px;
+  font-weight: 900;
+  font-family: 'Courier New', monospace;
   color: var(--c-text);
-  letter-spacing: 1px;
+  pointer-events: none;
+  flex-shrink: 0;
+  z-index: 1;
 }
 
-.dial-window--correct .dial-window__active { color: var(--c-green); }
+.drum--correct .drum__active { color: var(--c-green); }
+.drum--correct .drum__ghost  { color: rgba(34,197,94,0.2); }
 
-/* Pop animation on crack */
-.dial-window--pop { animation: dial-pop 0.35s var(--ease-spring); }
+/* Left and right fade overlays */
+.drum__fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 36px;
+  pointer-events: none;
+  z-index: 2;
+}
 
-@keyframes dial-pop {
+.drum__fade--l {
+  left: 0;
+  background: linear-gradient(to right, rgba(6,6,14,0.95) 0%, transparent 100%);
+}
+
+.drum__fade--r {
+  right: 0;
+  background: linear-gradient(to left, rgba(6,6,14,0.95) 0%, transparent 100%);
+}
+
+/* Pop animation */
+.drum--pop { animation: drum-pop 0.3s var(--ease-spring); }
+
+@keyframes drum-pop {
   0%   { transform: scale(1); }
-  50%  { transform: scale(1.06); }
+  50%  { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
 
