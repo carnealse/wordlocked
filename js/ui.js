@@ -128,7 +128,7 @@ export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, 
     pair.appendChild(rBtn)
     btnsEl.appendChild(pair)
 
-    // Drum window — right column
+    // Drum window — right column (fixed clipped frame; never translated)
     const drum = document.createElement('div')
     drum.className    = `drum${isCorrect ? ' drum--correct' : ''}`
     drum.id           = `dial-${i}`
@@ -137,12 +137,20 @@ export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, 
     drum.setAttribute('aria-label', `Dial ${i + 1}: ${cur}`)
     drum.setAttribute('tabindex', '0')
 
+    const prev2 = wheel[(pos - 2 + len) % len]
+    const next2 = wheel[(pos + 2) % len]
+
+    // 5-cell strip: viewport shows the middle three; strip slides inside .drum
     drum.innerHTML = `
-      <span class="drum__ghost">${prev}</span>
-      <span class="drum__active">${cur}</span>
-      <span class="drum__ghost">${next}</span>
-      <div class="drum__fade drum__fade--l"></div>
-      <div class="drum__fade drum__fade--r"></div>`
+      <div class="drum__strip" data-pos="-20">
+        <span class="drum__cell drum__ghost" data-cell="prev2">${prev2}</span>
+        <span class="drum__cell drum__ghost" data-cell="prev">${prev}</span>
+        <span class="drum__cell drum__active" data-cell="cur">${cur}</span>
+        <span class="drum__cell drum__ghost" data-cell="next">${next}</span>
+        <span class="drum__cell drum__ghost" data-cell="next2">${next2}</span>
+      </div>
+      <div class="drum__fade drum__fade--l" aria-hidden="true"></div>
+      <div class="drum__fade drum__fade--r" aria-hidden="true"></div>`
 
     drum.addEventListener('pointerdown',   e => onSwipeStart(e, i))
     drum.addEventListener('pointermove',   e => onSwipeMove(e, i))
@@ -153,40 +161,73 @@ export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, 
   })
 }
 
+/** Write the five visible wheel letters into a drum strip (no motion). */
+function _fillStrip(strip, wheel, pos) {
+  const len = wheel.length
+  strip.querySelector('[data-cell="prev2"]').textContent = wheel[(pos - 2 + len) % len]
+  strip.querySelector('[data-cell="prev"]').textContent  = wheel[(pos - 1 + len) % len]
+  strip.querySelector('[data-cell="cur"]').textContent   = wheel[pos]
+  strip.querySelector('[data-cell="next"]').textContent  = wheel[(pos + 1) % len]
+  strip.querySelector('[data-cell="next2"]').textContent = wheel[(pos + 2) % len]
+}
+
 /**
  * Incremental dial update after a spin.
- * Replaces the three visible letters and re-applies correct state.
+ * Animates only `.drum__strip` inside the fixed, overflow-clipped `.drum` frame.
+ * State is already advanced when this runs, so we seed the strip with the
+ * previous letters, slide one cell, then settle on the new letters.
  */
 export function updateDialDisplay(dialIdx, dir) {
   const { wheels, positions, correct } = getState()
   const wheel = wheels[dialIdx]
   const pos   = positions[dialIdx]
   const len   = wheel.length
-  const prev  = wheel[(pos - 1 + len) % len]
-  const cur   = wheel[pos]
-  const next  = wheel[(pos + 1) % len]
+  const fromPos = ((pos - dir) % len + len) % len
 
   const drum = document.getElementById(`dial-${dialIdx}`)
   if (!drum) return
+  const strip = drum.querySelector('.drum__strip')
+  if (!strip) return
 
-  const dx = dir > 0 ? '-30%' : '30%'
-  drum.style.transition = 'none'
-  drum.style.transform  = `translateX(${dx})`
-  drum.style.opacity    = '0.5'
-
-  requestAnimationFrame(() => {
-    drum.querySelector('.drum__ghost:first-child').textContent = prev
-    drum.querySelector('.drum__active').textContent = cur
-    drum.querySelector('.drum__ghost:last-child').textContent = next
-    drum.setAttribute('aria-label', `Dial ${dialIdx + 1}: ${cur}`)
-    requestAnimationFrame(() => {
-      drum.style.transition = 'transform 0.1s ease, opacity 0.08s ease'
-      drum.style.transform  = 'translateX(0)'
-      drum.style.opacity    = '1'
-    })
-  })
-
+  drum.setAttribute('aria-label', `Dial ${dialIdx + 1}: ${wheel[pos]}`)
   drum.classList.toggle('drum--correct', correct[dialIdx])
+
+  // Cancel in-flight slide
+  clearTimeout(strip._slideTimer)
+  if (strip._onSlideEnd) {
+    strip.removeEventListener('transitionend', strip._onSlideEnd)
+    strip._onSlideEnd = null
+  }
+
+  // Seed previous letters at rest (no anim), then slide one cell
+  strip.classList.add('drum__strip--no-anim')
+  strip.classList.remove('drum__strip--slide-next', 'drum__strip--slide-prev')
+  _fillStrip(strip, wheel, fromPos)
+  strip.classList.add('drum__strip--rest')
+  void strip.offsetWidth
+
+  const slideClass = dir > 0 ? 'drum__strip--slide-next' : 'drum__strip--slide-prev'
+
+  const finish = (e) => {
+    if (e && e.target !== strip) return
+    if (strip._onSlideEnd) {
+      strip.removeEventListener('transitionend', strip._onSlideEnd)
+      strip._onSlideEnd = null
+    }
+    clearTimeout(strip._slideTimer)
+    strip.classList.add('drum__strip--no-anim')
+    strip.classList.remove(slideClass)
+    _fillStrip(strip, wheel, pos)
+    strip.classList.add('drum__strip--rest')
+    void strip.offsetWidth
+    strip.classList.remove('drum__strip--no-anim')
+  }
+
+  strip._onSlideEnd = finish
+  strip.addEventListener('transitionend', finish)
+  strip.classList.remove('drum__strip--no-anim')
+  strip.classList.add(slideClass)
+  strip._slideTimer = setTimeout(() => finish(), 200)
 }
 
 export function animateCrack() {

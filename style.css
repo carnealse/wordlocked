@@ -400,18 +400,20 @@ button {
   padding: 8px 0;
 }
 
-/* Individual drum window — horizontal tumbler */
+/*
+ * Drum window = fixed clipped frame. It must never translate/scale on spin.
+ * Only `.drum__strip` moves, and always inside overflow:hidden.
+ */
 .drum {
   width: 100%;
   height: var(--lock-row-h);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
+  display: block;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  contain: layout paint;
   background: var(--lock-drum);
-  border: 1.5px solid var(--lock-drum-border);
+  border: 2px solid var(--lock-drum-border);
   border-radius: 8px;
   cursor: pointer;
   touch-action: none;
@@ -419,73 +421,97 @@ button {
   -webkit-user-select: none;
   box-shadow: inset 0 2px 10px rgba(0,0,0,0.9);
   transition: border-color var(--t-base), box-shadow var(--t-base);
+  /* Guard against accidental transforms on the frame */
+  transform: none;
 }
 
 .drum--correct {
   border-color: var(--c-green);
-  border-width: 2px;
   box-shadow:
     inset 0 2px 10px rgba(0,0,0,0.9),
     0 0 0 1px rgba(34, 197, 94, 0.45);
 }
 
-/* Ghost letters — dim prev/next neighbors */
-.drum__ghost {
-  flex: 1;
-  text-align: center;
-  font-size: 15px;
-  font-weight: 600;
-  font-family: inherit;
-  letter-spacing: 0.02em;
-  color: rgba(228, 228, 240, 0.26);
-  pointer-events: none;
-  position: relative;
+/*
+ * 5-cell strip. Each cell = 1/3 of the drum width.
+ * Resting translateX(-20%) shows cells 1–3 (prev | cur | next).
+ */
+.drum__strip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: calc(500% / 3);
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 1;
+  transform: translateX(-20%);
+  transition: transform 0.14s var(--ease);
+  will-change: transform;
+  pointer-events: none;
 }
 
-/* Active center letter */
-.drum__active {
-  flex: 1;
-  text-align: center;
-  font-size: 28px;
-  font-weight: 800;
+.drum__strip--rest { transform: translateX(-20%); }
+.drum__strip--slide-next { transform: translateX(-40%); } /* content moves left */
+.drum__strip--slide-prev { transform: translateX(0%); }   /* content moves right */
+.drum__strip--no-anim { transition: none !important; }
+
+.drum__cell {
+  flex: 0 0 20%; /* 1/5 of strip == 1/3 of drum */
+  width: 20%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: inherit;
   letter-spacing: 0.02em;
-  color: #ffffff;
   pointer-events: none;
-  position: relative;
-  z-index: 1;
+}
+
+.drum__ghost {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(228, 228, 240, 0.26);
+}
+
+.drum__active {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffffff;
 }
 
 .drum--correct .drum__active { color: var(--c-green); }
 .drum--correct .drum__ghost  { color: rgba(34, 197, 94, 0.45); }
 
-/* Soft edge fades so neighbors read as recessed */
-.drum__fade--l {
+/* Soft edge fades pinned to the fixed frame (not the strip) */
+.drum__fade--l,
+.drum__fade--r {
   position: absolute;
-  top: 0; bottom: 0; left: 0;
-  width: 24%;
-  background: linear-gradient(to right, rgba(5,5,12,0.88) 0%, transparent 100%);
+  top: 0;
+  bottom: 0;
+  width: 22%;
   pointer-events: none;
   z-index: 2;
+}
+
+.drum__fade--l {
+  left: 0;
+  background: linear-gradient(to right, rgba(5,5,12,0.9) 0%, transparent 100%);
 }
 
 .drum__fade--r {
-  position: absolute;
-  top: 0; bottom: 0; right: 0;
-  width: 24%;
-  background: linear-gradient(to left, rgba(5,5,12,0.88) 0%, transparent 100%);
-  pointer-events: none;
-  z-index: 2;
+  right: 0;
+  background: linear-gradient(to left, rgba(5,5,12,0.9) 0%, transparent 100%);
 }
 
-/* Pop animation on crack */
-.drum--pop { animation: drum-pop 0.3s var(--ease-spring); }
+/* Pop animation on crack — scale the letters, not the frame box */
+.drum--pop .drum__strip { animation: drum-pop 0.3s var(--ease-spring); }
 
 @keyframes drum-pop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0%   { transform: translateX(-20%) scale(1); }
+  50%  { transform: translateX(-20%) scale(1.05); }
+  100% { transform: translateX(-20%) scale(1); }
 }
 
 /* ── SUBMIT ─────────────────────────────────────────────────────── */
