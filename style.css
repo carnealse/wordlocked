@@ -400,14 +400,11 @@ button {
   padding: 8px 0;
 }
 
-/* Individual drum window — horizontal tumbler */
+/* Individual drum window — fixed clipped frame; never translates on spin */
 .drum {
   width: 100%;
   height: var(--lock-row-h);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
+  display: block;
   position: relative;
   overflow: hidden;
   background: var(--lock-drum);
@@ -419,6 +416,19 @@ button {
   -webkit-user-select: none;
   box-shadow: inset 0 2px 10px rgba(0,0,0,0.9);
   transition: border-color var(--t-base), box-shadow var(--t-base);
+}
+
+/* Letter strip slides inside the fixed window */
+.drum__strip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+  will-change: transform, opacity;
 }
 
 .drum--correct {
@@ -439,8 +449,6 @@ button {
   letter-spacing: 0.02em;
   color: rgba(228, 228, 240, 0.26);
   pointer-events: none;
-  position: relative;
-  z-index: 1;
 }
 
 /* Active center letter */
@@ -453,8 +461,6 @@ button {
   letter-spacing: 0.02em;
   color: #ffffff;
   pointer-events: none;
-  position: relative;
-  z-index: 1;
 }
 
 .drum--correct .drum__active { color: var(--c-green); }

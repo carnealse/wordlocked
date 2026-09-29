@@ -137,10 +137,13 @@ export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, 
     drum.setAttribute('aria-label', `Dial ${i + 1}: ${cur}`)
     drum.setAttribute('tabindex', '0')
 
+    // Fixed clipped window; letters live in an inner strip that slides on spin
     drum.innerHTML = `
-      <span class="drum__ghost">${prev}</span>
-      <span class="drum__active">${cur}</span>
-      <span class="drum__ghost">${next}</span>
+      <div class="drum__strip">
+        <span class="drum__ghost">${prev}</span>
+        <span class="drum__active">${cur}</span>
+        <span class="drum__ghost">${next}</span>
+      </div>
       <div class="drum__fade drum__fade--l"></div>
       <div class="drum__fade drum__fade--r"></div>`
 
@@ -155,7 +158,7 @@ export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, 
 
 /**
  * Incremental dial update after a spin.
- * Replaces the three visible letters and re-applies correct state.
+ * Slides only the inner letter strip; the drum window stays fixed.
  */
 export function updateDialDisplay(dialIdx, dir) {
   const { wheels, positions, correct } = getState()
@@ -168,21 +171,24 @@ export function updateDialDisplay(dialIdx, dir) {
 
   const drum = document.getElementById(`dial-${dialIdx}`)
   if (!drum) return
+  const strip = drum.querySelector('.drum__strip')
+  if (!strip) return
 
   const dx = dir > 0 ? '-30%' : '30%'
-  drum.style.transition = 'none'
-  drum.style.transform  = `translateX(${dx})`
-  drum.style.opacity    = '0.5'
+  strip.style.transition = 'none'
+  strip.style.transform  = `translateX(${dx})`
+  strip.style.opacity    = '0.5'
 
   requestAnimationFrame(() => {
-    drum.querySelector('.drum__ghost:first-child').textContent = prev
-    drum.querySelector('.drum__active').textContent = cur
-    drum.querySelector('.drum__ghost:last-child').textContent = next
+    const ghosts = strip.querySelectorAll('.drum__ghost')
+    ghosts[0].textContent = prev
+    strip.querySelector('.drum__active').textContent = cur
+    ghosts[1].textContent = next
     drum.setAttribute('aria-label', `Dial ${dialIdx + 1}: ${cur}`)
     requestAnimationFrame(() => {
-      drum.style.transition = 'transform 0.1s ease, opacity 0.08s ease'
-      drum.style.transform  = 'translateX(0)'
-      drum.style.opacity    = '1'
+      strip.style.transition = 'transform 0.1s ease, opacity 0.08s ease'
+      strip.style.transform  = 'translateX(0)'
+      strip.style.opacity    = '1'
     })
   })
 
