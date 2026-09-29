@@ -69,16 +69,10 @@
       <div class="lock__body" id="lock-body">
         <div class="lock__shine" aria-hidden="true"></div>
 
-        <div class="lock__inner">
-          <!-- Arrow column (left side only) -->
-          <div class="lock__arrows" id="arrows-col">
-            <!-- Injected per dial by ui.js -->
-          </div>
-
-          <!-- Dials (right side, wide) -->
-          <div class="lock__dials" id="dials-row" role="group" aria-label="Letter dials">
-            <!-- Injected by ui.js -->
-          </div>
+        <div class="lock__dials" id="dials-row" role="group" aria-label="Letter dials">
+          <!-- Each dial row injected by ui.js:
+               [<] [>]  |  [letter window]
+          -->
         </div>
       </div>
     </div>
