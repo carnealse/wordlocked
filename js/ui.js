@@ -80,8 +80,10 @@ export function renderHint() {
  */
 export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, onSwipeEnd) {
   const { wheels, positions, correct } = getState()
-  const container = document.getElementById('dials-row')
-  container.innerHTML = ''
+  const btnsEl  = document.getElementById('lock-btns')
+  const drumsEl = document.getElementById('dials-row')
+  btnsEl.innerHTML  = ''
+  drumsEl.innerHTML = ''
 
   wheels.forEach((wheel, i) => {
     const pos       = positions[i]
@@ -91,42 +93,50 @@ export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, 
     const next      = wheel[(pos + 1) % len]
     const isCorrect = correct[i]
 
-    // Full row: [<] [>] | [letter window]
-    const row = document.createElement('div')
-    row.className = 'dial-row'
+    // Button pair — left column
+    const pair = document.createElement('div')
+    pair.className = 'btn-pair'
 
     const lBtn = document.createElement('button')
-    lBtn.className = 'dial-ctrl'
+    lBtn.className = 'drum-btn'
     lBtn.setAttribute('aria-label', `Dial ${i + 1} previous`)
     lBtn.setAttribute('tabindex', '-1')
-    lBtn.textContent = '\u2039'
+    lBtn.textContent = '‹'
     lBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinLeft(i) })
 
     const rBtn = document.createElement('button')
-    rBtn.className = 'dial-ctrl'
+    rBtn.className = 'drum-btn'
     rBtn.setAttribute('aria-label', `Dial ${i + 1} next`)
     rBtn.setAttribute('tabindex', '-1')
-    rBtn.textContent = '\u203a'
+    rBtn.textContent = '›'
     rBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinRight(i) })
 
-    const win = document.createElement('div')
-    win.className    = `dial-window${isCorrect ? ' dial-window--correct' : ''}`
-    win.id           = `dial-${i}`
-    win.dataset.dial = i
-    win.setAttribute('role', 'spinbutton')
-    win.setAttribute('aria-label', `Dial ${i + 1}: ${cur}`)
-    win.setAttribute('tabindex', '0')
-    win.innerHTML = `<span class="dial-window__ghost">${prev}</span><span class="dial-window__active">${cur}</span><span class="dial-window__ghost">${next}</span>`
+    pair.appendChild(lBtn)
+    pair.appendChild(rBtn)
+    btnsEl.appendChild(pair)
 
-    win.addEventListener('pointerdown',   e => onSwipeStart(e, i))
-    win.addEventListener('pointermove',   e => onSwipeMove(e, i))
-    win.addEventListener('pointerup',     e => onSwipeEnd(e, i))
-    win.addEventListener('pointercancel', e => onSwipeEnd(e, i))
+    // Drum window — right column
+    const drum = document.createElement('div')
+    drum.className    = `drum${isCorrect ? ' drum--correct' : ''}`
+    drum.id           = `dial-${i}`
+    drum.dataset.dial = i
+    drum.setAttribute('role', 'spinbutton')
+    drum.setAttribute('aria-label', `Dial ${i + 1}: ${cur}`)
+    drum.setAttribute('tabindex', '0')
 
-    row.appendChild(lBtn)
-    row.appendChild(rBtn)
-    row.appendChild(win)
-    container.appendChild(row)
+    drum.innerHTML = `
+      <span class="drum__ghost">${prev}</span>
+      <span class="drum__active">${cur}</span>
+      <span class="drum__ghost">${next}</span>
+      <div class="drum__fade drum__fade--l"></div>
+      <div class="drum__fade drum__fade--r"></div>`
+
+    drum.addEventListener('pointerdown',   e => onSwipeStart(e, i))
+    drum.addEventListener('pointermove',   e => onSwipeMove(e, i))
+    drum.addEventListener('pointerup',     e => onSwipeEnd(e, i))
+    drum.addEventListener('pointercancel', e => onSwipeEnd(e, i))
+
+    drumsEl.appendChild(drum)
   })
 }
 
@@ -143,38 +153,35 @@ export function updateDialDisplay(dialIdx, dir) {
   const cur   = wheel[pos]
   const next  = wheel[(pos + 1) % len]
 
-  const win = document.getElementById(`dial-${dialIdx}`)
-  if (!win) return
+  const drum = document.getElementById(`dial-${dialIdx}`)
+  if (!drum) return
 
-  const isCorrect = correct[dialIdx]
-  const dy = dir > 0 ? '-40%' : '40%'
-
-  win.style.transition = 'none'
-  win.style.transform  = `translateY(${dy})`
-  win.style.opacity    = '0.5'
+  const dx = dir > 0 ? '-30%' : '30%'
+  drum.style.transition = 'none'
+  drum.style.transform  = `translateX(${dx})`
+  drum.style.opacity    = '0.5'
 
   requestAnimationFrame(() => {
-    win.querySelector('.dial-window__ghost:first-child').textContent = prev
-    win.querySelector('.dial-window__active').textContent = cur
-    win.querySelector('.dial-window__ghost:last-child').textContent = next
-    win.setAttribute('aria-label', `Dial ${dialIdx + 1}: ${cur}`)
-
+    drum.querySelector('.drum__ghost:first-child').textContent = prev
+    drum.querySelector('.drum__active').textContent = cur
+    drum.querySelector('.drum__ghost:last-child').textContent = next
+    drum.setAttribute('aria-label', `Dial ${dialIdx + 1}: ${cur}`)
     requestAnimationFrame(() => {
-      win.style.transition = 'transform 0.1s ease, opacity 0.08s ease'
-      win.style.transform  = 'translateY(0)'
-      win.style.opacity    = '1'
+      drum.style.transition = 'transform 0.1s ease, opacity 0.08s ease'
+      drum.style.transform  = 'translateX(0)'
+      drum.style.opacity    = '1'
     })
   })
 
-  win.classList.toggle('dial-window--correct', isCorrect)
+  drum.classList.toggle('drum--correct', correct[dialIdx])
 }
 
 export function animateCrack() {
-  document.querySelectorAll('.dial-window').forEach((dial, i) => {
+  document.querySelectorAll('.drum').forEach((drum, i) => {
     setTimeout(() => {
-      dial.classList.add('dial-window--pop')
-      dial.addEventListener('animationend', () =>
-        dial.classList.remove('dial-window--pop'), { once: true })
+      drum.classList.add('drum--pop')
+      drum.addEventListener('animationend', () =>
+        drum.classList.remove('drum--pop'), { once: true })
     }, i * 60)
   })
 }
@@ -200,7 +207,7 @@ export function animateShake() {
 export function flashCorrectDials() {
   const { correct } = getState()
   correct.forEach((isCorrect, i) => {
-    if (isCorrect) document.getElementById(`dial-${i}`)?.classList.add('dial-window--correct')
+    if (isCorrect) document.getElementById(`dial-${i}`)?.classList.add('drum--correct')
   })
 }
 
