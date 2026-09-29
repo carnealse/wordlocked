@@ -204,8 +204,8 @@ async function submitGuess() {
     } else {
       setStatus('won')
       persist()
-      const stats = recordResult(true, getState().guessesUsed)
-      renderStats(stats, getState().guessesUsed)
+      const stats = recordResult(true, getState().totalGuesses)
+      renderStats(stats, getState().totalGuesses)
       document.getElementById('stats-actions').removeAttribute('hidden')
       await sleep(200)
       buildAndShowEndModal(true)
@@ -218,7 +218,7 @@ async function submitGuess() {
       recordLevelResult(false)
       setStatus('lost')
       persist()
-      recordResult(false, getState().guessesUsed)
+      recordResult(false, getState().totalGuesses)
       renderStats(loadStats(), null)
       await sleep(500)
       buildAndShowEndModal(false)
@@ -235,10 +235,10 @@ async function submitGuess() {
 
 // ── PERSIST ───────────────────────────────────────────────────────
 function persist() {
-  const { todayStr, dayIndex, level, guessesUsed, levelGuessStart,
+  const { todayStr, dayIndex, level, guessesUsed, totalGuesses,
           positions, correct, results, status } = getState()
   storage.set(STORAGE_DAILY, {
-    todayStr, dayIndex, level, guessesUsed, levelGuessStart,
+    todayStr, dayIndex, level, guessesUsed, totalGuesses,
     positions, correct, results, status,
   })
 }
