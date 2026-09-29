@@ -370,6 +370,7 @@ button {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 0;
   position: relative;
   overflow: hidden;
   background: linear-gradient(180deg, #06060e 0%, #0e0e1c 50%, #06060e 100%);
@@ -381,7 +382,6 @@ button {
   -webkit-user-select: none;
   box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), inset 0 -2px 8px rgba(0,0,0,0.8);
   transition: border-color var(--t-base), box-shadow var(--t-base);
-  gap: 10px;
 }
 
 .drum--correct {
@@ -392,49 +392,55 @@ button {
     0 0 20px var(--c-green-glow);
 }
 
-/* Ghost letters flanking the active center */
+/* Ghost letters — fixed width, flanking center */
 .drum__ghost {
-  font-size: 16px;
+  width: 28%;
+  text-align: center;
+  font-size: 15px;
   font-weight: 700;
   font-family: 'Courier New', monospace;
-  color: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.18);
   pointer-events: none;
   flex-shrink: 0;
+  position: relative;
   z-index: 1;
 }
 
 /* Active center letter */
 .drum__active {
+  width: 44%;
+  text-align: center;
   font-size: 28px;
   font-weight: 900;
   font-family: 'Courier New', monospace;
   color: var(--c-text);
   pointer-events: none;
   flex-shrink: 0;
+  position: relative;
   z-index: 1;
 }
 
 .drum--correct .drum__active { color: var(--c-green); }
-.drum--correct .drum__ghost  { color: rgba(34,197,94,0.2); }
+.drum--correct .drum__ghost  { color: rgba(34,197,94,0.25); }
 
-/* Left and right fade overlays */
-.drum__fade {
+/* Left fade overlay */
+.drum__fade--l {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 36px;
+  top: 0; bottom: 0; left: 0;
+  width: 32%;
+  background: linear-gradient(to right, rgba(6,6,14,0.96) 0%, transparent 100%);
   pointer-events: none;
   z-index: 2;
 }
 
-.drum__fade--l {
-  left: 0;
-  background: linear-gradient(to right, rgba(6,6,14,0.95) 0%, transparent 100%);
-}
-
+/* Right fade overlay */
 .drum__fade--r {
-  right: 0;
-  background: linear-gradient(to left, rgba(6,6,14,0.95) 0%, transparent 100%);
+  position: absolute;
+  top: 0; bottom: 0; right: 0;
+  width: 32%;
+  background: linear-gradient(to left, rgba(6,6,14,0.96) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* Pop animation */
@@ -442,6 +448,10 @@ button {
 
 @keyframes drum-pop {
   0%   { transform: scale(1); }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
   50%  { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
