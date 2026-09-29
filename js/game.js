@@ -102,8 +102,8 @@ function renderAll() {
   renderStages()
   renderHint()
   renderDials(
-    handleSpinUp,
-    handleSpinDown,
+    handleSpinLeft,
+    handleSpinRight,
     handleSwipeStart,
     handleSwipeMove,
     handleSwipeEnd,
@@ -112,15 +112,15 @@ function renderAll() {
 
 // ── SPIN ──────────────────────────────────────────────────────────
 function spin(dialIdx, dir) {
-  const { wheels, positions, correct } = getState()
+  const { wheels, positions } = getState()
   const wheel  = wheels[dialIdx]
   const newPos = advancePosition(positions[dialIdx], dir, wheel.length)
   setDialPosition(dialIdx, newPos)
-  updateDialDisplay(dialIdx, wheel[newPos], correct[dialIdx], dir)
+  updateDialDisplay(dialIdx, dir)
 }
 
-function handleSpinUp(dialIdx)   { spin(dialIdx, -1) }
-function handleSpinDown(dialIdx) { spin(dialIdx,  1) }
+function handleSpinLeft(dialIdx)  { spin(dialIdx, -1) }
+function handleSpinRight(dialIdx) { spin(dialIdx,  1) }
 
 // ── SWIPE ─────────────────────────────────────────────────────────
 function handleSwipeStart(e, dialIdx) {
@@ -151,10 +151,10 @@ function handleKeyDown(e) {
   const { words, level, wheels } = getState()
   const wordLen = words[level].length
 
-  if (e.key === 'ArrowUp')    { e.preventDefault(); spin(_focusedDial, -1) }
-  if (e.key === 'ArrowDown')  { e.preventDefault(); spin(_focusedDial,  1) }
-  if (e.key === 'ArrowLeft')  { e.preventDefault(); _focusedDial = Math.max(0, _focusedDial - 1) }
-  if (e.key === 'ArrowRight') { e.preventDefault(); _focusedDial = Math.min(wordLen - 1, _focusedDial + 1) }
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); spin(_focusedDial, -1) }
+  if (e.key === 'ArrowRight') { e.preventDefault(); spin(_focusedDial,  1) }
+  if (e.key === 'ArrowUp')    { e.preventDefault(); _focusedDial = Math.max(0, _focusedDial - 1) }
+  if (e.key === 'ArrowDown')  { e.preventDefault(); _focusedDial = Math.min(wordLen - 1, _focusedDial + 1) }
   if (e.key === 'Enter')      { submitGuess() }
 
   if (/^[a-zA-Z]$/.test(e.key)) {
@@ -163,7 +163,7 @@ function handleKeyDown(e) {
     const idx    = wheel.indexOf(target)
     if (idx >= 0) {
       setDialPosition(_focusedDial, idx)
-      updateDialDisplay(_focusedDial, target, getState().correct[_focusedDial], 1)
+      updateDialDisplay(_focusedDial, 1)
       if (_focusedDial < wordLen - 1) _focusedDial++
     }
   }
