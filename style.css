@@ -247,23 +247,42 @@ button {
 
 /* ── LOCK ───────────────────────────────────────────────────────── */
 .lock {
+  --lock-body:       #4c4c65;
+  --lock-body-hi:    #545470;
+  --lock-body-lo:    #3c3c55;
+  --lock-shackle:    #70708e;
+  --lock-well:       #1a1a2e;
+  --lock-btn:        #313146;
+  --lock-btn-hi:     #4a4a68;
+  --lock-btn-border: #4e4e6c;
+  --lock-drum:       #06060f;
+  --lock-drum-border:#222238;
+  --lock-arrow:      #c0c0d8;
+  --lock-row-h:      62px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: min(100%, 326px);
 }
 
-/* Shackle */
+/* Shackle — tall U-bar matching target proportions */
 .lock__shackle {
-  width: 52px;
-  height: 32px;
-  border: 7px solid var(--c-metal-mid);
+  width: 152px;
+  height: 134px;
+  border: 26px solid var(--lock-shackle);
   border-bottom: none;
-  border-radius: 28px 28px 0 0;
+  border-radius: 96px 96px 0 0;
   background: transparent;
-  box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+  box-shadow:
+    inset 4px 0 0 rgba(255,255,255,0.2),
+    inset -3px 0 0 rgba(0,0,0,0.28);
   transform-origin: center bottom;
   transition: transform 0.55s var(--ease-spring), border-color var(--t-slow);
   will-change: transform;
+  position: relative;
+  z-index: 1;
+  margin-bottom: -6px;
 }
 
 .lock__shackle--open {
@@ -271,47 +290,38 @@ button {
   border-color: var(--c-green);
 }
 
-/* Body */
+/* Body — flat slate padlock, no brushed texture */
 .lock__body {
   position: relative;
-  background:
-    repeating-linear-gradient(
-      180deg,
-      rgba(255,255,255,0.03) 0px,
-      rgba(255,255,255,0.03) 1px,
-      transparent 1px,
-      transparent 4px
-    ),
-    linear-gradient(160deg,
-      #6a6a88 0%,
-      #4a4a68 20%,
-      #383850 50%,
-      #2a2a40 80%,
-      #1e1e30 100%
-    );
-  border-radius: var(--r-md);
-  padding: 16px 12px 14px;
+  width: 100%;
+  background: linear-gradient(180deg,
+    var(--lock-body-hi) 0%,
+    var(--lock-body) 45%,
+    var(--lock-body-lo) 100%
+  );
+  border-radius: 16px;
+  padding: 16px 14px 18px;
   box-shadow:
-    0 12px 48px rgba(0,0,0,0.7),
-    0 2px 0 rgba(255,255,255,0.12) inset,
-    0 -2px 0 rgba(0,0,0,0.6) inset,
-    2px 0 0 rgba(255,255,255,0.06) inset,
-    -2px 0 0 rgba(0,0,0,0.4) inset;
-  border: 1px solid rgba(255,255,255,0.08);
+    0 14px 40px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -1px 0 rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .lock__shine {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(170deg, rgba(255,255,255,0.1) 0%, transparent 45%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 40%);
   pointer-events: none;
+  z-index: 0;
 }
 
-/* ── DIALS ──────────────────────────────────────────────────────── */
 /* ── LOCK INNER LAYOUT ──────────────────────────────────────────── */
-/* Left: fixed-width button column. Right: drums fill remaining space */
+/* Left: recessed control well. Right: drum windows on the body. */
 .lock__inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -323,84 +333,111 @@ button {
 .lock__btns {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   flex: 0 0 auto;
-  width: 108px;     /* exactly 2 buttons × 50px + 4px gap + 4px slack */
+  width: 122px;
+  padding: 8px;
+  background: var(--lock-well);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 2px 6px rgba(0,0,0,0.55),
+    inset 0 0 0 1px rgba(0,0,0,0.35);
 }
 
 .btn-pair {
   display: flex;
   flex-direction: row;
-  gap: 4px;
-  height: 54px;
+  gap: 6px;
+  height: var(--lock-row-h);
 }
 
 .drum-btn {
-  flex: 0 0 52px;   /* fixed width — never shrinks or grows */
-  height: 54px;
+  flex: 1 1 0;
+  height: var(--lock-row-h);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #2a2a40 0%, #181828 100%);
-  border: 1px solid var(--c-border);
+  background: var(--lock-btn);
+  border: 1px solid var(--lock-btn-border);
   border-radius: 8px;
-  color: var(--c-text-muted);
-  font-size: 28px;
+  color: var(--lock-arrow);
+  font-size: 26px;
   font-weight: 300;
   line-height: 1;
-  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+  transition:
+    background var(--t-fast),
+    color var(--t-fast),
+    border-color var(--t-fast),
+    box-shadow var(--t-fast),
+    transform var(--t-fast);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
-.drum-btn:hover  { background: linear-gradient(180deg, #383854 0%, #222238 100%); color: var(--c-text); }
-.drum-btn:active { transform: scale(0.92); }
+.drum-btn:hover {
+  background: var(--lock-btn-hi);
+  color: #e0e0f0;
+}
+
+/* Pressed arrow — lighter elevated plate (matches target interaction cue) */
+.drum-btn:active,
+.drum-btn--pressed {
+  background: linear-gradient(180deg, #6a6a88 0%, #525272 100%);
+  border-color: #8a8aa8;
+  color: #f4f4ff;
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    0 0 0 1px rgba(180,180,220,0.18);
+}
 
 /* ── DRUM COLUMN ─────────────────────────────────────────────────── */
 .lock__drums {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  flex: 1 1 0;      /* fill all remaining space */
+  gap: 10px;
+  flex: 1 1 0;
   min-width: 0;
+  padding: 8px 0;
 }
 
 /* Individual drum window — horizontal tumbler */
 .drum {
   width: 100%;
-  height: 54px;
+  height: var(--lock-row-h);
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #06060e 0%, #0e0e1c 50%, #06060e 100%);
-  border: 2px solid var(--c-border-2);
+  background: var(--lock-drum);
+  border: 1.5px solid var(--lock-drum-border);
   border-radius: 8px;
   cursor: pointer;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), inset 0 -2px 8px rgba(0,0,0,0.8);
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.9);
   transition: border-color var(--t-base), box-shadow var(--t-base);
 }
 
 .drum--correct {
   border-color: var(--c-green);
+  border-width: 2px;
   box-shadow:
-    inset 0 2px 8px rgba(0,0,0,0.8),
-    0 0 10px var(--c-green-glow),
-    0 0 20px var(--c-green-glow);
+    inset 0 2px 10px rgba(0,0,0,0.9),
+    0 0 0 1px rgba(34, 197, 94, 0.45);
 }
 
-/* Ghost letters */
+/* Ghost letters — dim prev/next neighbors */
 .drum__ghost {
   flex: 1;
   text-align: center;
   font-size: 15px;
-  font-weight: 700;
-  font-family: 'Courier New', monospace;
-  color: rgba(255,255,255,0.22);
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  color: rgba(228, 228, 240, 0.26);
   pointer-events: none;
   position: relative;
   z-index: 1;
@@ -411,23 +448,24 @@ button {
   flex: 1;
   text-align: center;
   font-size: 28px;
-  font-weight: 900;
-  font-family: 'Courier New', monospace;
-  color: var(--c-text);
+  font-weight: 800;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  color: #ffffff;
   pointer-events: none;
   position: relative;
   z-index: 1;
 }
 
 .drum--correct .drum__active { color: var(--c-green); }
-.drum--correct .drum__ghost  { color: rgba(34,197,94,0.3); }
+.drum--correct .drum__ghost  { color: rgba(34, 197, 94, 0.45); }
 
-/* Fade overlays — left and right edges */
+/* Soft edge fades so neighbors read as recessed */
 .drum__fade--l {
   position: absolute;
   top: 0; bottom: 0; left: 0;
-  width: 30%;
-  background: linear-gradient(to right, rgba(6,6,14,0.95) 0%, transparent 100%);
+  width: 24%;
+  background: linear-gradient(to right, rgba(5,5,12,0.88) 0%, transparent 100%);
   pointer-events: none;
   z-index: 2;
 }
@@ -435,8 +473,8 @@ button {
 .drum__fade--r {
   position: absolute;
   top: 0; bottom: 0; right: 0;
-  width: 30%;
-  background: linear-gradient(to left, rgba(6,6,14,0.95) 0%, transparent 100%);
+  width: 24%;
+  background: linear-gradient(to left, rgba(5,5,12,0.88) 0%, transparent 100%);
   pointer-events: none;
   z-index: 2;
 }
@@ -934,10 +972,11 @@ button {
 /* ── RESPONSIVE ─────────────────────────────────────────────────── */
 @media (max-width: 360px) {
   .wordmark        { font-size: 17px; letter-spacing: 4px; }
-  .dial-window     { height: 44px; }
-  .dial-btn        { width: 38px; height: 44px; font-size: 13px; }
-  .dial-letter     { font-size: 20px; }
-  .dials-row       { gap: 5px; }
+  .lock            { width: min(100%, 300px); --lock-row-h: 50px; }
+  .lock__btns      { width: 108px; }
+  .lock__shackle   { width: 128px; height: 78px; border-width: 22px; }
+  .drum__active    { font-size: 24px; }
+  .drum__ghost     { font-size: 13px; }
   .game            { gap: 12px; padding: 14px 12px 28px; }
 }
 
