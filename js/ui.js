@@ -80,12 +80,8 @@ export function renderHint() {
  */
 export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, onSwipeEnd) {
   const { wheels, positions, correct } = getState()
-
-  const dialsEl  = document.getElementById('dials-row')
-  const arrowCol = document.getElementById('arrows-col')
-
-  dialsEl.innerHTML  = ''
-  arrowCol.innerHTML = ''
+  const container = document.getElementById('dials-row')
+  container.innerHTML = ''
 
   wheels.forEach((wheel, i) => {
     const pos       = positions[i]
@@ -95,50 +91,42 @@ export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, 
     const next      = wheel[(pos + 1) % len]
     const isCorrect = correct[i]
 
-    // Arrow pair for this dial row
-    const arrowPair = document.createElement('div')
-    arrowPair.className = 'arrow-pair'
+    // Full row: [<] [>] | [letter window]
+    const row = document.createElement('div')
+    row.className = 'dial-row'
 
     const lBtn = document.createElement('button')
-    lBtn.className = 'arrow-btn'
-    lBtn.dataset.dial = i
-    lBtn.setAttribute('aria-label', `Dial ${i + 1} left`)
+    lBtn.className = 'dial-ctrl'
+    lBtn.setAttribute('aria-label', `Dial ${i + 1} previous`)
     lBtn.setAttribute('tabindex', '-1')
-    lBtn.textContent = '‹'
+    lBtn.textContent = '\u2039'
     lBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinLeft(i) })
 
     const rBtn = document.createElement('button')
-    rBtn.className = 'arrow-btn'
-    rBtn.dataset.dial = i
-    rBtn.setAttribute('aria-label', `Dial ${i + 1} right`)
+    rBtn.className = 'dial-ctrl'
+    rBtn.setAttribute('aria-label', `Dial ${i + 1} next`)
     rBtn.setAttribute('tabindex', '-1')
-    rBtn.textContent = '›'
+    rBtn.textContent = '\u203a'
     rBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinRight(i) })
 
-    arrowPair.appendChild(lBtn)
-    arrowPair.appendChild(rBtn)
-    arrowCol.appendChild(arrowPair)
+    const win = document.createElement('div')
+    win.className    = `dial-window${isCorrect ? ' dial-window--correct' : ''}`
+    win.id           = `dial-${i}`
+    win.dataset.dial = i
+    win.setAttribute('role', 'spinbutton')
+    win.setAttribute('aria-label', `Dial ${i + 1}: ${cur}`)
+    win.setAttribute('tabindex', '0')
+    win.innerHTML = `<span class="dial-window__ghost">${prev}</span><span class="dial-window__active">${cur}</span><span class="dial-window__ghost">${next}</span>`
 
-    // Dial window
-    const dial = document.createElement('div')
-    dial.className    = `dial${isCorrect ? ' dial--correct' : ''}`
-    dial.id           = `dial-${i}`
-    dial.dataset.dial = i
-    dial.setAttribute('role', 'spinbutton')
-    dial.setAttribute('aria-label', `Dial ${i + 1}: ${cur}`)
-    dial.setAttribute('tabindex', '0')
+    win.addEventListener('pointerdown',   e => onSwipeStart(e, i))
+    win.addEventListener('pointermove',   e => onSwipeMove(e, i))
+    win.addEventListener('pointerup',     e => onSwipeEnd(e, i))
+    win.addEventListener('pointercancel', e => onSwipeEnd(e, i))
 
-    dial.innerHTML = `
-      <span class="dial__letter dial__letter--ghost">${prev}</span>
-      <span class="dial__letter dial__letter--active">${cur}</span>
-      <span class="dial__letter dial__letter--ghost">${next}</span>`
-
-    dial.addEventListener('pointerdown',   e => onSwipeStart(e, i))
-    dial.addEventListener('pointermove',   e => onSwipeMove(e, i))
-    dial.addEventListener('pointerup',     e => onSwipeEnd(e, i))
-    dial.addEventListener('pointercancel', e => onSwipeEnd(e, i))
-
-    dialsEl.appendChild(dial)
+    row.appendChild(lBtn)
+    row.appendChild(rBtn)
+    row.appendChild(win)
+    container.appendChild(row)
   })
 }
 
@@ -155,41 +143,38 @@ export function updateDialDisplay(dialIdx, dir) {
   const cur   = wheel[pos]
   const next  = wheel[(pos + 1) % len]
 
-  const dial = document.getElementById(`dial-${dialIdx}`)
-  if (!dial) return
+  const win = document.getElementById(`dial-${dialIdx}`)
+  if (!win) return
 
   const isCorrect = correct[dialIdx]
+  const dy = dir > 0 ? '-40%' : '40%'
 
-  // Animate the strip
-  const letters = dial.querySelectorAll('.dial__letter')
-  const dy = dir > 0 ? '-33%' : '33%'
-
-  dial.style.transition = 'none'
-  dial.style.transform  = `translateY(${dy})`
-  dial.style.opacity    = '0.6'
+  win.style.transition = 'none'
+  win.style.transform  = `translateY(${dy})`
+  win.style.opacity    = '0.5'
 
   requestAnimationFrame(() => {
-    letters[0].textContent = prev
-    letters[1].textContent = cur
-    letters[2].textContent = next
-    dial.setAttribute('aria-label', `Dial ${dialIdx + 1}: ${cur}`)
+    win.querySelector('.dial-window__ghost:first-child').textContent = prev
+    win.querySelector('.dial-window__active').textContent = cur
+    win.querySelector('.dial-window__ghost:last-child').textContent = next
+    win.setAttribute('aria-label', `Dial ${dialIdx + 1}: ${cur}`)
 
     requestAnimationFrame(() => {
-      dial.style.transition = 'transform 0.1s ease, opacity 0.08s ease'
-      dial.style.transform  = 'translateY(0)'
-      dial.style.opacity    = '1'
+      win.style.transition = 'transform 0.1s ease, opacity 0.08s ease'
+      win.style.transform  = 'translateY(0)'
+      win.style.opacity    = '1'
     })
   })
 
-  dial.classList.toggle('dial--correct', isCorrect)
+  win.classList.toggle('dial-window--correct', isCorrect)
 }
 
 export function animateCrack() {
-  document.querySelectorAll('.dial').forEach((dial, i) => {
+  document.querySelectorAll('.dial-window').forEach((dial, i) => {
     setTimeout(() => {
-      dial.classList.add('dial--pop')
+      dial.classList.add('dial-window--pop')
       dial.addEventListener('animationend', () =>
-        dial.classList.remove('dial--pop'), { once: true })
+        dial.classList.remove('dial-window--pop'), { once: true })
     }, i * 60)
   })
 }
@@ -215,7 +200,7 @@ export function animateShake() {
 export function flashCorrectDials() {
   const { correct } = getState()
   correct.forEach((isCorrect, i) => {
-    if (isCorrect) document.getElementById(`dial-${i}`)?.classList.add('dial--correct')
+    if (isCorrect) document.getElementById(`dial-${i}`)?.classList.add('dial-window--correct')
   })
 }
 
