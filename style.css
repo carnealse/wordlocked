@@ -296,44 +296,47 @@ button {
 }
 
 /* ── DIALS ──────────────────────────────────────────────────────── */
+/* Vertical stack — one dial per row */
 .dials-row {
   display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-}
-
-.dial-col {
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 5px;
+  gap: 6px;
+  width: 100%;
 }
 
-/* Arrow buttons — minimum 44×44px touch targets */
+/* Each dial is a horizontal row: [▲] [window] [▼] */
+.dial-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Arrow buttons — 44px minimum touch target */
 .dial-btn {
+  flex-shrink: 0;
   width: 44px;
-  height: 30px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0,0,0,0.35);
   border: 1px solid var(--c-border);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--c-text-muted);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
-  min-height: 44px;
 }
 
 .dial-btn:hover  { background: var(--c-surface-2); color: var(--c-text); }
 .dial-btn:active { transform: scale(0.90); }
 
-/* Dial window */
+/* Dial window — full width between arrows */
 .dial-window {
-  width: 44px;
-  height: 58px;
+  flex: 1;
+  height: 52px;
   background: var(--c-bg);
   border: 2px solid var(--c-border-2);
   border-radius: 8px;
@@ -871,9 +874,9 @@ button {
 /* ── RESPONSIVE ─────────────────────────────────────────────────── */
 @media (max-width: 360px) {
   .wordmark        { font-size: 17px; letter-spacing: 4px; }
-  .dial-window     { width: 38px; height: 50px; }
-  .dial-btn        { width: 38px; }
-  .dial-letter     { font-size: 22px; }
+  .dial-window     { height: 44px; }
+  .dial-btn        { width: 38px; height: 44px; font-size: 13px; }
+  .dial-letter     { font-size: 20px; }
   .dials-row       { gap: 5px; }
   .game            { gap: 12px; padding: 14px 12px 28px; }
 }
