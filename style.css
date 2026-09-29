@@ -274,17 +274,30 @@ button {
 /* Body */
 .lock__body {
   position: relative;
-  background: linear-gradient(150deg,
-    var(--c-metal-hi)  0%,
-    var(--c-metal-mid) 45%,
-    var(--c-metal-lo)  100%
-  );
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    linear-gradient(160deg,
+      #6a6a88 0%,
+      #4a4a68 20%,
+      #383850 50%,
+      #2a2a40 80%,
+      #1e1e30 100%
+    );
   border-radius: var(--r-md);
-  padding: 16px 14px 14px;
+  padding: 16px 12px 14px;
   box-shadow:
-    0 8px 40px rgba(0,0,0,0.6),
-    0 2px 0 rgba(255,255,255,0.08) inset,
-    0 -1px 0 rgba(0,0,0,0.5) inset;
+    0 12px 48px rgba(0,0,0,0.7),
+    0 2px 0 rgba(255,255,255,0.12) inset,
+    0 -2px 0 rgba(0,0,0,0.6) inset,
+    2px 0 0 rgba(255,255,255,0.06) inset,
+    -2px 0 0 rgba(0,0,0,0.4) inset;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .lock__shine {
@@ -296,97 +309,159 @@ button {
 }
 
 /* ── DIALS ──────────────────────────────────────────────────────── */
-/* Vertical stack — one dial per row */
-.dials-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-}
-
-/* Each dial is a horizontal row: [▲] [window] [▼] */
-.dial-row {
+/* ── LOCK INNER LAYOUT ──────────────────────────────────────────── */
+/* Mirrors the physical layout: [arrows-left] [dials] [arrows-right] */
+.lock__inner {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
+  align-items: stretch;
+  gap: 10px;
+  position: relative;
 }
 
-/* Arrow buttons — 44px minimum touch target */
-.dial-btn {
+/* ── ARROW COLUMNS ───────────────────────────────────────────────── */
+.lock__arrows {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 4px;
   flex-shrink: 0;
+}
+
+.arrow-btn {
   width: 44px;
   height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.35);
+  background: linear-gradient(180deg, #3a3a50 0%, #22222e 100%);
   border: 1px solid var(--c-border);
   border-radius: 8px;
   color: var(--c-text-muted);
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
   transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
-.dial-btn:hover  { background: var(--c-surface-2); color: var(--c-text); }
-.dial-btn:active { transform: scale(0.90); }
+.arrow-btn:hover  { background: linear-gradient(180deg, #484860 0%, #2e2e40 100%); color: var(--c-text); }
+.arrow-btn:active { transform: scale(0.90); }
 
-/* Dial window — full width between arrows */
-.dial-window {
-  flex: 1;
-  height: 52px;
-  background: var(--c-bg);
-  border: 2px solid var(--c-border-2);
-  border-radius: 8px;
+/* ── DIALS COLUMN ────────────────────────────────────────────────── */
+.lock__dials {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  position: relative;
+}
+
+/* ── RED INDICATOR LINE ──────────────────────────────────────────── */
+/* Absolutely positioned over the center of the dial stack */
+.lock__indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Vertically centered within lock__inner */
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  background: var(--c-red, #ef4444);
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+}
+
+/* ── INDIVIDUAL DIAL ─────────────────────────────────────────────── */
+.dial {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   overflow: hidden;
-  box-shadow:
-    inset 0 3px 10px rgba(0,0,0,0.7),
-    inset 0 -2px 6px rgba(0,0,0,0.4);
-  transition: border-color var(--t-base), box-shadow var(--t-base);
+  background: linear-gradient(180deg,
+    #0d0d14 0%,
+    #181826 30%,
+    #1e1e2e 50%,
+    #181826 70%,
+    #0d0d14 100%
+  );
+  border: 1.5px solid var(--c-border-2);
+  border-radius: 6px;
   cursor: pointer;
   touch-action: none;
-  -webkit-user-select: none;
   user-select: none;
-}
-
-.dial-window--correct {
-  border-color: var(--c-green);
+  -webkit-user-select: none;
+  position: relative;
   box-shadow:
-    inset 0 3px 10px rgba(0,0,0,0.7),
-    0 0 10px var(--c-green-glow),
-    0 0 22px var(--c-green-glow);
+    inset 0 2px 8px rgba(0,0,0,0.8),
+    inset 0 -2px 8px rgba(0,0,0,0.8);
+  transition: border-color var(--t-base);
 }
 
-.dial-strip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.dial-letter {
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: var(--c-text);
-  line-height: 1;
+/* Ridged texture lines on dial edges */
+.dial::before,
+.dial::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
   pointer-events: none;
 }
 
-.dial-window--correct .dial-letter { color: var(--c-green); }
+.dial::before { top: 17px; }
+.dial::after  { bottom: 17px; }
+
+.dial--correct {
+  border-color: var(--c-green);
+  box-shadow:
+    inset 0 2px 8px rgba(0,0,0,0.8),
+    0 0 10px var(--c-green-glow),
+    0 0 20px var(--c-green-glow);
+}
+
+/* Three letters: ghost / active / ghost */
+.dial__letter {
+  width: 100%;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dial__letter--ghost {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text-faint);
+  opacity: 0.5;
+}
+
+.dial__letter--active {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--c-text);
+  letter-spacing: 1px;
+}
+
+.dial--correct .dial__letter--active { color: var(--c-green); }
 
 /* Pop animation on crack */
-.dial-window--pop { animation: dial-pop 0.35s var(--ease-spring); }
+.dial--pop { animation: dial-pop 0.35s var(--ease-spring); }
 
 @keyframes dial-pop {
   0%   { transform: scale(1); }
-  50%  { transform: scale(1.2); }
+  50%  { transform: scale(1.08); }
   100% { transform: scale(1); }
 }
 
