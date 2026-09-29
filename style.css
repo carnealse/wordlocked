@@ -310,76 +310,64 @@ button {
 
 /* ── DIALS ──────────────────────────────────────────────────────── */
 /* ── LOCK INNER LAYOUT ──────────────────────────────────────────── */
-/* [arrow-col LEFT] [dials RIGHT — wide] */
-.lock__inner {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 10px;
-}
-
-/* ── ARROW COLUMN (left side) ────────────────────────────────────── */
-.lock__arrows {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-/* Each dial gets a pair of ‹ › buttons stacked vertically */
-.arrow-pair {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-}
-
-.arrow-btn {
-  flex: 1;
-  width: 48px;
-  min-height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, #3a3a52 0%, #22222e 100%);
-  border: 1px solid var(--c-border);
-  border-radius: 6px;
-  color: var(--c-text-muted);
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 1;
-  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-}
-
-.arrow-btn:hover  { background: linear-gradient(180deg, #484862 0%, #2e2e40 100%); color: var(--c-text); }
-.arrow-btn:active { transform: scale(0.92); }
-
-/* ── DIALS COLUMN (right side, wide) ────────────────────────────── */
+/* Stacked rows. Each row: [<] [>] | [letter window] */
 .lock__dials {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  flex: 1;
+  gap: 6px;
+  width: 100%;
 }
 
-/* ── INDIVIDUAL DIAL ─────────────────────────────────────────────── */
-.dial {
-  width: 100%;
+/* One horizontal dial row */
+.dial-row {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 5px;
   height: 52px;
+}
+
+/* ── CONTROL BUTTONS ─────────────────────────────────────────────── */
+.dial-ctrl {
+  width: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #2e2e42 0%, #1a1a28 100%);
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  color: var(--c-text-muted);
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -1px 0 rgba(0,0,0,0.4);
+}
+
+.dial-ctrl:hover  { background: linear-gradient(180deg, #3e3e58 0%, #262636 100%); color: var(--c-text); }
+.dial-ctrl:active { transform: scale(0.90); }
+
+/* ── LETTER WINDOW ───────────────────────────────────────────────── */
+.dial-window {
+  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   overflow: hidden;
   background: linear-gradient(180deg,
-    #0d0d14 0%,
-    #181826 30%,
-    #1e1e2e 50%,
-    #181826 70%,
-    #0d0d14 100%
+    #0a0a12 0%,
+    #14141f 25%,
+    #1c1c2c 50%,
+    #14141f 75%,
+    #0a0a12 100%
   );
-  border: 1.5px solid var(--c-border-2);
+  border: 2px solid var(--c-border-2);
   border-radius: 6px;
   cursor: pointer;
   touch-action: none;
@@ -387,70 +375,74 @@ button {
   -webkit-user-select: none;
   position: relative;
   box-shadow:
-    inset 0 2px 8px rgba(0,0,0,0.8),
-    inset 0 -2px 8px rgba(0,0,0,0.8);
-  transition: border-color var(--t-base);
+    inset 0 3px 10px rgba(0,0,0,0.8),
+    inset 0 -3px 10px rgba(0,0,0,0.8);
+  transition: border-color var(--t-base), box-shadow var(--t-base);
 }
 
-/* Ridged texture lines on dial edges */
-.dial::before,
-.dial::after {
+/* Top and bottom fade gradients for depth */
+.dial-window::before,
+.dial-window::after {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(255,255,255,0.06);
+  left: 0; right: 0;
+  height: 35%;
   pointer-events: none;
+  z-index: 2;
+}
+.dial-window::before {
+  top: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+}
+.dial-window::after {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
 }
 
-.dial::before { top: 17px; }
-.dial::after  { bottom: 17px; }
-
-.dial--correct {
+.dial-window--correct {
   border-color: var(--c-green);
   box-shadow:
-    inset 0 2px 8px rgba(0,0,0,0.8),
-    0 0 10px var(--c-green-glow),
-    0 0 20px var(--c-green-glow);
+    inset 0 3px 10px rgba(0,0,0,0.8),
+    0 0 12px var(--c-green-glow),
+    0 0 24px var(--c-green-glow);
 }
 
 /* Three letters: ghost / active / ghost */
-.dial__letter {
+.dial-window__ghost,
+.dial-window__active {
   width: 100%;
   text-align: center;
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1;
   pointer-events: none;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
-.dial__letter--ghost {
-  font-size: 13px;
+.dial-window__ghost {
+  font-size: 11px;
   font-weight: 600;
-  color: var(--c-text-faint);
-  opacity: 0.5;
+  color: rgba(255,255,255,0.18);
+  letter-spacing: 1px;
 }
 
-.dial__letter--active {
-  font-size: 24px;
+.dial-window__active {
+  font-size: 26px;
   font-weight: 800;
   color: var(--c-text);
   letter-spacing: 1px;
 }
 
-.dial--correct .dial__letter--active { color: var(--c-green); }
+.dial-window--correct .dial-window__active { color: var(--c-green); }
 
 /* Pop animation on crack */
-.dial--pop { animation: dial-pop 0.35s var(--ease-spring); }
+.dial-window--pop { animation: dial-pop 0.35s var(--ease-spring); }
 
 @keyframes dial-pop {
   0%   { transform: scale(1); }
-  50%  { transform: scale(1.08); }
+  50%  { transform: scale(1.06); }
   100% { transform: scale(1); }
 }
 
