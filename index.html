@@ -68,9 +68,26 @@
       <div class="lock__shackle" id="lock-shackle" aria-hidden="true"></div>
       <div class="lock__body" id="lock-body">
         <div class="lock__shine" aria-hidden="true"></div>
-        <div class="dials-row" id="dials-row" role="group" aria-label="Letter dials">
-          <!-- Injected by ui.js -->
+
+        <div class="lock__inner">
+          <!-- Left arrows -->
+          <div class="lock__arrows lock__arrows--left" id="arrows-left">
+            <!-- Injected per dial by ui.js -->
+          </div>
+
+          <!-- Dials -->
+          <div class="lock__dials" id="dials-row" role="group" aria-label="Letter dials">
+            <!-- Injected by ui.js -->
+          </div>
+
+          <!-- Right arrows -->
+          <div class="lock__arrows lock__arrows--right" id="arrows-right">
+            <!-- Injected per dial by ui.js -->
+          </div>
         </div>
+
+        <!-- Red indicator line across all dials -->
+        <div class="lock__indicator" aria-hidden="true"></div>
       </div>
     </div>
 
