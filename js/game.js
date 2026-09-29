@@ -8,7 +8,7 @@ import { getTodayUTC, getDayIndex, mulberry32, hashStr } from './seed.js'
 import { buildWheelsForWord, wheelIndexOf, advancePosition } from './dials.js'
 import { storage } from './storage.js'
 import {
-  getState, MAX,
+  getState,
   initState, restoreState, setDialPosition,
   applyGuess, advanceLevel,
   recordLevelResult, setStatus,
@@ -21,7 +21,7 @@ import {
   openModal, closeModal, navigateEndPage,
 } from './ui.js'
 import { recordResult, loadStats, renderStats } from './stats.js'
-import { buildShareText, copyToClipboard } from './share.js'
+import { shareResult } from './share.js'
 
 const STORAGE_DAILY = 'daily'
 
@@ -64,6 +64,7 @@ export async function boot() {
 
   const { status } = getState()
   if (status === 'won' || status === 'lost') {
+    document.getElementById('stats-actions').removeAttribute('hidden')
     setTimeout(() => {
       buildAndShowEndModal(status === 'won')
       startCountdownTimer()
@@ -220,6 +221,7 @@ async function submitGuess() {
       persist()
       recordResult(false, getState().totalGuesses)
       renderStats(loadStats(), null)
+      document.getElementById('stats-actions').removeAttribute('hidden')
       await sleep(500)
       buildAndShowEndModal(false)
       startCountdownTimer()
@@ -245,10 +247,18 @@ function persist() {
 
 // ── SHARE ─────────────────────────────────────────────────────────
 async function handleShare() {
-  const { dayIndex, guessesUsed, results } = getState()
-  const text = buildShareText(dayIndex, guessesUsed, MAX, results)
-  const ok   = await copyToClipboard(text)
-  showToast(ok ? 'COPIED TO CLIPBOARD' : 'COPY FAILED — try manually')
+  const { dayIndex, results, status } = getState()
+  if (status !== 'won' && status !== 'lost') {
+    showToast('FINISH TODAY\'S LOCKS TO SHARE')
+    return
+  }
+
+  const outcome = await shareResult(dayIndex, results)
+  if (outcome === 'shared')          showToast('SHARED')
+  else if (outcome === 'copied-image') showToast('IMAGE COPIED')
+  else if (outcome === 'copied')     showToast('COPIED TO CLIPBOARD')
+  else if (outcome === 'cancelled')  { /* user dismissed share sheet */ }
+  else                               showToast('SHARE FAILED — try manually')
 }
 
 // ── EVENTS ────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 # WORDLOCKED
 
-Crack the daily combination lock. Three words. Five guesses.
+Crack the daily combination lock. Three locks. Five guesses each.
 
 ## Architecture
 
@@ -24,7 +24,7 @@ wordlocked/
     seed.js               # Seeded RNG, day index, daily word selection
     storage.js            # Safe localStorage adapter
     stats.js              # Stats persistence and rendering
-    share.js              # Spoiler-free share card
+    share.js              # Spoiler-free share text + image card
 ```
 
 ## Design principles
