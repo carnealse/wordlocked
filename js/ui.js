@@ -74,9 +74,8 @@ export function renderHint() {
 // ── DIALS ─────────────────────────────────────────────────────────
 /**
  * Renders tumbler-style dials.
- * Each dial shows 3 letters: prev (top), current (center), next (bottom).
- * Left/right arrow buttons live in the side columns (#arrows-left / #arrows-right).
- * The red indicator line is pure CSS — positioned over the center row.
+ * Each dial shows 3 letters: prev | current | next in a horizontal drum window.
+ * Paired < > buttons live in the left control column (#lock-btns).
  */
 export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, onSwipeEnd) {
   const { wheels, positions, correct } = getState()
@@ -101,15 +100,29 @@ export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, 
     lBtn.className = 'drum-btn'
     lBtn.setAttribute('aria-label', `Dial ${i + 1} previous`)
     lBtn.setAttribute('tabindex', '-1')
-    lBtn.textContent = '‹'
-    lBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinLeft(i) })
+    lBtn.textContent = '<'
+    lBtn.addEventListener('pointerdown', e => {
+      e.preventDefault()
+      lBtn.classList.add('drum-btn--pressed')
+      onSpinLeft(i)
+    })
+    lBtn.addEventListener('pointerup',     () => lBtn.classList.remove('drum-btn--pressed'))
+    lBtn.addEventListener('pointerleave',  () => lBtn.classList.remove('drum-btn--pressed'))
+    lBtn.addEventListener('pointercancel', () => lBtn.classList.remove('drum-btn--pressed'))
 
     const rBtn = document.createElement('button')
     rBtn.className = 'drum-btn'
     rBtn.setAttribute('aria-label', `Dial ${i + 1} next`)
     rBtn.setAttribute('tabindex', '-1')
-    rBtn.textContent = '›'
-    rBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinRight(i) })
+    rBtn.textContent = '>'
+    rBtn.addEventListener('pointerdown', e => {
+      e.preventDefault()
+      rBtn.classList.add('drum-btn--pressed')
+      onSpinRight(i)
+    })
+    rBtn.addEventListener('pointerup',     () => rBtn.classList.remove('drum-btn--pressed'))
+    rBtn.addEventListener('pointerleave',  () => rBtn.classList.remove('drum-btn--pressed'))
+    rBtn.addEventListener('pointercancel', () => rBtn.classList.remove('drum-btn--pressed'))
 
     pair.appendChild(lBtn)
     pair.appendChild(rBtn)
