@@ -82,63 +82,63 @@ export function renderDials(onSpinLeft, onSpinRight, onSwipeStart, onSwipeMove, 
   const { wheels, positions, correct } = getState()
 
   const dialsEl  = document.getElementById('dials-row')
-  const leftEl   = document.getElementById('arrows-left')
-  const rightEl  = document.getElementById('arrows-right')
+  const arrowCol = document.getElementById('arrows-col')
 
-  dialsEl.innerHTML = ''
-  leftEl.innerHTML  = ''
-  rightEl.innerHTML = ''
+  dialsEl.innerHTML  = ''
+  arrowCol.innerHTML = ''
 
   wheels.forEach((wheel, i) => {
-    const pos    = positions[i]
-    const len    = wheel.length
-    const prev   = wheel[(pos - 1 + len) % len]
-    const cur    = wheel[pos]
-    const next   = wheel[(pos + 1) % len]
+    const pos       = positions[i]
+    const len       = wheel.length
+    const prev      = wheel[(pos - 1 + len) % len]
+    const cur       = wheel[pos]
+    const next      = wheel[(pos + 1) % len]
     const isCorrect = correct[i]
 
-    // Dial
+    // Arrow pair for this dial row
+    const arrowPair = document.createElement('div')
+    arrowPair.className = 'arrow-pair'
+
+    const lBtn = document.createElement('button')
+    lBtn.className = 'arrow-btn'
+    lBtn.dataset.dial = i
+    lBtn.setAttribute('aria-label', `Dial ${i + 1} left`)
+    lBtn.setAttribute('tabindex', '-1')
+    lBtn.textContent = '‹'
+    lBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinLeft(i) })
+
+    const rBtn = document.createElement('button')
+    rBtn.className = 'arrow-btn'
+    rBtn.dataset.dial = i
+    rBtn.setAttribute('aria-label', `Dial ${i + 1} right`)
+    rBtn.setAttribute('tabindex', '-1')
+    rBtn.textContent = '›'
+    rBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinRight(i) })
+
+    arrowPair.appendChild(lBtn)
+    arrowPair.appendChild(rBtn)
+    arrowCol.appendChild(arrowPair)
+
+    // Dial window
     const dial = document.createElement('div')
-    dial.className = `dial${isCorrect ? ' dial--correct' : ''}`
-    dial.id        = `dial-${i}`
+    dial.className    = `dial${isCorrect ? ' dial--correct' : ''}`
+    dial.id           = `dial-${i}`
     dial.dataset.dial = i
     dial.setAttribute('role', 'spinbutton')
     dial.setAttribute('aria-label', `Dial ${i + 1}: ${cur}`)
     dial.setAttribute('tabindex', '0')
-    dial.setAttribute('touch-action', 'none')
 
     dial.innerHTML = `
       <span class="dial__letter dial__letter--ghost">${prev}</span>
       <span class="dial__letter dial__letter--active">${cur}</span>
       <span class="dial__letter dial__letter--ghost">${next}</span>`
 
-    // Swipe events on dial
     dial.addEventListener('pointerdown',   e => onSwipeStart(e, i))
     dial.addEventListener('pointermove',   e => onSwipeMove(e, i))
     dial.addEventListener('pointerup',     e => onSwipeEnd(e, i))
     dial.addEventListener('pointercancel', e => onSwipeEnd(e, i))
 
     dialsEl.appendChild(dial)
-
-    // Left arrow
-    const lBtn = document.createElement('button')
-    lBtn.className = 'arrow-btn arrow-btn--left'
-    lBtn.dataset.dial = i
-    lBtn.setAttribute('aria-label', `Dial ${i + 1} left`)
-    lBtn.setAttribute('tabindex', '-1')
-    lBtn.textContent = '‹'
-    lBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinLeft(i) })
-    leftEl.appendChild(lBtn)
-
-    // Right arrow
-    const rBtn = document.createElement('button')
-    rBtn.className = 'arrow-btn arrow-btn--right'
-    rBtn.dataset.dial = i
-    rBtn.setAttribute('aria-label', `Dial ${i + 1} right`)
-    rBtn.setAttribute('tabindex', '-1')
-    rBtn.textContent = '›'
-    rBtn.addEventListener('pointerdown', e => { e.preventDefault(); onSpinRight(i) })
-    rightEl.appendChild(rBtn)
   })
 }
 
