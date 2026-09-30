@@ -50,15 +50,15 @@ function normalizeResults(results) {
 }
 
 /**
- * @param {number} dayIndex
+ * @param {number} puzzleNumber
  * @param {import('./state.js').LevelResult[]} results
  * @returns {string}
  */
-export function buildShareText(dayIndex, results) {
+export function buildShareText(puzzleNumber, results) {
   const locks = normalizeResults(results)
   const unlocked = unlockedCount(locks)
 
-  const header = `WORDLOCKED #${dayIndex} — ${unlocked}/3 unlocked`
+  const header = `WORDLOCKED #${puzzleNumber} — ${unlocked}/3 unlocked`
 
   const lines = locks.map((r, i) => {
     const label = `${LENGTHS[i]} letters`
@@ -74,11 +74,11 @@ export function buildShareText(dayIndex, results) {
 
 /**
  * Composite a share card using the original lock graphic asset.
- * @param {number} dayIndex
+ * @param {number} puzzleNumber
  * @param {import('./state.js').LevelResult[]} results
  * @returns {Promise<HTMLCanvasElement>}
  */
-export async function buildShareCanvas(dayIndex, results) {
+export async function buildShareCanvas(puzzleNumber, results) {
   const locks = normalizeResults(results)
   const unlocked = unlockedCount(locks)
   const art = await loadLockArt()
@@ -107,7 +107,7 @@ export async function buildShareCanvas(dayIndex, results) {
 
   ctx.fillStyle = '#6868a0'
   ctx.font = '500 36px system-ui, -apple-system, "Segoe UI", sans-serif'
-  ctx.fillText(`#${dayIndex} — ${unlocked}/3 unlocked`, W / 2, 250)
+  ctx.fillText(`#${puzzleNumber} — ${unlocked}/3 unlocked`, W / 2, 250)
 
   const scale = 1.55
   const destW = Math.round(SRC.solved.w * scale)
@@ -190,21 +190,21 @@ export async function copyToClipboard(text) {
 /**
  * Share image + text via Web Share API when available; otherwise clipboard.
  *
- * @param {number} dayIndex
+ * @param {number} puzzleNumber
  * @param {import('./state.js').LevelResult[]} results
  * @returns {Promise<'shared' | 'copied-image' | 'copied' | 'cancelled' | 'failed'>}
  */
-export async function shareResult(dayIndex, results) {
-  const text = buildShareText(dayIndex, results)
+export async function shareResult(puzzleNumber, results) {
+  const text = buildShareText(puzzleNumber, results)
 
   let blob = null
   try {
-    const canvas = await buildShareCanvas(dayIndex, results)
+    const canvas = await buildShareCanvas(puzzleNumber, results)
     blob = await canvasToPngBlob(canvas)
   } catch { /* image optional — text share still works */ }
 
   const file = blob
-    ? new File([blob], `wordlocked-${dayIndex}.png`, { type: 'image/png' })
+    ? new File([blob], `wordlocked-${puzzleNumber}.png`, { type: 'image/png' })
     : null
 
   if (file && navigator.canShare?.({ files: [file] })) {

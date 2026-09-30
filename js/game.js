@@ -4,7 +4,7 @@
  * Zero DOM access — coordinates state and delegates rendering to ui.js.
  */
 
-import { getTodayUTC, getDayIndex, mulberry32, hashStr } from './seed.js'
+import { getTodayUTC, getDayIndex, getPuzzleNumber, mulberry32, hashStr } from './seed.js'
 import { buildWheelsForWord, wheelIndexOf, advancePosition } from './dials.js'
 import { storage } from './storage.js'
 import {
@@ -20,7 +20,7 @@ import {
   showToast, buildAndShowEndModal, startCountdownTimer,
   openModal, closeModal, navigateEndPage,
 } from './ui.js'
-import { recordResult, loadStats, renderStats } from './stats.js'
+import { recordResult, backfillDistribution, loadStats, renderStats } from './stats.js'
 import { shareResult } from './share.js'
 
 const STORAGE_DAILY = 'daily'
@@ -39,7 +39,8 @@ export async function boot() {
   const hints    = wordObjs.map(o => o.hint)
 
   const saved    = storage.get(STORAGE_DAILY)
-  const isSameDay = saved?.todayStr === todayStr
+  const puzzleNumber = getPuzzleNumber(todayStr)
+  const isSameDay = saved?.todayStr === todayStr && saved?.puzzleNumber === puzzleNumber
 
   if (isSameDay) {
     const wheels    = buildWheelsForWord(words[saved.level], dayIndex, saved.level)
@@ -53,7 +54,7 @@ export async function boot() {
     const positions = defaultPositions(wheels, words[0], dayIndex, 0)
 
     initState({
-      todayStr, dayIndex, words, hints,
+      todayStr, dayIndex, puzzleNumber, words, hints,
       wheels, positions,
       correct: new Array(words[0].length).fill(false),
     })
@@ -62,8 +63,9 @@ export async function boot() {
   renderAll()
   bindEvents()
 
-  const { status } = getState()
+  const { status, results } = getState()
   if (status === 'won' || status === 'lost') {
+    backfillDistribution(todayStr, results)
     document.getElementById('stats-actions').removeAttribute('hidden')
     setTimeout(() => {
       buildAndShowEndModal(status === 'won')
@@ -73,6 +75,19 @@ export async function boot() {
 }
 
 // ── WORD LOADING ──────────────────────────────────────────────────
+/**
+ * Puzzle #N uses the word whose id is N in each bank.
+ * @param {Array<{id: number, word: string, hint: string}>} bank
+ * @param {number} puzzleNumber
+ */
+function wordForPuzzle(bank, puzzleNumber) {
+  const matches = bank.filter(entry => entry.id === puzzleNumber)
+  if (matches.length !== 1) {
+    throw new Error(`Expected one word with id ${puzzleNumber}, found ${matches.length}`)
+  }
+  return matches[0]
+}
+
 async function loadWords(todayStr) {
   const [bank4, bank5, bank6] = await Promise.all([
     fetch('words/4-letters.json').then(r => r.json()),
@@ -80,9 +95,8 @@ async function loadWords(todayStr) {
     fetch('words/6-letters.json').then(r => r.json()),
   ])
 
-  const seed = hashStr(todayStr)
-  const rng  = mulberry32(seed)
-  return [bank4, bank5, bank6].map(bank => bank[Math.floor(rng() * bank.length)])
+  const puzzleNumber = getPuzzleNumber(todayStr)
+  return [bank4, bank5, bank6].map(bank => wordForPuzzle(bank, puzzleNumber))
 }
 
 // ── INITIAL POSITIONS ─────────────────────────────────────────────
@@ -205,8 +219,9 @@ async function submitGuess() {
     } else {
       setStatus('won')
       persist()
-      const stats = recordResult(true, getState().totalGuesses)
-      renderStats(stats, getState().totalGuesses)
+      const { results, todayStr } = getState()
+      const stats = recordResult(true, results, todayStr)
+      renderStats(stats, results)
       document.getElementById('stats-actions').removeAttribute('hidden')
       await sleep(200)
       buildAndShowEndModal(true)
@@ -219,8 +234,9 @@ async function submitGuess() {
       recordLevelResult(false)
       setStatus('lost')
       persist()
-      recordResult(false, getState().totalGuesses)
-      renderStats(loadStats(), null)
+      const finished = getState()
+      recordResult(false, finished.results, finished.todayStr)
+      renderStats(loadStats(), finished.results)
       document.getElementById('stats-actions').removeAttribute('hidden')
       await sleep(500)
       buildAndShowEndModal(false)
@@ -237,23 +253,24 @@ async function submitGuess() {
 
 // ── PERSIST ───────────────────────────────────────────────────────
 function persist() {
-  const { todayStr, dayIndex, level, guessesUsed, totalGuesses,
+  const { todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
           positions, correct, results, status } = getState()
   storage.set(STORAGE_DAILY, {
-    todayStr, dayIndex, level, guessesUsed, totalGuesses,
+    todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
     positions, correct, results, status,
   })
 }
 
 // ── SHARE ─────────────────────────────────────────────────────────
 async function handleShare() {
-  const { dayIndex, results, status } = getState()
+  const { todayStr, results, status } = getState()
   if (status !== 'won' && status !== 'lost') {
     showToast('FINISH TODAY\'S LOCKS TO SHARE')
     return
   }
 
-  const outcome = await shareResult(dayIndex, results)
+  const puzzleNumber = getPuzzleNumber(todayStr || getTodayUTC())
+  const outcome = await shareResult(puzzleNumber, results)
   if (outcome === 'shared')          showToast('SHARED')
   else if (outcome === 'copied-image') showToast('IMAGE COPIED')
   else if (outcome === 'copied')     showToast('COPIED TO CLIPBOARD')
@@ -265,7 +282,9 @@ async function handleShare() {
 function bindEvents() {
   document.getElementById('btn-how').addEventListener('click', () => openModal('modal-how'))
   document.getElementById('btn-stats').addEventListener('click', () => {
-    renderStats(loadStats(), null)
+    const { status, results } = getState()
+    const highlight = (status === 'won' || status === 'lost') ? results : null
+    renderStats(loadStats(), highlight)
     openModal('modal-stats')
   })
 

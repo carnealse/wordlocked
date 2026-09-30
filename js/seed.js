@@ -13,11 +13,24 @@ export function getTodayUTC() {
   return `${y}-${m}-${day}`
 }
 
-/** Days elapsed since epoch date — used as puzzle number */
+/**
+ * UTC date of public puzzle #1.
+ * Puzzle numbers increase by one each UTC midnight after this day.
+ */
+export const LAUNCH_DATE = '2026-09-30'
+
+/** Days elapsed since the RNG epoch. Seeds dials — not the public puzzle number. */
 export function getDayIndex(dateStr) {
   const epoch = Date.UTC(2025, 0, 1)
   const today = new Date(`${dateStr}T00:00:00Z`).getTime()
   return Math.floor((today - epoch) / 86_400_000)
+}
+
+/** Public puzzle number. Launch day is #1. */
+export function getPuzzleNumber(dateStr) {
+  const launch = new Date(`${LAUNCH_DATE}T00:00:00Z`).getTime()
+  const today = new Date(`${dateStr}T00:00:00Z`).getTime()
+  return Math.floor((today - launch) / 86_400_000) + 1
 }
 
 /**

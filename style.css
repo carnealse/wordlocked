@@ -766,24 +766,52 @@ button {
   margin-bottom: 10px;
 }
 
-.dist__bars {
+.dist__cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dist-col {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dist-col__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  margin-bottom: 4px;
+}
+
+.dist-col__len {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--c-text);
+}
+
+.dist-col__unit {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--c-text-muted);
 }
 
 .dist-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   font-size: 12px;
 }
 
-.dist-label { width: 12px; text-align: right; color: var(--c-text-muted); }
+.dist-label { width: 8px; text-align: right; color: var(--c-text-muted); font-size: 10px; }
 
 .dist-track {
   flex: 1;
-  height: 22px;
+  height: 16px;
   background: var(--c-surface);
   border-radius: 4px;
   overflow: hidden;
@@ -795,11 +823,11 @@ button {
   border-radius: 4px;
   display: flex;
   align-items: center;
-  padding-left: 8px;
-  font-size: 11px;
+  padding-left: 4px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--c-text);
-  min-width: 28px;
+  min-width: 14px;
   transition: width 0.5s var(--ease);
 }
 
