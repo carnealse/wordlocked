@@ -48,7 +48,8 @@ NON_US_SPELLINGS = ROOT / 'tools' / 'non-us-spellings.txt'
 SCOWL_35 = Path('/usr/share/dict/american-english-small')
 SCOWL_50 = Path('/usr/share/dict/american-english')
 LENGTHS = (4, 5, 6)
-TARGET = 4000
+# Words per bank: 1,500 days is just over four years of puzzles.
+TARGET = 1500
 ORDER_SALT = 'wordlocked-v1'
 
 # Zipf is log10(occurrences per billion words): 3 is once per million.
