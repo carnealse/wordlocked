@@ -2,9 +2,10 @@
  * share.js
  * Spoiler-free share text + image card for end-of-day results.
  *
- * One row per lock. Each row shows one padlock icon per guess used:
- *   - solved:  (guesses - 1) neutral locks, then a green lock
- *   - failed:  5 neutral locks, then a red lock (6 icons)
+ * One row per lock. Each row shows one padlock icon per guess used,
+ * so a row is never longer than MAX_TRIES (5) icons:
+ *   - solved:      (guesses - 1) neutral locks, then a green lock
+ *   - failed:      (MAX_TRIES - 1) neutral locks, then a red lock
  *   - not reached: a single muted lock
  *
  * Icon: Phosphor "lock-fill" (MIT, (c) 2023 Phosphor Icons), embedded as
@@ -46,9 +47,9 @@ function normalizeResults(results) {
   const rows = []
   for (let i = 0; i < 3; i++) {
     const r = results[i]
-    if (!r)             rows.push({ kind: 'unreached', tries: 0 })
-    else if (r.solved)  rows.push({ kind: 'solved', tries: r.tries })
-    else                rows.push({ kind: 'failed', tries: MAX_TRIES })
+    if (!r)            rows.push({ kind: 'unreached', tries: 0 })
+    else if (r.solved) rows.push({ kind: 'solved', tries: r.tries })
+    else               rows.push({ kind: 'failed', tries: MAX_TRIES })
   }
   return rows
 }
@@ -59,7 +60,7 @@ function normalizeResults(results) {
  */
 function rowIcons(row) {
   if (row.kind === 'unreached') return ['muted']
-  const misses = Array(row.kind === 'solved' ? row.tries - 1 : MAX_TRIES).fill('neutral')
+  const misses = Array(row.kind === 'solved' ? row.tries - 1 : MAX_TRIES - 1).fill('neutral')
   return [...misses, row.kind === 'solved' ? 'green' : 'red']
 }
 
@@ -92,11 +93,12 @@ export function buildShareText(puzzleNumber, results) {
 const W = 1080
 const H = 960
 
-const ICON_SIZE = 88
-const ICON_GAP  = 14
-const ROW_X_LABEL = 80
-const ROW_X_ICONS = 400
-const ROW_Y = [400, 550, 700]
+const ICON_SIZE   = 100
+const ICON_GAP    = 16
+const LABEL_GAP   = 56
+const ROW_Y       = [400, 550, 700]
+const FONT        = 'system-ui, -apple-system, "Segoe UI", sans-serif'
+const LABEL_FONT  = `700 46px ${FONT}`
 
 const lockPath = typeof Path2D === 'function' ? new Path2D(LOCK_PATH) : null
 
@@ -116,7 +118,6 @@ function drawLock(ctx, x, yCenter, color) {
  */
 export function drawShareCard(ctx, puzzleNumber, results) {
   const rows = normalizeResults(results)
-  const font = 'system-ui, -apple-system, "Segoe UI", sans-serif'
 
   ctx.fillStyle = COLOR.bg
   ctx.fillRect(0, 0, W, H)
@@ -131,29 +132,36 @@ export function drawShareCard(ctx, puzzleNumber, results) {
   ctx.textBaseline = 'middle'
 
   ctx.fillStyle = COLOR.title
-  ctx.font = `700 76px ${font}`
+  ctx.font = `700 76px ${FONT}`
   ctx.fillText('WORDLOCKED', W / 2, 150)
 
   ctx.fillStyle = COLOR.sub
-  ctx.font = `500 38px ${font}`
+  ctx.font = `500 38px ${FONT}`
   ctx.fillText(`Puzzle #${puzzleNumber}  \u00b7  ${unlockedCount(results)}/3 unlocked`, W / 2, 224)
+
+  // Center the widest possible row (label + MAX_TRIES icons) in the card.
+  ctx.font = LABEL_FONT
+  const labelW  = Math.ceil(Math.max(...LENGTHS.map(n => ctx.measureText(`${n} Letters`).width)))
+  const iconsW  = MAX_TRIES * ICON_SIZE + (MAX_TRIES - 1) * ICON_GAP
+  const labelX  = Math.round((W - (labelW + LABEL_GAP + iconsW)) / 2)
+  const iconsX  = labelX + labelW + LABEL_GAP
 
   rows.forEach((row, i) => {
     const y = ROW_Y[i]
 
     ctx.textAlign = 'left'
     ctx.fillStyle = COLOR.label
-    ctx.font = `700 46px ${font}`
-    ctx.fillText(`${LENGTHS[i]} Letters`, ROW_X_LABEL, y)
+    ctx.font = LABEL_FONT
+    ctx.fillText(`${LENGTHS[i]} Letters`, labelX, y)
 
     rowIcons(row).forEach((key, n) => {
-      drawLock(ctx, ROW_X_ICONS + n * (ICON_SIZE + ICON_GAP), y, COLOR[key])
+      drawLock(ctx, iconsX + n * (ICON_SIZE + ICON_GAP), y, COLOR[key])
     })
   })
 
   ctx.textAlign = 'center'
   ctx.fillStyle = COLOR.footer
-  ctx.font = `500 30px ${font}`
+  ctx.font = `500 30px ${FONT}`
   ctx.fillText('wordlocked.com', W / 2, H - 90)
 }
 
