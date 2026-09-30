@@ -7,6 +7,7 @@
 import { getState } from './state.js'
 import { LOCK_LENGTHS, LOCK_COUNT, MAX_GUESSES } from './config.js'
 import { pickFailMessage, pickConsolation, pickWinMessage } from './messages.js'
+import { nextPuzzleAt } from './seed.js'
 
 // ── TOAST ────────────────────────────────────────────────────────
 let _toastTimer = null
@@ -311,13 +312,21 @@ export function flashCorrectDials() {
 // ── COUNTDOWN TIMER ───────────────────────────────────────────────
 let _timerInterval = null
 
-export function startCountdownTimer() {
+/**
+ * Counts down to the next puzzle in the stats modal.
+ * @param {() => void} onRollover  called once when the next puzzle is live
+ */
+export function startCountdownTimer(onRollover) {
   const el = document.getElementById('next-timer')
   if (!el) return
+  const next = nextPuzzleAt().getTime()
   const tick = () => {
-    const now  = new Date()
-    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1))
-    const ms   = next - now
+    const ms = next - Date.now()
+    if (ms <= 0) {
+      clearInterval(_timerInterval)
+      onRollover()
+      return
+    }
     const h = String(Math.floor(ms / 3_600_000)).padStart(2, '0')
     const m = String(Math.floor((ms % 3_600_000) / 60_000)).padStart(2, '0')
     const s = String(Math.floor((ms % 60_000) / 1_000)).padStart(2, '0')
