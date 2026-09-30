@@ -75,16 +75,17 @@ export async function boot() {
 
 // ── WORD LOADING ──────────────────────────────────────────────────
 /**
- * Puzzle #N uses the word whose id is N in each bank.
+ * Puzzle #N uses the word whose id is N in each bank, wrapping to id 1 once
+ * a bank runs out. Banks differ in size, so the daily trio keeps changing.
+ * Banks are written by tools/build_word_banks.py with ids 1..length in order.
  * @param {Array<{id: number, word: string, hint: string}>} bank
  * @param {number} puzzleNumber
  */
 function wordForPuzzle(bank, puzzleNumber) {
-  const matches = bank.filter(entry => entry.id === puzzleNumber)
-  if (matches.length !== 1) {
-    throw new Error(`Expected one word with id ${puzzleNumber}, found ${matches.length}`)
-  }
-  return matches[0]
+  const id = ((puzzleNumber - 1) % bank.length) + 1
+  const entry = bank[id - 1]
+  if (entry?.id !== id) throw new Error(`Word bank is out of order at id ${id}`)
+  return entry
 }
 
 async function fetchBank(length) {
