@@ -16,6 +16,7 @@
  * @typedef {Object} GameState
  * @property {string}         todayStr
  * @property {number}         dayIndex
+ * @property {number}         puzzleNumber   — public puzzle id; selects word id in each bank
  * @property {string[]}       words
  * @property {string[]}       hints
  * @property {number}         level          — 0 | 1 | 2
@@ -40,6 +41,7 @@ function _initial() {
   return {
     todayStr:     '',
     dayIndex:     0,
+    puzzleNumber: 0,
     words:        [],
     hints:        [],
     level:        0,

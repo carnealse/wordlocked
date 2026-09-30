@@ -42,4 +42,4 @@ Connect the repo to Vercel. Framework preset: **Other** (static). Deploys on eve
 
 ## Word banks
 
-Each bank is `{"word": "WORD", "hint": "Part of speech"}[]`. Replace with full curated lists before launch.
+Each bank is `{"id": 1, "word": "WORD", "hint": "Part of speech"}[]`. Puzzle #1 uses `id` 1 from each bank, puzzle #2 uses `id` 2, and so on. Replace with full curated lists before launch.

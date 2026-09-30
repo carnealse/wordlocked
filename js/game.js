@@ -39,7 +39,8 @@ export async function boot() {
   const hints    = wordObjs.map(o => o.hint)
 
   const saved    = storage.get(STORAGE_DAILY)
-  const isSameDay = saved?.todayStr === todayStr
+  const puzzleNumber = getPuzzleNumber(todayStr)
+  const isSameDay = saved?.todayStr === todayStr && saved?.puzzleNumber === puzzleNumber
 
   if (isSameDay) {
     const wheels    = buildWheelsForWord(words[saved.level], dayIndex, saved.level)
@@ -53,7 +54,7 @@ export async function boot() {
     const positions = defaultPositions(wheels, words[0], dayIndex, 0)
 
     initState({
-      todayStr, dayIndex, words, hints,
+      todayStr, dayIndex, puzzleNumber, words, hints,
       wheels, positions,
       correct: new Array(words[0].length).fill(false),
     })
@@ -74,6 +75,19 @@ export async function boot() {
 }
 
 // ── WORD LOADING ──────────────────────────────────────────────────
+/**
+ * Puzzle #N uses the word whose id is N in each bank.
+ * @param {Array<{id: number, word: string, hint: string}>} bank
+ * @param {number} puzzleNumber
+ */
+function wordForPuzzle(bank, puzzleNumber) {
+  const matches = bank.filter(entry => entry.id === puzzleNumber)
+  if (matches.length !== 1) {
+    throw new Error(`Expected one word with id ${puzzleNumber}, found ${matches.length}`)
+  }
+  return matches[0]
+}
+
 async function loadWords(todayStr) {
   const [bank4, bank5, bank6] = await Promise.all([
     fetch('words/4-letters.json').then(r => r.json()),
@@ -81,9 +95,8 @@ async function loadWords(todayStr) {
     fetch('words/6-letters.json').then(r => r.json()),
   ])
 
-  const seed = hashStr(todayStr)
-  const rng  = mulberry32(seed)
-  return [bank4, bank5, bank6].map(bank => bank[Math.floor(rng() * bank.length)])
+  const puzzleNumber = getPuzzleNumber(todayStr)
+  return [bank4, bank5, bank6].map(bank => wordForPuzzle(bank, puzzleNumber))
 }
 
 // ── INITIAL POSITIONS ─────────────────────────────────────────────
@@ -240,10 +253,10 @@ async function submitGuess() {
 
 // ── PERSIST ───────────────────────────────────────────────────────
 function persist() {
-  const { todayStr, dayIndex, level, guessesUsed, totalGuesses,
+  const { todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
           positions, correct, results, status } = getState()
   storage.set(STORAGE_DAILY, {
-    todayStr, dayIndex, level, guessesUsed, totalGuesses,
+    todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
     positions, correct, results, status,
   })
 }
