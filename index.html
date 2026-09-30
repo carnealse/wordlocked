@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#09090f" />
-  <meta name="description" content="WORDLOCKED — crack the daily combination lock. Three locks, five guesses each." />
+  <meta name="description" content="WORDLOCKED. Crack the daily combination lock. Three locks, five guesses each." />
   <meta property="og:title"       content="WORDLOCKED" />
   <meta property="og:description" content="Crack the daily combination lock. Three locks, five guesses each." />
   <meta property="og:type"        content="website" />
@@ -142,12 +142,26 @@
         <div class="dist__cols" id="dist-bars"></div>
       </div>
 
+      <button class="btn-ghost stats-trophies" id="btn-trophies">TROPHY CASE</button>
+
       <div class="modal-actions" id="stats-actions" hidden>
         <button class="btn-share" data-action="share">SHARE RESULT</button>
         <div class="next-puzzle">
           <span class="next-puzzle__label">NEXT PUZZLE</span>
           <span class="next-puzzle__timer" id="next-timer">--:--:--</span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TROPHY CASE ────────────────────────────────── -->
+  <div class="modal-overlay" id="modal-trophies" role="dialog" aria-modal="true"
+       aria-labelledby="trophies-title" hidden>
+    <div class="modal">
+      <button class="modal__close" data-close="modal-trophies" aria-label="Close">✕</button>
+      <h2 class="modal__title" id="trophies-title">TROPHY CASE</h2>
+      <div id="trophy-list">
+        <!-- Injected by ui.js -->
       </div>
     </div>
   </div>

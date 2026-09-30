@@ -18,10 +18,11 @@ import {
   updateDialDisplay, animateCrack, animateShackleOpen,
   resetShackle, animateShake, flashCorrectDials,
   showToast, buildAndShowEndModal, startCountdownTimer,
-  openModal, closeModal, navigateEndPage,
+  openModal, closeModal, navigateEndPage, openTrophyCase,
 } from './ui.js'
 import { recordResult, backfillDistribution, loadStats, renderStats } from './stats.js'
 import { shareResult } from './share.js'
+import { awardAchievements, trophyEntries } from './achievements.js'
 
 const STORAGE_DAILY = 'daily'
 
@@ -65,10 +66,11 @@ export async function boot() {
 
   const { status, results } = getState()
   if (status === 'won' || status === 'lost') {
-    backfillDistribution(todayStr, results)
+    const stats = backfillDistribution(todayStr, results)
+    const achievements = awardAchievements({ stats, today: todayContext() })
     document.getElementById('stats-actions').removeAttribute('hidden')
     setTimeout(() => {
-      buildAndShowEndModal(status === 'won')
+      buildAndShowEndModal(status === 'won', { achievements, trophies: trophyEntries() })
       startCountdownTimer()
     }, 300)
   }
@@ -97,6 +99,13 @@ async function loadWords(todayStr) {
 
   const puzzleNumber = getPuzzleNumber(todayStr)
   return [bank4, bank5, bank6].map(bank => wordForPuzzle(bank, puzzleNumber))
+}
+
+// ── END OF DAY ────────────────────────────────────────────────────
+/** The slice of state achievement checks need. */
+function todayContext() {
+  const { status, results, puzzleNumber } = getState()
+  return { status, results, puzzleNumber }
 }
 
 // ── INITIAL POSITIONS ─────────────────────────────────────────────
@@ -215,16 +224,17 @@ async function submitGuess() {
 
       resetShackle()
       renderAll()
-      showToast('LOCK CRACKED — NEXT LEVEL')
+      showToast('LOCK CRACKED. NEXT LEVEL')
     } else {
       setStatus('won')
       persist()
       const { results, todayStr } = getState()
       const stats = recordResult(true, results, todayStr)
       renderStats(stats, results)
+      const achievements = awardAchievements({ stats, today: todayContext() })
       document.getElementById('stats-actions').removeAttribute('hidden')
       await sleep(200)
-      buildAndShowEndModal(true)
+      buildAndShowEndModal(true, { achievements, trophies: trophyEntries() })
       startCountdownTimer()
     }
   } else {
@@ -235,14 +245,15 @@ async function submitGuess() {
       setStatus('lost')
       persist()
       const finished = getState()
-      recordResult(false, finished.results, finished.todayStr)
-      renderStats(loadStats(), finished.results)
+      const stats = recordResult(false, finished.results, finished.todayStr)
+      renderStats(stats, finished.results)
+      const achievements = awardAchievements({ stats, today: todayContext() })
       document.getElementById('stats-actions').removeAttribute('hidden')
       await sleep(500)
-      buildAndShowEndModal(false)
+      buildAndShowEndModal(false, { achievements, trophies: trophyEntries() })
       startCountdownTimer()
     } else {
-      showToast('NOT QUITE — KEEP SPINNING')
+      showToast('NOT QUITE. KEEP SPINNING')
     }
   }
 
@@ -275,7 +286,7 @@ async function handleShare() {
   else if (outcome === 'copied-image') showToast('IMAGE COPIED')
   else if (outcome === 'copied')     showToast('COPIED TO CLIPBOARD')
   else if (outcome === 'cancelled')  { /* user dismissed share sheet */ }
-  else                               showToast('SHARE FAILED — try manually')
+  else                               showToast('SHARE FAILED. Try manually')
 }
 
 // ── EVENTS ────────────────────────────────────────────────────────
@@ -286,6 +297,11 @@ function bindEvents() {
     const highlight = (status === 'won' || status === 'lost') ? results : null
     renderStats(loadStats(), highlight)
     openModal('modal-stats')
+  })
+
+  document.getElementById('btn-trophies').addEventListener('click', () => {
+    closeModal('modal-stats')
+    openTrophyCase(trophyEntries())
   })
 
   document.querySelectorAll('[data-close]').forEach(btn =>

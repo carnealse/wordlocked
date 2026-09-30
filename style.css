@@ -1045,3 +1045,52 @@ button {
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* ── TROPHY CASE ────────────────────────────────────────────────── */
+.stats-trophies { margin-top: 16px; }
+
+.end-page__reward { font-style: italic; }
+
+.trophy-count {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--c-text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.trophy-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.trophy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+}
+
+.trophy__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+.trophy__meta {
+  font-size: 11px;
+  color: var(--c-text-muted);
+}
+
+.trophy--earned { border-color: var(--c-gold-dim); }
+.trophy--earned .trophy__name { color: var(--c-gold); }
+
+.trophy--locked { opacity: 0.6; }
+.trophy--locked .trophy__name { letter-spacing: 3px; color: var(--c-text-muted); }
