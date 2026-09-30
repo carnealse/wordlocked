@@ -76,7 +76,7 @@ export async function boot() {
 // ── WORD LOADING ──────────────────────────────────────────────────
 /**
  * Puzzle #N uses the word whose id is N in each bank, wrapping to id 1 once
- * a bank runs out. Banks differ in size, so the daily trio keeps changing.
+ * a bank runs out, so the game keeps working until new banks are appended.
  * Banks are written by tools/build_word_banks.py with ids 1..length in order.
  * @param {Array<{id: number, word: string, hint: string}>} bank
  * @param {number} puzzleNumber
