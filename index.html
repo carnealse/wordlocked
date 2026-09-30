@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#09090f" />
-  <meta name="description" content="WORDLOCKED — crack the daily combination lock. Three words, five guesses." />
+  <meta name="description" content="WORDLOCKED — crack the daily combination lock. Three locks, five guesses each." />
   <meta property="og:title"       content="WORDLOCKED" />
-  <meta property="og:description" content="Crack the daily combination lock. Three words, five guesses." />
+  <meta property="og:description" content="Crack the daily combination lock. Three locks, five guesses each." />
   <meta property="og:type"        content="website" />
   <title>WORDLOCKED</title>
   <link rel="stylesheet" href="style.css" />
@@ -28,7 +28,7 @@
 
     <!-- Guess tracker -->
     <div class="guess-track" aria-label="Guess tracker">
-      <span class="guess-track__label">GUESSES</span>
+      <span class="guess-track__label">THIS LOCK</span>
       <div class="pips" role="img" aria-label="Guess pips">
         <span class="pip" data-pip="0" aria-hidden="true"></span>
         <span class="pip" data-pip="1" aria-hidden="true"></span>
@@ -97,9 +97,10 @@
       <button class="modal__close" data-close="modal-how" aria-label="Close">✕</button>
       <h2 class="modal__title" id="how-title">HOW TO PLAY</h2>
       <div class="how">
-        <p>Crack <strong>3 combination locks</strong> with only <strong>5 total guesses</strong>.</p>
+        <p>Crack <strong>3 combination locks</strong> — each lock gives you <strong>5 guesses</strong>.</p>
         <ol class="how__steps">
           <li>Three locks in sequence: <strong>4 → 5 → 6 letters</strong>.</li>
+          <li>Each lock has its own pool of <strong>5 tries</strong>; the counter resets when you crack one.</li>
           <li>Spin the dials using the <strong>&lt; &gt; arrows</strong>, swipe, or type on a keyboard.</li>
           <li>Press <strong>TRY THE LOCK</strong> to submit your guess.</li>
           <li>A <span class="c-green">green dial</span> means correct letter, correct position.</li>

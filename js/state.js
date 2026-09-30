@@ -20,7 +20,7 @@
  * @property {string[]}       hints
  * @property {number}         level          — 0 | 1 | 2
  * @property {number}         guessesUsed    — guesses used on current level (resets each level)
- * @property {number}         totalGuesses   — cumulative across all levels (for stats/share)
+ * @property {number}         totalGuesses   — cumulative across all levels (for stats)
  * @property {string[][]}     wheels
  * @property {number[]}       positions
  * @property {boolean[]}      correct

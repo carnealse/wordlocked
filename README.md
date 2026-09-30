@@ -1,6 +1,6 @@
 # WORDLOCKED
 
-Crack the daily combination lock. Three words. Five guesses.
+Crack the daily combination lock. Three locks. Five guesses each.
 
 ## Architecture
 
@@ -11,6 +11,8 @@ wordlocked/
   index.html              # Semantic markup, zero inline styles
   style.css               # BEM, design tokens, mobile-first
   vercel.json             # Static routing + cache headers
+  assets/
+    share-graphic-ref.png # Original share lock graphic (composited, not redrawn)
   words/
     4-letters.json        # Word bank — {word, hint}[]
     5-letters.json
@@ -24,7 +26,7 @@ wordlocked/
     seed.js               # Seeded RNG, day index, daily word selection
     storage.js            # Safe localStorage adapter
     stats.js              # Stats persistence and rendering
-    share.js              # Spoiler-free share card
+    share.js              # Spoiler-free share text + image card
 ```
 
 ## Design principles
