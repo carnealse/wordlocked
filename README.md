@@ -15,6 +15,7 @@ wordlocked/
     4-letters.json        # Word bank — {id, word, hint}[]
     5-letters.json
     6-letters.json
+  tools/                  # Word bank build script and its inputs (not deployed)
   js/
     main.js               # Entry point — imports boot()
     config.js             # Puzzle shape: lock lengths, guesses per lock
@@ -44,7 +45,11 @@ Connect the repo to Vercel. Framework preset: **Other** (static). Deploys on eve
 
 ## Word banks
 
-Each bank is `{"id": 1, "word": "WORD", "hint": "Part of speech"}[]`. Puzzle #1 uses `id` 1 from each bank, puzzle #2 uses `id` 2, and so on. Replace with full curated lists before launch.
+Each bank is `{"id": 1, "word": "WORD", "hint": "Part of speech"}[]`. Puzzle #N uses `id` N from each bank, wrapping to `id` 1 when a bank runs out.
+
+The banks are generated, not hand-edited. `tools/build_word_banks.py` keeps only common American English words from `tools/source-words.txt`: in SCOWL's common-word lists, frequent in everyday text, not blocklisted (`tools/blocklist.txt`), and not a British spelling (`tools/non-us-spellings.txt`). It then tags parts of speech with WordNet and fixes the puzzle order by a stable hash so difficulty is mixed. Setup and rules are in the script's docstring.
+
+Once the game is live, ids that have already been played must never change. After launch, append new words instead of rebuilding.
 
 ## Content
 
