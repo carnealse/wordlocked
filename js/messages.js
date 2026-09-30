@@ -25,9 +25,9 @@ export const FAIL_MESSAGES = [
   {
     title: 'LOCK STATUS REPORT',
     body: [
-      'Inspection complete. The lock is undamaged. Your confidence, however, took a hit.',
-      'The Bad News: That was not the word. It was not even in the same zip code as the word.',
-      'The Good News: A fresh vault is waiting tomorrow. The Lock has promised to act surprised when you return.',
+      'Inspection complete. The lock is undamaged. Your confidence in lock picking may be a different story.',
+      'The Bad News: That was not close to the correct word. It was not even in the same zip code as the word.',
+      'The Good News: A fresh set of locks will be delivered tomorrow! They promise to act surprised when you return.',
     ],
   },
   {
@@ -35,7 +35,7 @@ export const FAIL_MESSAGES = [
     body: [
       'The vault has reviewed your attempt and would like to file it under "brave."',
       'The Bad News: The tumblers never even flinched.',
-      'The Good News: New locks tomorrow. Bring snacks and a better guess.',
+      'The Good News: New locks tomorrow. Bring snacks and better guesses.',
     ],
   },
   {
@@ -43,7 +43,7 @@ export const FAIL_MESSAGES = [
     body: [
       'Local guesser defeated by padlock. Witnesses say the lock remained calm throughout.',
       'The Bad News: Sources confirm it was not even close.',
-      'The Good News: A rematch is scheduled for midnight UTC. The padlock has agreed to attend.',
+      'The Good News: A rematch is scheduled for tomorrow. The lock has agreed to attend.',
     ],
   },
   {
@@ -51,7 +51,7 @@ export const FAIL_MESSAGES = [
     body: [
       'That was a lot of spinning for a whole lot of nothing.',
       'The Bad News: The lock did not click. It did not even clear its throat.',
-      'The Good News: The vault resets tomorrow with brand new locks and a fresh supply of your optimism.',
+      'The Good News: The locks reset tomorrow with brand new words and a fresh supply of your optimism.',
     ],
   },
 ]
@@ -62,14 +62,14 @@ export const CONSOLATIONS = [
     title: 'CONSOLATION PRIZE',
     body: [
       'The combination lock has filed a restraining order. You are not permitted within 10 letters of it until tomorrow.',
-      'See you at midnight UTC, when the vault resets!',
+      'See you tomorrow, when the locks resets!',
     ],
   },
   {
     title: 'CONSOLATION PRIZE',
     body: [
-      'You have won a lifetime supply of almost.',
-      'Redeem it tomorrow at midnight UTC, when the vault resets.',
+      'You have won a lifetime supply of "almost got it" sauce.',
+      'Redeem it tomorrow, when the locks reset.',
     ],
   },
   {
@@ -83,14 +83,14 @@ export const CONSOLATIONS = [
     title: 'CONSOLATION PRIZE',
     body: [
       'The Lock would like to offer you a hug, but it has no arms. It is a padlock.',
-      'Try again at midnight UTC!',
+      'Try again tomorrow. The puzzle, not the hug.',
     ],
   },
   {
     title: 'CONSOLATION PRIZE',
     body: [
       'Every master locksmith has failed a lock. They just did it in private.',
-      'You did it in front of the whole vault. Bold. See you tomorrow!',
+      'You did it in front of the other lock solvers trying to get into the vault. Bold. See you tomorrow!',
     ],
   },
 ]
@@ -99,9 +99,9 @@ export const CONSOLATIONS = [
 export const WIN_MESSAGES = [
   { title: 'VAULT OPEN',         body: ['You cracked the combination.'] },
   { title: 'DOORS SWING OPEN',   body: ['The vault doors swing open.'] },
-  { title: 'CLICK CLICK CLICK',  body: ['The tumblers clicked into place.'] },
+  { title: 'CLICK CLICK CLICK',  body: ['The tumblers bow to your superiority.'] },
   { title: 'MASTERFUL',          body: ["That's the sound of mastery."] },
-  { title: 'COMBINATION CONFIRMED', body: ['Combination confirmed. The Lock is impressed and a little scared.'] },
+  { title: 'COMBINATION CONFIRMED', body: ['Nice. The Lock is impressed and a little scared.'] },
 ]
 
 /** Deterministic pick: same pool, salt, and puzzle number always give the same entry. */
