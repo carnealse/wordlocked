@@ -1,21 +1,54 @@
 /**
  * seed.js
  * Deterministic daily puzzle selection.
- * All players on the same UTC date receive identical words.
+ * The puzzle day is the calendar date in PUZZLE_TIME_ZONE, so every player
+ * worldwide is on the same puzzle at the same moment.
  */
 
-/** UTC date string → 'YYYY-MM-DD' */
-export function getTodayUTC() {
-  const d = new Date()
-  const y = d.getUTCFullYear()
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(d.getUTCDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
+import { PUZZLE_TIME_ZONE } from './config.js'
+
+// hourCycle h23: some engines otherwise report midnight as hour 24.
+const zoneClock = new Intl.DateTimeFormat('en-US', {
+  timeZone: PUZZLE_TIME_ZONE,
+  hourCycle: 'h23',
+  year: 'numeric', month: 'numeric', day: 'numeric',
+  hour: 'numeric', minute: 'numeric', second: 'numeric',
+})
+
+/** Wall-clock fields in PUZZLE_TIME_ZONE at `instant`. */
+function wallClock(instant) {
+  const f = {}
+  for (const { type, value } of zoneClock.formatToParts(instant)) f[type] = Number(value)
+  return f
+}
+
+/** How far PUZZLE_TIME_ZONE is ahead of UTC at `instant`, in ms (negative in the Americas). */
+function zoneOffsetMs(instant) {
+  const w = wallClock(instant)
+  const wallAsUtc = Date.UTC(w.year, w.month - 1, w.day, w.hour, w.minute, w.second)
+  return wallAsUtc - Math.floor(instant.getTime() / 1000) * 1000
+}
+
+/** Puzzle day at `now`, as 'YYYY-MM-DD'. */
+export function getPuzzleDate(now = new Date()) {
+  const { year, month, day } = wallClock(now)
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
 /**
- * UTC date of public puzzle #1.
- * Puzzle numbers increase by one each UTC midnight after this day.
+ * The instant the next puzzle day begins. Correct across DST changes:
+ * the offset is re-read at the target instant, not assumed from `now`.
+ */
+export function nextPuzzleAt(now = new Date()) {
+  const { year, month, day } = wallClock(now)
+  const midnightAsUtc = Date.UTC(year, month - 1, day + 1)
+  const guess = midnightAsUtc - zoneOffsetMs(now)
+  return new Date(midnightAsUtc - zoneOffsetMs(new Date(guess)))
+}
+
+/**
+ * Puzzle day of public puzzle #1.
+ * Puzzle numbers increase by one at each midnight in PUZZLE_TIME_ZONE after this day.
  */
 export const LAUNCH_DATE = '2026-09-30'
 

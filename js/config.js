@@ -15,3 +15,6 @@ export const LOCK_COUNT = LOCK_LENGTHS.length
 
 /** Guesses allowed per lock. */
 export const MAX_GUESSES = 5
+
+/** IANA zone whose midnight starts a new puzzle for every player worldwide. */
+export const PUZZLE_TIME_ZONE = 'America/New_York'
