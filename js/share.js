@@ -1,10 +1,38 @@
 /**
  * share.js
  * Spoiler-free share text + image card for end-of-day results.
+ *
+ * Lock artwork is the user's original share graphic asset — cropped and
+ * composited via drawImage. No canvas path redrawing of the locks.
  */
 
 const SITE_URL = 'https://wordlocked.com'
 const LENGTHS = [4, 5, 6]
+
+/** Untouched original lock graphic (user-provided). */
+const LOCK_ART_SRC = 'assets/share-graphic-ref.png'
+
+/**
+ * Source crops inside assets/share-graphic-ref.png (720×420).
+ * Solved = left lock (green face); failed = right lock (red ✕).
+ * Face rect is relative to the solved crop — used only to stamp the try count.
+ */
+const SRC = {
+  solved: { x: 60, y: 120, w: 160, h: 200, face: { x: 27, y: 89, w: 105, h: 87 } },
+  failed: { x: 500, y: 120, w: 160, h: 200 },
+}
+
+/** @type {HTMLImageElement | null} */
+let _lockArt = null
+
+async function loadLockArt() {
+  if (_lockArt?.complete && _lockArt.naturalWidth) return _lockArt
+  const img = new Image()
+  img.src = LOCK_ART_SRC
+  await img.decode()
+  _lockArt = img
+  return img
+}
 
 /** @param {import('./state.js').LevelResult[]} results */
 export function unlockedCount(results) {
@@ -12,7 +40,6 @@ export function unlockedCount(results) {
 }
 
 /**
- * Pad results to three locks (unreached levels count as failed / locked).
  * @param {import('./state.js').LevelResult[]} results
  * @returns {{ solved: boolean, tries: number }[]}
  */
@@ -46,14 +73,15 @@ export function buildShareText(dayIndex, results) {
 }
 
 /**
- * Draw the share card onto a canvas (matches media/share-graphic-ref.png layout).
+ * Composite a share card using the original lock graphic asset.
  * @param {number} dayIndex
  * @param {import('./state.js').LevelResult[]} results
- * @returns {HTMLCanvasElement}
+ * @returns {Promise<HTMLCanvasElement>}
  */
-export function buildShareCanvas(dayIndex, results) {
+export async function buildShareCanvas(dayIndex, results) {
   const locks = normalizeResults(results)
   const unlocked = unlockedCount(locks)
+  const art = await loadLockArt()
 
   const W = 1080
   const H = 1080
@@ -62,42 +90,63 @@ export function buildShareCanvas(dayIndex, results) {
   canvas.height = H
   const ctx = canvas.getContext('2d')
 
-  // Background
   ctx.fillStyle = '#09090f'
   ctx.fillRect(0, 0, W, H)
 
-  // Soft top glow
   const glow = ctx.createRadialGradient(W / 2, 0, 40, W / 2, 0, 520)
   glow.addColorStop(0, 'rgba(26, 26, 58, 0.9)')
   glow.addColorStop(1, 'rgba(9, 9, 15, 0)')
   ctx.fillStyle = glow
   ctx.fillRect(0, 0, W, H)
 
-  // Title
   ctx.fillStyle = '#e4e4f0'
   ctx.font = '700 72px system-ui, -apple-system, "Segoe UI", sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText('WORDLOCKED', W / 2, 180)
 
-  // Subtitle — unlocked metric (not guesses)
   ctx.fillStyle = '#6868a0'
   ctx.font = '500 36px system-ui, -apple-system, "Segoe UI", sans-serif'
   ctx.fillText(`#${dayIndex} — ${unlocked}/3 unlocked`, W / 2, 250)
 
-  // Three locks — geometry sampled from share-graphic-ref.png
+  const scale = 1.55
+  const destW = Math.round(SRC.solved.w * scale)
+  const destH = Math.round(SRC.solved.h * scale)
   const centers = [W * 0.22, W * 0.5, W * 0.78]
-  const lockY = 540
+  const lockMidY = 520
+
   centers.forEach((cx, i) => {
-    drawLock(ctx, cx, lockY, locks[i])
+    const r = locks[i]
+    const dx = Math.round(cx - destW / 2)
+    const dy = Math.round(lockMidY - destH / 2)
+
+    if (r.solved) {
+      const s = SRC.solved
+      ctx.drawImage(art, s.x, s.y, s.w, s.h, dx, dy, destW, destH)
+      // Stamp try count onto the existing green face (asset pixels for the lock stay)
+      const fx = dx + Math.round(s.face.x * scale)
+      const fy = dy + Math.round(s.face.y * scale)
+      const fw = Math.round(s.face.w * scale)
+      const fh = Math.round(s.face.h * scale)
+      ctx.fillStyle = '#22c55e'
+      ctx.fillRect(fx, fy, fw, fh)
+      ctx.fillStyle = '#111111'
+      ctx.font = `700 ${Math.round(56 * scale / 1.45)}px system-ui, -apple-system, "Segoe UI", sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(String(r.tries), fx + fw / 2, fy + fh / 2 + 1)
+    } else {
+      const s = SRC.failed
+      ctx.drawImage(art, s.x, s.y, s.w, s.h, dx, dy, destW, destH)
+    }
+
     ctx.fillStyle = '#6868a0'
     ctx.font = '600 28px system-ui, -apple-system, "Segoe UI", sans-serif'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
-    ctx.fillText(`${LENGTHS[i]} LETTERS`, cx, lockY + 170)
+    ctx.fillText(`${LENGTHS[i]} LETTERS`, cx, dy + destH + 8)
   })
 
-  // Footer
   ctx.fillStyle = '#3a3a58'
   ctx.font = '500 28px system-ui, -apple-system, "Segoe UI", sans-serif'
   ctx.textAlign = 'center'
@@ -105,86 +154,6 @@ export function buildShareCanvas(dayIndex, results) {
   ctx.fillText('wordlocked.com', W / 2, H - 100)
 
   return canvas
-}
-
-/** Flat lock fill from the reference graphic (RGB 228,228,240). */
-const LOCK_FILL = '#e4e4f0'
-const LOCK_INK = '#111111'
-
-/**
- * Padlock copied from share-graphic-ref.png:
- * flat #e4e4f0 body + U-shackle, rectangular status face, no metal bevels.
- *
- * Ref metrics (720-wide asset), scaled ~1.45× for the 1080 card:
- *   body 145×126, face 106×87, rim ~20, shackle stroke ~23, outer span ~102
- *
- * @param {CanvasRenderingContext2D} ctx
- * @param {number} cx
- * @param {number} cy  — center of lock body
- * @param {{ solved: boolean, tries: number }} result
- */
-function drawLock(ctx, cx, cy, result) {
-  const S = 1.45
-  const bodyW = Math.round(145 * S)
-  const bodyH = Math.round(126 * S)
-  const radius = Math.round(22 * S)
-  const faceW = Math.round(106 * S)
-  const faceH = Math.round(87 * S)
-  const shackleStroke = Math.round(23 * S)
-  // Distance between shackle stroke centerlines (ref outer 102 − stroke 23)
-  const shackleSpan = Math.round(79 * S)
-  const shackleRise = Math.round(62 * S)
-
-  const bodyTop = cy - bodyH / 2
-  const bodyLeft = cx - bodyW / 2
-  const half = shackleSpan / 2
-  const archCy = bodyTop - shackleRise + half
-
-  // Shackle — flat U, same fill as body
-  ctx.beginPath()
-  ctx.moveTo(cx - half, bodyTop + 2)
-  ctx.lineTo(cx - half, archCy)
-  ctx.arc(cx, archCy, half, Math.PI, 0, false)
-  ctx.lineTo(cx + half, bodyTop + 2)
-  ctx.strokeStyle = LOCK_FILL
-  ctx.lineWidth = shackleStroke
-  ctx.lineCap = 'butt'
-  ctx.lineJoin = 'round'
-  ctx.stroke()
-
-  // Body — flat rounded rect
-  roundRect(ctx, bodyLeft, bodyTop, bodyW, bodyH, radius)
-  ctx.fillStyle = LOCK_FILL
-  ctx.fill()
-
-  // Status face (ref face is wider than tall)
-  const faceX = cx - faceW / 2
-  const faceY = bodyTop + Math.round((bodyH - faceH) / 2)
-  ctx.fillStyle = result.solved ? '#22c55e' : '#ef4444'
-  ctx.fillRect(faceX, faceY, faceW, faceH)
-
-  const faceCy = faceY + faceH / 2
-  ctx.fillStyle = LOCK_INK
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  if (result.solved) {
-    ctx.font = `700 ${Math.round(52 * S)}px system-ui, -apple-system, "Segoe UI", sans-serif`
-    ctx.fillText(String(result.tries), cx, faceCy + 1)
-  } else {
-    ctx.font = `700 ${Math.round(48 * S)}px system-ui, -apple-system, "Segoe UI", sans-serif`
-    ctx.fillText('✕', cx, faceCy + 2)
-  }
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  const rr = Math.max(0, Math.min(r, w / 2, h / 2))
-  ctx.beginPath()
-  ctx.moveTo(x + rr, y)
-  ctx.arcTo(x + w, y, x + w, y + h, rr)
-  ctx.arcTo(x + w, y + h, x, y + h, rr)
-  ctx.arcTo(x, y + h, x, y, rr)
-  ctx.arcTo(x, y, x + w, y, rr)
-  ctx.closePath()
 }
 
 /** @returns {Promise<Blob>} */
@@ -220,7 +189,6 @@ export async function copyToClipboard(text) {
 
 /**
  * Share image + text via Web Share API when available; otherwise clipboard.
- * Preference order: native files share → native text share → image clipboard → text clipboard.
  *
  * @param {number} dayIndex
  * @param {import('./state.js').LevelResult[]} results
@@ -228,13 +196,12 @@ export async function copyToClipboard(text) {
  */
 export async function shareResult(dayIndex, results) {
   const text = buildShareText(dayIndex, results)
-  const canvas = buildShareCanvas(dayIndex, results)
-  let blob
+
+  let blob = null
   try {
+    const canvas = await buildShareCanvas(dayIndex, results)
     blob = await canvasToPngBlob(canvas)
-  } catch {
-    blob = null
-  }
+  } catch { /* image optional — text share still works */ }
 
   const file = blob
     ? new File([blob], `wordlocked-${dayIndex}.png`, { type: 'image/png' })
@@ -242,15 +209,10 @@ export async function shareResult(dayIndex, results) {
 
   if (file && navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({
-        title: 'WORDLOCKED',
-        text,
-        files: [file],
-      })
+      await navigator.share({ title: 'WORDLOCKED', text, files: [file] })
       return 'shared'
     } catch (err) {
       if (err?.name === 'AbortError') return 'cancelled'
-      // fall through
     }
   }
 
@@ -260,7 +222,6 @@ export async function shareResult(dayIndex, results) {
       return 'shared'
     } catch (err) {
       if (err?.name === 'AbortError') return 'cancelled'
-      // fall through
     }
   }
 

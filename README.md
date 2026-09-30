@@ -11,6 +11,8 @@ wordlocked/
   index.html              # Semantic markup, zero inline styles
   style.css               # BEM, design tokens, mobile-first
   vercel.json             # Static routing + cache headers
+  assets/
+    share-graphic-ref.png # Original share lock graphic (composited, not redrawn)
   words/
     4-letters.json        # Word bank — {word, hint}[]
     5-letters.json
