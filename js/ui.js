@@ -290,9 +290,9 @@ const FAIL_PAGES = [
   {
     title: 'SYSTEM ANNOUNCEMENT',
     body: [
-      'Well, well, well. Look who decided to play digital locksmith and locked themselves out of victory instead.',
-      "The Bad News: Today's password puzzle has thoroughly defeated you. The lock didn't even click. It just made a tiny, wet raspberry sound at you.",
-      "The Good News: The Lock is merciful. Mostly because watching you brings it phenomenal entertainment value. The vault resets tomorrow — you get to wake up, stare at a brand new blank screen, and confidently type complete gibberish all over again.",
+      'Well, well, well. Look who played digital locksmith and locked themselves out of victory instead.',
+      "The Bad News: Today's password puzzle won. The lock didn't even click. It just made a tiny, wet raspberry sound at you.",
+      "The Good News: The Lock is merciful. Mostly because you bring it phenomenal entertainment value. The vault resets tomorrow. You get to wake up, stare at brand new locks, and confidently guess gibberish all over again.",
     ],
     showAnswer: true,
   },
@@ -301,14 +301,14 @@ const FAIL_PAGES = [
     achievement: 'Linguistic Mistake Maker',
     body: [
       'You stared at the lock, threw a dictionary at it, and missed every single word.',
-      'Reward: A single dose of locked regret. This reward cannot be shared or re-gifted.',
+      'Reward: A single dose of unlocked regret. This reward cannot be shared or re-gifted.',
     ],
   },
   {
     title: 'CONSOLATION PRIZE',
     body: [
       'The combination lock has filed a restraining order. You are not permitted within 10 letters of it until tomorrow.',
-      'See you at midnight UTC, when the vault resets and you can confidently type complete gibberish all over again.',
+      'See you at midnight UTC, when the vault resets!',
     ],
   },
 ]
