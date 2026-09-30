@@ -5,6 +5,7 @@
  */
 
 import { getState, MAX } from './state.js'
+import { pickFailMessage, pickConsolation, pickWinMessage } from './messages.js'
 
 // ── TOAST ────────────────────────────────────────────────────────
 let _toastTimer = null
@@ -286,64 +287,81 @@ export function startCountdownTimer() {
 }
 
 // ── END MODAL ─────────────────────────────────────────────────────
-const FAIL_PAGES = [
-  {
-    title: 'SYSTEM ANNOUNCEMENT',
-    body: [
-      'Well, well, well. Look who played digital locksmith and locked themselves out of victory instead.',
-      "The Bad News: Today's password puzzle won. The lock didn't even click. It just made a tiny, wet raspberry sound at you.",
-      "The Good News: The Lock is merciful. Mostly because you bring it phenomenal entertainment value. The vault resets tomorrow. You get to wake up, stare at brand new locks, and confidently guess gibberish all over again.",
-    ],
-    showAnswer: true,
-  },
-  {
-    title: 'ACHIEVEMENT UNLOCKED',
-    achievement: 'Linguistic Mistake Maker',
-    body: [
-      'You stared at the lock, threw a dictionary at it, and missed every single word.',
-      'Reward: A single dose of unlocked regret. This reward cannot be shared or re-gifted.',
-    ],
-  },
-  {
-    title: 'CONSOLATION PRIZE',
-    body: [
-      'The combination lock has filed a restraining order. You are not permitted within 10 letters of it until tomorrow.',
-      'See you at midnight UTC, when the vault resets!',
-    ],
-  },
-]
-
-const WIN_LINES = [
-  'You cracked the combination.',
-  'The vault doors swing open.',
-  'The tumblers clicked into place.',
-  "That's the sound of mastery.",
-  'Combination confirmed.',
-]
-
 let _endPageIdx = 0
 let _endPages   = []
 
-export function buildAndShowEndModal(won) {
-  const { words, hints, level, results, totalGuesses } = getState()
+/**
+ * Builds the end-of-day pages from plain data and opens the modal.
+ *
+ * Page order:
+ *   won:  win message, achievements earned today, trophy case
+ *   lost: fail message (with answer), achievements earned today,
+ *         consolation prize, trophy case
+ *
+ * @param {boolean} won
+ * @param {{ achievements?: Array, trophies?: Array }} [extras]
+ */
+export function buildAndShowEndModal(won, { achievements = [], trophies = [] } = {}) {
+  const { words, hints, level, results, totalGuesses, puzzleNumber } = getState()
+  const pages = []
 
-  _endPages = won
-    ? [{
-        title: 'VAULT OPEN',
-        body: [
-          WIN_LINES[totalGuesses % WIN_LINES.length],
-          `You cracked all 3 locks using ${totalGuesses} total guesses.`,
-        ],
-      }]
-    : FAIL_PAGES.map((p, i) => ({
-        ...p,
-        answerWord: i === 0 ? (words[results.filter(r => r.solved).length] ?? words[level]) : null,
-        answerHint: i === 0 ? (hints[results.filter(r => r.solved).length] ?? hints[level]) : null,
-      }))
+  if (won) {
+    const msg = pickWinMessage(puzzleNumber)
+    pages.push({
+      title: msg.title,
+      body: [...msg.body, `You cracked all 3 locks using ${totalGuesses} total guesses.`],
+    })
+  } else {
+    const msg = pickFailMessage(puzzleNumber)
+    const failedIdx = results.filter(r => r.solved).length
+    pages.push({
+      title: msg.title,
+      body: msg.body,
+      answerWord: words[failedIdx] ?? words[level],
+      answerHint: hints[failedIdx] ?? hints[level],
+    })
+  }
 
+  achievements.forEach(a => pages.push({
+    title: 'ACHIEVEMENT UNLOCKED',
+    achievement: a.name,
+    body: a.body,
+    reward: a.reward,
+  }))
+
+  if (!won) {
+    const c = pickConsolation(puzzleNumber)
+    pages.push({ title: c.title, body: c.body })
+  }
+
+  pages.push({ title: 'TROPHY CASE', trophies })
+
+  _endPages   = pages
   _endPageIdx = 0
   _renderEndPages()
   openModal('modal-end')
+}
+
+function _trophyListHTML(trophies) {
+  const earned = trophies.filter(t => t.earnedOn !== null).length
+  const items = trophies.map(t => t.earnedOn !== null
+    ? `<li class="trophy trophy--earned">
+         <span class="trophy__name">${t.name}</span>
+         <span class="trophy__meta">Puzzle #${t.earnedOn}</span>
+       </li>`
+    : `<li class="trophy trophy--locked">
+         <span class="trophy__name">???</span>
+         <span class="trophy__meta">${t.hint}</span>
+       </li>`
+  ).join('')
+  return `<p class="trophy-count">${earned} / ${trophies.length} unlocked</p>
+          <ul class="trophy-list">${items}</ul>`
+}
+
+/** Opens the standalone trophy case modal. */
+export function openTrophyCase(trophies) {
+  document.getElementById('trophy-list').innerHTML = _trophyListHTML(trophies)
+  openModal('modal-trophies')
 }
 
 function _renderEndPages() {
@@ -355,12 +373,14 @@ function _renderEndPages() {
       <span class="achievement__label">ACHIEVEMENT UNLOCKED</span>
       <span class="achievement__name">${page.achievement}</span>
     </div>`
-    page.body.forEach(p => { html += `<p class="end-page__body">${p}</p>` })
+    ;(page.body ?? []).forEach(p => { html += `<p class="end-page__body">${p}</p>` })
+    if (page.reward)      html += `<p class="end-page__body end-page__reward">Reward: ${page.reward}</p>`
     if (page.answerWord)  html += `<div class="answer-reveal">
       The lock you couldn't crack:<br>
       <span class="answer-reveal__word">${page.answerWord}</span>
       <span class="answer-reveal__hint">${page.answerHint}</span>
     </div>`
+    if (page.trophies)    html += _trophyListHTML(page.trophies)
     html += '</div>'
     return html
   }).join('')
