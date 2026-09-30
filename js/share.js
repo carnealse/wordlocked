@@ -2,36 +2,34 @@
  * share.js
  * Spoiler-free share text + image card for end-of-day results.
  *
- * Lock artwork is the user's original share graphic asset — cropped and
- * composited via drawImage. No canvas path redrawing of the locks.
+ * One row per lock. Each row shows one padlock icon per guess used:
+ *   - solved:  (guesses - 1) neutral locks, then a green lock
+ *   - failed:  5 neutral locks, then a red lock (6 icons)
+ *   - not reached: a single muted lock
+ *
+ * Icon: Phosphor "lock-fill" (MIT, (c) 2023 Phosphor Icons), embedded as
+ * a path so there is no runtime dependency and no asset to load.
  */
 
-const SITE_URL = 'https://wordlocked.com'
-const LENGTHS = [4, 5, 6]
+const SITE_URL  = 'https://wordlocked.com'
+const LENGTHS   = [4, 5, 6]
+const MAX_TRIES = 5
 
-/** Untouched original lock graphic (user-provided). */
-const LOCK_ART_SRC = 'assets/share-graphic-ref.png'
+const LOCK_PATH =
+  'M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208' +
+  'a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-80,84a12,12,0,1,1,12-12A12,12,0,0,1,128,164Z' +
+  'm32-84H96V56a32,32,0,0,1,64,0Z'
 
-/**
- * Source crops inside assets/share-graphic-ref.png (720×420).
- * Solved = left lock (green face); failed = right lock (red ✕).
- * Face rect is relative to the solved crop — used only to stamp the try count.
- */
-const SRC = {
-  solved: { x: 60, y: 120, w: 160, h: 200, face: { x: 27, y: 89, w: 105, h: 87 } },
-  failed: { x: 500, y: 120, w: 160, h: 200 },
-}
-
-/** @type {HTMLImageElement | null} */
-let _lockArt = null
-
-async function loadLockArt() {
-  if (_lockArt?.complete && _lockArt.naturalWidth) return _lockArt
-  const img = new Image()
-  img.src = LOCK_ART_SRC
-  await img.decode()
-  _lockArt = img
-  return img
+const COLOR = {
+  bg:      '#09090f',
+  title:   '#e4e4f0',
+  sub:     '#6868a0',
+  label:   '#e4e4f0',
+  neutral: '#8a8ab8',
+  muted:   '#3a3a58',
+  green:   '#22c55e',
+  red:     '#ef4444',
+  footer:  '#3a3a58',
 }
 
 /** @param {import('./state.js').LevelResult[]} results */
@@ -40,57 +38,87 @@ export function unlockedCount(results) {
 }
 
 /**
+ * Always returns three rows.
  * @param {import('./state.js').LevelResult[]} results
- * @returns {{ solved: boolean, tries: number }[]}
+ * @returns {{ kind: 'solved' | 'failed' | 'unreached', tries: number }[]}
  */
 function normalizeResults(results) {
-  const out = results.map(r => ({ solved: !!r.solved, tries: r.tries ?? 0 }))
-  while (out.length < 3) out.push({ solved: false, tries: 0 })
-  return out.slice(0, 3)
+  const rows = []
+  for (let i = 0; i < 3; i++) {
+    const r = results[i]
+    if (!r)             rows.push({ kind: 'unreached', tries: 0 })
+    else if (r.solved)  rows.push({ kind: 'solved', tries: r.tries })
+    else                rows.push({ kind: 'failed', tries: MAX_TRIES })
+  }
+  return rows
 }
+
+/**
+ * The icon sequence for one row, as color keys.
+ * @returns {('neutral' | 'green' | 'red' | 'muted')[]}
+ */
+function rowIcons(row) {
+  if (row.kind === 'unreached') return ['muted']
+  const misses = Array(row.kind === 'solved' ? row.tries - 1 : MAX_TRIES).fill('neutral')
+  return [...misses, row.kind === 'solved' ? 'green' : 'red']
+}
+
+// ── TEXT ──────────────────────────────────────────────────────────
+
+const TEXT_ICON = { neutral: '🔒', green: '🟩', red: '🟥', muted: '🔒' }
 
 /**
  * @param {number} puzzleNumber
  * @param {import('./state.js').LevelResult[]} results
- * @returns {string}
  */
 export function buildShareText(puzzleNumber, results) {
-  const locks = normalizeResults(results)
-  const unlocked = unlockedCount(locks)
+  const rows = normalizeResults(results)
 
-  const header = `WORDLOCKED #${puzzleNumber} — ${unlocked}/3 unlocked`
+  const lines = rows.map((row, i) =>
+    `${LENGTHS[i]} Letters - ${rowIcons(row).map(k => TEXT_ICON[k]).join('')}`
+  )
 
-  const lines = locks.map((r, i) => {
-    const label = `${LENGTHS[i]} letters`
-    if (r.solved) {
-      const unit = r.tries === 1 ? 'try' : 'tries'
-      return `🔓 ${label}: ${r.tries} ${unit}`
-    }
-    return `🔒 ${label}: ✕`
-  })
+  return [
+    `WORDLOCKED #${puzzleNumber}  ${unlockedCount(results)}/3 unlocked`,
+    '',
+    ...lines,
+    '',
+    SITE_URL,
+  ].join('\n')
+}
 
-  return [header, '', ...lines, '', SITE_URL].join('\n')
+// ── IMAGE ─────────────────────────────────────────────────────────
+
+const W = 1080
+const H = 960
+
+const ICON_SIZE = 88
+const ICON_GAP  = 14
+const ROW_X_LABEL = 80
+const ROW_X_ICONS = 400
+const ROW_Y = [400, 550, 700]
+
+const lockPath = typeof Path2D === 'function' ? new Path2D(LOCK_PATH) : null
+
+function drawLock(ctx, x, yCenter, color) {
+  const s = ICON_SIZE / 256
+  ctx.save()
+  ctx.translate(x, yCenter - ICON_SIZE / 2)
+  ctx.scale(s, s)
+  ctx.fillStyle = color
+  ctx.fill(lockPath)
+  ctx.restore()
 }
 
 /**
- * Composite a share card using the original lock graphic asset.
- * @param {number} puzzleNumber
- * @param {import('./state.js').LevelResult[]} results
- * @returns {Promise<HTMLCanvasElement>}
+ * Paints the whole card onto a 1080x960 context.
+ * Separate from canvas creation so it can be run anywhere.
  */
-export async function buildShareCanvas(puzzleNumber, results) {
-  const locks = normalizeResults(results)
-  const unlocked = unlockedCount(locks)
-  const art = await loadLockArt()
+export function drawShareCard(ctx, puzzleNumber, results) {
+  const rows = normalizeResults(results)
+  const font = 'system-ui, -apple-system, "Segoe UI", sans-serif'
 
-  const W = 1080
-  const H = 1080
-  const canvas = document.createElement('canvas')
-  canvas.width = W
-  canvas.height = H
-  const ctx = canvas.getContext('2d')
-
-  ctx.fillStyle = '#09090f'
+  ctx.fillStyle = COLOR.bg
   ctx.fillRect(0, 0, W, H)
 
   const glow = ctx.createRadialGradient(W / 2, 0, 40, W / 2, 0, 520)
@@ -99,60 +127,46 @@ export async function buildShareCanvas(puzzleNumber, results) {
   ctx.fillStyle = glow
   ctx.fillRect(0, 0, W, H)
 
-  ctx.fillStyle = '#e4e4f0'
-  ctx.font = '700 72px system-ui, -apple-system, "Segoe UI", sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText('WORDLOCKED', W / 2, 180)
 
-  ctx.fillStyle = '#6868a0'
-  ctx.font = '500 36px system-ui, -apple-system, "Segoe UI", sans-serif'
-  ctx.fillText(`#${puzzleNumber} — ${unlocked}/3 unlocked`, W / 2, 250)
+  ctx.fillStyle = COLOR.title
+  ctx.font = `700 76px ${font}`
+  ctx.fillText('WORDLOCKED', W / 2, 150)
 
-  const scale = 1.55
-  const destW = Math.round(SRC.solved.w * scale)
-  const destH = Math.round(SRC.solved.h * scale)
-  const centers = [W * 0.22, W * 0.5, W * 0.78]
-  const lockMidY = 520
+  ctx.fillStyle = COLOR.sub
+  ctx.font = `500 38px ${font}`
+  ctx.fillText(`Puzzle #${puzzleNumber}  \u00b7  ${unlockedCount(results)}/3 unlocked`, W / 2, 224)
 
-  centers.forEach((cx, i) => {
-    const r = locks[i]
-    const dx = Math.round(cx - destW / 2)
-    const dy = Math.round(lockMidY - destH / 2)
+  rows.forEach((row, i) => {
+    const y = ROW_Y[i]
 
-    if (r.solved) {
-      const s = SRC.solved
-      ctx.drawImage(art, s.x, s.y, s.w, s.h, dx, dy, destW, destH)
-      // Stamp try count onto the existing green face (asset pixels for the lock stay)
-      const fx = dx + Math.round(s.face.x * scale)
-      const fy = dy + Math.round(s.face.y * scale)
-      const fw = Math.round(s.face.w * scale)
-      const fh = Math.round(s.face.h * scale)
-      ctx.fillStyle = '#22c55e'
-      ctx.fillRect(fx, fy, fw, fh)
-      ctx.fillStyle = '#111111'
-      ctx.font = `700 ${Math.round(56 * scale / 1.45)}px system-ui, -apple-system, "Segoe UI", sans-serif`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText(String(r.tries), fx + fw / 2, fy + fh / 2 + 1)
-    } else {
-      const s = SRC.failed
-      ctx.drawImage(art, s.x, s.y, s.w, s.h, dx, dy, destW, destH)
-    }
+    ctx.textAlign = 'left'
+    ctx.fillStyle = COLOR.label
+    ctx.font = `700 46px ${font}`
+    ctx.fillText(`${LENGTHS[i]} Letters`, ROW_X_LABEL, y)
 
-    ctx.fillStyle = '#6868a0'
-    ctx.font = '600 28px system-ui, -apple-system, "Segoe UI", sans-serif'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'top'
-    ctx.fillText(`${LENGTHS[i]} LETTERS`, cx, dy + destH + 8)
+    rowIcons(row).forEach((key, n) => {
+      drawLock(ctx, ROW_X_ICONS + n * (ICON_SIZE + ICON_GAP), y, COLOR[key])
+    })
   })
 
-  ctx.fillStyle = '#3a3a58'
-  ctx.font = '500 28px system-ui, -apple-system, "Segoe UI", sans-serif'
   ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText('wordlocked.com', W / 2, H - 100)
+  ctx.fillStyle = COLOR.footer
+  ctx.font = `500 30px ${font}`
+  ctx.fillText('wordlocked.com', W / 2, H - 90)
+}
 
+/**
+ * @param {number} puzzleNumber
+ * @param {import('./state.js').LevelResult[]} results
+ * @returns {HTMLCanvasElement}
+ */
+export function buildShareCanvas(puzzleNumber, results) {
+  const canvas = document.createElement('canvas')
+  canvas.width = W
+  canvas.height = H
+  drawShareCard(canvas.getContext('2d'), puzzleNumber, results)
   return canvas
 }
 
@@ -165,6 +179,8 @@ export function canvasToPngBlob(canvas) {
     }, 'image/png')
   })
 }
+
+// ── SHARE ─────────────────────────────────────────────────────────
 
 /** Copies text to clipboard with a textarea fallback for older browsers. */
 export async function copyToClipboard(text) {
@@ -199,9 +215,8 @@ export async function shareResult(puzzleNumber, results) {
 
   let blob = null
   try {
-    const canvas = await buildShareCanvas(puzzleNumber, results)
-    blob = await canvasToPngBlob(canvas)
-  } catch { /* image optional — text share still works */ }
+    blob = await canvasToPngBlob(buildShareCanvas(puzzleNumber, results))
+  } catch { /* image optional, text share still works */ }
 
   const file = blob
     ? new File([blob], `wordlocked-${puzzleNumber}.png`, { type: 'image/png' })
@@ -227,9 +242,7 @@ export async function shareResult(puzzleNumber, results) {
 
   if (blob && navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
     try {
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': blob }),
-      ])
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
       return 'copied-image'
     } catch { /* fall through */ }
   }
