@@ -30,6 +30,7 @@ const DEFAULTS = {
   played:    0,
   wins:      0,
   streak:    0,
+  lossStreak: 0,
   maxStreak: 0,
   recordedDates: [],
   dist:      emptyDist(),
@@ -47,6 +48,17 @@ export function loadStats() {
     recordedDates: Array.isArray(saved.recordedDates) ? saved.recordedDates : [],
     dist,
   }
+}
+
+/** Latest recorded UTC day (YYYY-MM-DD sorts correctly as a string), or ''. */
+function lastRecordedDate(stats) {
+  return stats.recordedDates.reduce((a, b) => (b > a ? b : a), '')
+}
+
+function daysBetween(fromDate, toDate) {
+  return Math.round(
+    (Date.parse(`${toDate}T00:00:00Z`) - Date.parse(`${fromDate}T00:00:00Z`)) / 86_400_000
+  )
 }
 
 /**
@@ -76,14 +88,23 @@ export function recordResult(won, results, dateStr) {
   const stats = loadStats()
   if (dateStr && stats.recordedDates.includes(dateStr)) return stats
 
+  // A missed day breaks both streaks.
+  const last = lastRecordedDate(stats)
+  if (dateStr && last && daysBetween(last, dateStr) > 1) {
+    stats.streak = 0
+    stats.lossStreak = 0
+  }
+
   stats.played++
 
   if (won) {
     stats.wins++
     stats.streak++
+    stats.lossStreak = 0
     stats.maxStreak = Math.max(stats.maxStreak, stats.streak)
   } else {
     stats.streak = 0
+    stats.lossStreak++
   }
 
   addLockResults(stats, results)
