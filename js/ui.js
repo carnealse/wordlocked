@@ -5,7 +5,7 @@
  */
 
 import { getState } from './state.js'
-import { LOCK_COUNT, MAX_GUESSES } from './config.js'
+import { LOCK_LENGTHS, LOCK_COUNT, MAX_GUESSES } from './config.js'
 import { pickFailMessage, pickConsolation, pickWinMessage } from './messages.js'
 
 // ── TOAST ────────────────────────────────────────────────────────
@@ -41,35 +41,71 @@ export function revealStatsActions() {
   document.getElementById('stats-actions').removeAttribute('hidden')
 }
 
-// ── GUESS PIPS ────────────────────────────────────────────────────
+// ── HUD: GUESS PIPS + STAGE CHIPS ─────────────────────────────────
+/** @type {HTMLSpanElement[]} */
+let _pips = []
+/** @type {{ chip: HTMLDivElement, lock: HTMLSpanElement, length: number }[]} */
+let _chips = []
+
+function el(tag, className, text) {
+  const node = document.createElement(tag)
+  node.className = className
+  if (text) node.textContent = text
+  return node
+}
+
+function decorative(node) {
+  node.setAttribute('aria-hidden', 'true')
+  return node
+}
+
+/** Builds one pip per guess and one chip per lock from config. Call once, before any render. */
+export function buildHud() {
+  _pips = Array.from({ length: MAX_GUESSES }, () => el('span', 'pip'))
+  document.getElementById('pips').replaceChildren(..._pips)
+
+  _chips = LOCK_LENGTHS.map(length => {
+    const chip = el('div', 'stage-chip')
+    const lock = decorative(el('span', 'stage-lock', '🔒'))
+    chip.append(lock, el('span', 'stage-chip__label', `${length} letters`))
+    return { chip, lock, length }
+  })
+  document.getElementById('stage-bar').replaceChildren(
+    ..._chips.flatMap(({ chip }, i) => i ? [decorative(el('span', 'stage-arrow', '→')), chip] : [chip])
+  )
+}
+
 export function renderPips() {
   const { guessesUsed } = getState()
-  document.querySelectorAll('.pip').forEach((pip, i) => {
-    pip.className = 'pip'
-    if (i < guessesUsed) pip.classList.add('pip--used')
-  })
+  _pips.forEach((pip, i) => pip.classList.toggle('pip--used', i < guessesUsed))
+  document.getElementById('pips').setAttribute('aria-label', `${guessesUsed} of ${MAX_GUESSES} guesses used`)
   const rem = MAX_GUESSES - guessesUsed
   document.getElementById('guess-remaining').textContent =
     `${rem} ${rem === 1 ? 'guess' : 'guesses'} left`
 }
 
-// ── STAGE CHIPS ───────────────────────────────────────────────────
+const STAGE = {
+  done:    { modifier: 'stage-chip--done',   icon: '🔓', label: 'cracked' },
+  failed:  { modifier: 'stage-chip--failed', icon: '🔒', label: 'failed' },
+  active:  { modifier: 'stage-chip--active', icon: '🔒', label: 'current lock' },
+  pending: { modifier: null,                 icon: '🔒', label: 'locked' },
+}
+
+function stageOf(i, { level, results, status }) {
+  if (results[i]) return results[i].solved ? STAGE.done : STAGE.failed
+  return i === level && status === 'playing' ? STAGE.active : STAGE.pending
+}
+
 export function renderStages() {
-  const { level, results, status } = getState()
-  for (let i = 0; i < LOCK_COUNT; i++) {
-    const chip = document.getElementById(`stage-${i}`)
-    const lock = chip.querySelector('.stage-lock')
-    chip.className = 'stage-chip'
-    if (results[i]?.solved) {
-      chip.classList.add('stage-chip--done'); lock.textContent = '🔓'
-    } else if (results[i] && !results[i].solved) {
-      chip.classList.add('stage-chip--failed'); lock.textContent = '🔒'
-    } else if (i === level && status === 'playing') {
-      chip.classList.add('stage-chip--active'); lock.textContent = '🔒'
-    } else {
-      lock.textContent = '🔒'
-    }
-  }
+  const state = getState()
+  _chips.forEach(({ chip, lock, length }, i) => {
+    const stage = stageOf(i, state)
+    chip.className = stage.modifier ? `stage-chip ${stage.modifier}` : 'stage-chip'
+    chip.setAttribute('aria-label', `${length} letters, ${stage.label}`)
+    if (stage === STAGE.active) chip.setAttribute('aria-current', 'step')
+    else chip.removeAttribute('aria-current')
+    lock.textContent = stage.icon
+  })
 }
 
 // ── HINT ──────────────────────────────────────────────────────────

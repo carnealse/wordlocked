@@ -15,7 +15,7 @@ import {
   recordLevelResult, setStatus,
 } from './state.js'
 import {
-  renderPips, renderStages, renderHint, renderDials,
+  buildHud, renderPips, renderStages, renderHint, renderDials,
   updateDialDisplay, animateCrack, animateShackleOpen,
   resetShackle, animateShake, flashCorrectDials,
   showToast, buildAndShowEndModal, startCountdownTimer,
@@ -33,6 +33,8 @@ let _focusedDial = 0
 
 // ── BOOT ─────────────────────────────────────────────────────────
 export async function boot() {
+  buildHud()
+
   const todayStr     = getTodayUTC()
   const dayIndex     = getDayIndex(todayStr)
   const puzzleNumber = getPuzzleNumber(todayStr)

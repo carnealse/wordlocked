@@ -29,32 +29,15 @@
     <!-- Guess tracker -->
     <div class="guess-track" aria-label="Guess tracker">
       <span class="guess-track__label">THIS LOCK</span>
-      <div class="pips" role="img" aria-label="Guess pips">
-        <span class="pip" data-pip="0" aria-hidden="true"></span>
-        <span class="pip" data-pip="1" aria-hidden="true"></span>
-        <span class="pip" data-pip="2" aria-hidden="true"></span>
-        <span class="pip" data-pip="3" aria-hidden="true"></span>
-        <span class="pip" data-pip="4" aria-hidden="true"></span>
+      <div class="pips" id="pips" role="img" aria-label="Guesses used">
+        <!-- Built by ui.js from config.js -->
       </div>
-      <span class="guess-track__remaining" id="guess-remaining">5 guesses left</span>
+      <span class="guess-track__remaining" id="guess-remaining"></span>
     </div>
 
     <!-- Level progress -->
-    <div class="stage-bar" aria-label="Level progress">
-      <div class="stage-chip" id="stage-0">
-        <span class="stage-lock" aria-hidden="true">🔒</span>
-        <span class="stage-chip__label">4 letters</span>
-      </div>
-      <span class="stage-arrow" aria-hidden="true">→</span>
-      <div class="stage-chip" id="stage-1">
-        <span class="stage-lock" aria-hidden="true">🔒</span>
-        <span class="stage-chip__label">5 letters</span>
-      </div>
-      <span class="stage-arrow" aria-hidden="true">→</span>
-      <div class="stage-chip" id="stage-2">
-        <span class="stage-lock" aria-hidden="true">🔒</span>
-        <span class="stage-chip__label">6 letters</span>
-      </div>
+    <div class="stage-bar" id="stage-bar" role="group" aria-label="Level progress">
+      <!-- Built by ui.js from config.js -->
     </div>
 
     <!-- Hint -->
