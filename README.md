@@ -11,14 +11,13 @@ wordlocked/
   index.html              # Semantic markup, zero inline styles
   style.css               # BEM, design tokens, mobile-first
   vercel.json             # Static routing + cache headers
-  assets/
-    share-graphic-ref.png # Original share lock graphic (composited, not redrawn)
   words/
-    4-letters.json        # Word bank — {word, hint}[]
+    4-letters.json        # Word bank — {id, word, hint}[]
     5-letters.json
     6-letters.json
   js/
     main.js               # Entry point — imports boot()
+    config.js             # Puzzle shape: lock lengths, guesses per lock
     game.js               # Game loop, guess logic, level progression
     state.js              # Single source of truth, subscriber pattern
     ui.js                 # All DOM rendering, purely reads state
@@ -33,7 +32,8 @@ wordlocked/
 
 ## Design principles
 
-- **State → UI**: `state.js` is the only truth. `ui.js` reads it; nothing else touches the DOM.
+- **State → UI**: `state.js` is the only truth. `ui.js` (and `stats.js` for its modal) render from it; game logic never draws.
+- **One source for the puzzle shape**: lock count, word lengths, and guess limits all derive from `config.js`.
 - **No shared mutable state outside state.js**: All mutations go through named mutators.
 - **Zero inline styles**: JS only adds/removes CSS classes. Animations live entirely in CSS.
 - **No dependencies**: Ships as-is to any static host.
@@ -49,4 +49,4 @@ Each bank is `{"id": 1, "word": "WORD", "hint": "Part of speech"}[]`. Puzzle #1 
 ## Content
 
 - **Messages** live in `js/messages.js`. Append `{ title, body: [] }` to a pool. Picks are seeded by puzzle number, so a reload never changes the message.
-- **Achievements** live in `js/achievements.js`. Append `{ id, name, hint, body, reward, check }`. `check({ stats, today })` runs once per finished puzzle for achievements not yet earned. Never rename an `id`, it is the storage key.
+- **Achievements** live in `js/achievements.js`. Append `{ id, name, hint, body, reward, check }`. `check({ stats, today })` runs for every achievement not yet earned each time a finished day loads, and the popup shows only the first time it passes. Never rename an `id`, it is the storage key.

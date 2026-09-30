@@ -2,109 +2,98 @@
  * stats.js
  * Tracks game statistics in localStorage and renders the stats modal.
  *
- * Guess distribution is per lock (4, 5, and 6 letters). Each solved lock
- * adds one count to the bucket for how many guesses that lock took.
+ * Guess distribution is per lock. Each solved lock adds one count to the
+ * bucket for how many guesses that lock took.
  */
 
 import { storage } from './storage.js'
+import { LOCK_LENGTHS, LOCK_COUNT, MAX_GUESSES } from './config.js'
 
 const KEY = 'stats'
-const LOCKS = 3
-const GUESS_BUCKETS = [1, 2, 3, 4, 5]
+const GUESS_BUCKETS = Array.from({ length: MAX_GUESSES }, (_, i) => i + 1)
+const DAY_MS = 86_400_000
+
+/**
+ * @typedef {Object} Stats
+ * @property {number}   played
+ * @property {number}   wins
+ * @property {number}   streak         consecutive days won, reset by a loss or a missed day
+ * @property {number}   maxStreak
+ * @property {string[]} recordedDates  UTC days already counted, oldest first
+ * @property {Array<Record<number, number>>} dist  per lock: guesses -> solves
+ */
 
 function emptyLockDist() {
-  return { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+  return Object.fromEntries(GUESS_BUCKETS.map(g => [g, 0]))
 }
 
 function emptyDist() {
-  return Array.from({ length: LOCKS }, emptyLockDist)
+  return Array.from({ length: LOCK_COUNT }, emptyLockDist)
 }
 
 function isPerLockDist(dist) {
   return Array.isArray(dist)
-    && dist.length === LOCKS
+    && dist.length === LOCK_COUNT
     && dist.every(lock => lock && typeof lock === 'object' && !Array.isArray(lock))
 }
 
-const DEFAULTS = {
-  played:    0,
-  wins:      0,
-  streak:    0,
-  lossStreak: 0,
-  maxStreak: 0,
-  recordedDates: [],
-  dist:      emptyDist(),
-}
+const count = n => (Number.isInteger(n) && n > 0 ? n : 0)
 
+/** @returns {Stats} */
 export function loadStats() {
-  const saved = storage.get(KEY, {})
-  const dist = isPerLockDist(saved.dist)
-    ? saved.dist.map(lock => ({ ...emptyLockDist(), ...lock }))
-    : emptyDist()
-
+  const saved = storage.get(KEY) ?? {}
   return {
-    ...DEFAULTS,
-    ...saved,
+    played:        count(saved.played),
+    wins:          count(saved.wins),
+    streak:        count(saved.streak),
+    maxStreak:     count(saved.maxStreak),
     recordedDates: Array.isArray(saved.recordedDates) ? saved.recordedDates : [],
-    dist,
+    dist: isPerLockDist(saved.dist)
+      ? saved.dist.map(lock => ({ ...emptyLockDist(), ...lock }))
+      : emptyDist(),
   }
 }
 
-/** Latest recorded UTC day (YYYY-MM-DD sorts correctly as a string), or ''. */
-function lastRecordedDate(stats) {
-  return stats.recordedDates.reduce((a, b) => (b > a ? b : a), '')
-}
-
 function daysBetween(fromDate, toDate) {
-  return Math.round(
-    (Date.parse(`${toDate}T00:00:00Z`) - Date.parse(`${fromDate}T00:00:00Z`)) / 86_400_000
-  )
+  return Math.round((Date.parse(`${toDate}T00:00:00Z`) - Date.parse(`${fromDate}T00:00:00Z`)) / DAY_MS)
 }
 
 /**
  * Count each solved lock in the bucket for its own guess count.
  * A 1 / 3 / 5 solve increments three different bars — never a single clamped total.
- * @param {Object} stats
- * @param {Array<{ solved?: boolean, tries?: number }>} results
+ * @param {Stats} stats
+ * @param {import('./state.js').LevelResult[]} results
  */
 function addLockResults(stats, results) {
   if (!Array.isArray(results)) return
   results.forEach((result, i) => {
-    if (!result?.solved || i >= LOCKS) return
-    const tries = Math.min(5, Math.max(1, result.tries | 0))
-    const key = String(tries)
-    stats.dist[i][key] = (stats.dist[i][key] ?? 0) + 1
+    if (!result?.solved || i >= LOCK_COUNT) return
+    const tries = Math.min(MAX_GUESSES, Math.max(1, result.tries | 0))
+    stats.dist[i][tries] = (stats.dist[i][tries] ?? 0) + 1
   })
 }
 
 /**
  * Record a completed game result and persist.
  * @param {boolean} won
- * @param {Array<{ solved?: boolean, tries?: number }>} results
+ * @param {import('./state.js').LevelResult[]} results
  * @param {string} [dateStr]  UTC day, so a reload cannot count the same puzzle twice
- * @returns {Object} Updated stats
+ * @returns {Stats}
  */
 export function recordResult(won, results, dateStr) {
   const stats = loadStats()
   if (dateStr && stats.recordedDates.includes(dateStr)) return stats
 
-  // A missed day breaks both streaks.
-  const last = lastRecordedDate(stats)
-  if (dateStr && last && daysBetween(last, dateStr) > 1) {
-    stats.streak = 0
-    stats.lossStreak = 0
-  }
+  const last = stats.recordedDates.at(-1)
+  const missedDay = dateStr && last && daysBetween(last, dateStr) > 1
 
   stats.played++
-
   if (won) {
     stats.wins++
-    stats.streak++
-    stats.lossStreak = 0
+    stats.streak = missedDay ? 1 : stats.streak + 1
     stats.maxStreak = Math.max(stats.maxStreak, stats.streak)
   } else {
     stats.streak = 0
-    stats.lossStreak++
   }
 
   addLockResults(stats, results)
@@ -119,7 +108,7 @@ export function recordResult(won, results, dateStr) {
  * Does not change played / wins / streak.
  * @param {string} dateStr
  * @param {Array<{ solved?: boolean, tries?: number }>} results
- * @returns {Object}
+ * @returns {Stats}
  */
 export function backfillDistribution(dateStr, results) {
   const stats = loadStats()
@@ -133,7 +122,7 @@ export function backfillDistribution(dateStr, results) {
 
 /**
  * Renders stat values and per-lock distribution bars into the stats modal.
- * @param {Object} stats
+ * @param {Stats} stats
  * @param {Array<{ solved?: boolean, tries?: number }>|null} highlightResults
  *        Solved locks highlight the matching bar. null = no highlight.
  */
@@ -148,10 +137,10 @@ export function renderStats(stats, highlightResults) {
   const barsEl = document.getElementById('dist-bars')
   barsEl.innerHTML = ''
 
-  const highlights = Array(LOCKS).fill(null)
+  const highlights = Array(LOCK_COUNT).fill(null)
   if (Array.isArray(highlightResults)) {
     highlightResults.forEach((result, i) => {
-      if (result?.solved && i < LOCKS) highlights[i] = result.tries
+      if (result?.solved && i < LOCK_COUNT) highlights[i] = result.tries
     })
   }
 
@@ -162,7 +151,7 @@ export function renderStats(stats, highlightResults) {
 
     const head = document.createElement('div')
     head.className = 'dist-col__head'
-    head.innerHTML = `<span class="dist-col__len">${lockIdx + 4}</span><span class="dist-col__unit">LETTERS</span>`
+    head.innerHTML = `<span class="dist-col__len">${LOCK_LENGTHS[lockIdx]}</span><span class="dist-col__unit">LETTERS</span>`
     col.appendChild(head)
 
     GUESS_BUCKETS.forEach(g => {

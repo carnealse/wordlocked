@@ -4,7 +4,8 @@
  * All animation is CSS-driven; JS only toggles classes.
  */
 
-import { getState, MAX } from './state.js'
+import { getState } from './state.js'
+import { LOCK_LENGTHS, LOCK_COUNT, MAX_GUESSES } from './config.js'
 import { pickFailMessage, pickConsolation, pickWinMessage } from './messages.js'
 
 // ── TOAST ────────────────────────────────────────────────────────
@@ -35,35 +36,76 @@ export function closeModal(id) {
   document.getElementById(id)?.setAttribute('hidden', '')
 }
 
-// ── GUESS PIPS ────────────────────────────────────────────────────
+/** Shows the share button and countdown in the stats modal. */
+export function revealStatsActions() {
+  document.getElementById('stats-actions').removeAttribute('hidden')
+}
+
+// ── HUD: GUESS PIPS + STAGE CHIPS ─────────────────────────────────
+/** @type {HTMLSpanElement[]} */
+let _pips = []
+/** @type {{ chip: HTMLDivElement, lock: HTMLSpanElement, length: number }[]} */
+let _chips = []
+
+function el(tag, className, text) {
+  const node = document.createElement(tag)
+  node.className = className
+  if (text) node.textContent = text
+  return node
+}
+
+function decorative(node) {
+  node.setAttribute('aria-hidden', 'true')
+  return node
+}
+
+/** Builds one pip per guess and one chip per lock from config. Call once, before any render. */
+export function buildHud() {
+  _pips = Array.from({ length: MAX_GUESSES }, () => el('span', 'pip'))
+  document.getElementById('pips').replaceChildren(..._pips)
+
+  _chips = LOCK_LENGTHS.map(length => {
+    const chip = el('div', 'stage-chip')
+    const lock = decorative(el('span', 'stage-lock', '🔒'))
+    chip.append(lock, el('span', 'stage-chip__label', `${length} letters`))
+    return { chip, lock, length }
+  })
+  document.getElementById('stage-bar').replaceChildren(
+    ..._chips.flatMap(({ chip }, i) => i ? [decorative(el('span', 'stage-arrow', '→')), chip] : [chip])
+  )
+}
+
 export function renderPips() {
   const { guessesUsed } = getState()
-  document.querySelectorAll('.pip').forEach((pip, i) => {
-    pip.className = 'pip'
-    if (i < guessesUsed) pip.classList.add('pip--used')
-  })
-  const rem = MAX - guessesUsed
+  _pips.forEach((pip, i) => pip.classList.toggle('pip--used', i < guessesUsed))
+  document.getElementById('pips').setAttribute('aria-label', `${guessesUsed} of ${MAX_GUESSES} guesses used`)
+  const rem = MAX_GUESSES - guessesUsed
   document.getElementById('guess-remaining').textContent =
     `${rem} ${rem === 1 ? 'guess' : 'guesses'} left`
 }
 
-// ── STAGE CHIPS ───────────────────────────────────────────────────
+const STAGE = {
+  done:    { modifier: 'stage-chip--done',   icon: '🔓', label: 'cracked' },
+  failed:  { modifier: 'stage-chip--failed', icon: '🔒', label: 'failed' },
+  active:  { modifier: 'stage-chip--active', icon: '🔒', label: 'current lock' },
+  pending: { modifier: null,                 icon: '🔒', label: 'locked' },
+}
+
+function stageOf(i, { level, results, status }) {
+  if (results[i]) return results[i].solved ? STAGE.done : STAGE.failed
+  return i === level && status === 'playing' ? STAGE.active : STAGE.pending
+}
+
 export function renderStages() {
-  const { level, results, status } = getState()
-  for (let i = 0; i < 3; i++) {
-    const chip = document.getElementById(`stage-${i}`)
-    const lock = chip.querySelector('.stage-lock')
-    chip.className = 'stage-chip'
-    if (results[i]?.solved) {
-      chip.classList.add('stage-chip--done'); lock.textContent = '🔓'
-    } else if (results[i] && !results[i].solved) {
-      chip.classList.add('stage-chip--failed'); lock.textContent = '🔒'
-    } else if (i === level && status === 'playing') {
-      chip.classList.add('stage-chip--active'); lock.textContent = '🔒'
-    } else {
-      lock.textContent = '🔒'
-    }
-  }
+  const state = getState()
+  _chips.forEach(({ chip, lock, length }, i) => {
+    const stage = stageOf(i, state)
+    chip.className = stage.modifier ? `stage-chip ${stage.modifier}` : 'stage-chip'
+    chip.setAttribute('aria-label', `${length} letters, ${stage.label}`)
+    if (stage === STAGE.active) chip.setAttribute('aria-current', 'step')
+    else chip.removeAttribute('aria-current')
+    lock.textContent = stage.icon
+  })
 }
 
 // ── HINT ──────────────────────────────────────────────────────────
@@ -294,36 +336,36 @@ let _endPages   = []
  * Builds the end-of-day pages from plain data and opens the modal.
  *
  * Page order:
- *   won:  win message, achievements earned today, trophy case
- *   lost: fail message (with answer), achievements earned today,
+ *   won:  win message, newly unlocked achievements, trophy case
+ *   lost: fail message (with answer), newly unlocked achievements,
  *         consolation prize, trophy case
  *
  * @param {boolean} won
- * @param {{ achievements?: Array, trophies?: Array }} [extras]
+ * @param {{ achievements?: import('./achievements.js').Achievement[],
+ *           trophies?: import('./achievements.js').Trophy[] }} [extras]
  */
 export function buildAndShowEndModal(won, { achievements = [], trophies = [] } = {}) {
-  const { words, hints, level, results, totalGuesses, puzzleNumber } = getState()
+  const { words, hints, level, totalGuesses, puzzleNumber } = getState()
   const pages = []
 
   if (won) {
     const msg = pickWinMessage(puzzleNumber)
     pages.push({
       title: msg.title,
-      body: [...msg.body, `You cracked all 3 locks using ${totalGuesses} total guesses.`],
+      body: [...msg.body, `You cracked all ${LOCK_COUNT} locks using ${totalGuesses} total guesses.`],
     })
   } else {
+    // A loss ends the day on the failed lock, so `level` still points at it.
     const msg = pickFailMessage(puzzleNumber)
-    const failedIdx = results.filter(r => r.solved).length
     pages.push({
       title: msg.title,
       body: msg.body,
-      answerWord: words[failedIdx] ?? words[level],
-      answerHint: hints[failedIdx] ?? hints[level],
+      answerWord: words[level],
+      answerHint: hints[level],
     })
   }
 
   achievements.forEach(a => pages.push({
-    title: 'ACHIEVEMENT UNLOCKED',
     achievement: a.name,
     body: a.body,
     reward: a.reward,

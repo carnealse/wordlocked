@@ -62,7 +62,7 @@ export const CONSOLATIONS = [
     title: 'CONSOLATION PRIZE',
     body: [
       'The combination lock has filed a restraining order. You are not permitted within 10 letters of it until tomorrow.',
-      'See you tomorrow, when the locks resets!',
+      'See you tomorrow, when the locks reset!',
     ],
   },
   {

@@ -4,6 +4,8 @@
  * State is never mutated directly — always replaced via update().
  */
 
+import { MAX_GUESSES } from './config.js'
+
 /** @typedef {'idle' | 'playing' | 'won' | 'lost'} GameStatus */
 
 /**
@@ -19,7 +21,7 @@
  * @property {number}         puzzleNumber   — public puzzle id; selects word id in each bank
  * @property {string[]}       words
  * @property {string[]}       hints
- * @property {number}         level          — 0 | 1 | 2
+ * @property {number}         level          — index into LOCK_LENGTHS
  * @property {number}         guessesUsed    — guesses used on current level (resets each level)
  * @property {number}         totalGuesses   — cumulative across all levels (for stats)
  * @property {string[][]}     wheels
@@ -28,8 +30,6 @@
  * @property {LevelResult[]}  results
  * @property {GameStatus}     status
  */
-
-export const MAX = 5  // guesses per level
 
 /** @type {GameState} */
 let _state = _initial()
@@ -56,6 +56,11 @@ function _initial() {
 }
 
 export function getState() { return _state }
+
+/** True once today's puzzle is won or lost. */
+export function isFinished() {
+  return _state.status === 'won' || _state.status === 'lost'
+}
 
 function _update(partial) {
   _state = { ..._state, ...partial }
@@ -92,7 +97,7 @@ export function applyGuess(correctMask) {
   const allCorrect  = merged.every(Boolean)
   const guessesUsed = _state.guessesUsed + 1
   const totalGuesses = _state.totalGuesses + 1
-  const outOfGuesses = guessesUsed >= MAX && !allCorrect
+  const outOfGuesses = guessesUsed >= MAX_GUESSES && !allCorrect
 
   _update({ correct: merged, guessesUsed, totalGuesses })
   return { allCorrect, outOfGuesses }

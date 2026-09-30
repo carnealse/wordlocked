@@ -175,8 +175,7 @@ button {
   transition: background var(--t-base), border-color var(--t-base);
 }
 
-.pip--used    { background: var(--c-red);   border-color: var(--c-red);   }
-.pip--cracked { background: var(--c-green); border-color: var(--c-green); }
+.pip--used { background: var(--c-red); border-color: var(--c-red); }
 
 .guess-track__remaining {
   font-size: 10px;
@@ -192,6 +191,7 @@ button {
   display: flex;
   align-items: center;
   gap: 6px;
+  min-height: 27px; /* one chip tall, so the row holds its space until ui.js builds the chips */
 }
 
 .stage-chip {
@@ -218,6 +218,12 @@ button {
   border-color: var(--c-green-dim);
   background: rgba(34, 197, 94, 0.08);
   color: var(--c-green);
+}
+
+.stage-chip--failed {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--c-red);
 }
 
 .stage-arrow { color: var(--c-text-faint); font-size: 12px; }

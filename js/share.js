@@ -3,18 +3,18 @@
  * Spoiler-free share text + image card for end-of-day results.
  *
  * One row per lock. Each row shows one padlock icon per guess used,
- * so a row is never longer than MAX_TRIES (5) icons:
+ * so a row is never longer than MAX_GUESSES icons:
  *   - solved:      (guesses - 1) neutral locks, then a green lock
- *   - failed:      (MAX_TRIES - 1) neutral locks, then a red lock
+ *   - failed:      (MAX_GUESSES - 1) neutral locks, then a red lock
  *   - not reached: a single muted lock
  *
  * Icon: Phosphor "lock-fill" (MIT, (c) 2023 Phosphor Icons), embedded as
  * a path so there is no runtime dependency and no asset to load.
  */
 
-const SITE_URL  = 'https://wordlocked.com'
-const LENGTHS   = [4, 5, 6]
-const MAX_TRIES = 5
+import { LOCK_LENGTHS, LOCK_COUNT, MAX_GUESSES } from './config.js'
+
+const SITE_URL = 'https://wordlocked.com'
 
 const LOCK_PATH =
   'M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208' +
@@ -39,17 +39,17 @@ export function unlockedCount(results) {
 }
 
 /**
- * Always returns three rows.
+ * Always returns one row per lock.
  * @param {import('./state.js').LevelResult[]} results
  * @returns {{ kind: 'solved' | 'failed' | 'unreached', tries: number }[]}
  */
 function normalizeResults(results) {
   const rows = []
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < LOCK_COUNT; i++) {
     const r = results[i]
     if (!r)            rows.push({ kind: 'unreached', tries: 0 })
     else if (r.solved) rows.push({ kind: 'solved', tries: r.tries })
-    else               rows.push({ kind: 'failed', tries: MAX_TRIES })
+    else               rows.push({ kind: 'failed', tries: MAX_GUESSES })
   }
   return rows
 }
@@ -60,7 +60,7 @@ function normalizeResults(results) {
  */
 function rowIcons(row) {
   if (row.kind === 'unreached') return ['muted']
-  const misses = Array(row.kind === 'solved' ? row.tries - 1 : MAX_TRIES - 1).fill('neutral')
+  const misses = Array(row.kind === 'solved' ? row.tries - 1 : MAX_GUESSES - 1).fill('neutral')
   return [...misses, row.kind === 'solved' ? 'green' : 'red']
 }
 
@@ -76,11 +76,11 @@ export function buildShareText(puzzleNumber, results) {
   const rows = normalizeResults(results)
 
   const lines = rows.map((row, i) =>
-    `${LENGTHS[i]} Letters - ${rowIcons(row).map(k => TEXT_ICON[k]).join('')}`
+    `${LOCK_LENGTHS[i]} Letters - ${rowIcons(row).map(k => TEXT_ICON[k]).join('')}`
   )
 
   return [
-    `WORDLOCKED #${puzzleNumber}  ${unlockedCount(results)}/3 unlocked`,
+    `WORDLOCKED #${puzzleNumber}  ${unlockedCount(results)}/${LOCK_COUNT} unlocked`,
     '',
     ...lines,
     '',
@@ -96,7 +96,8 @@ const H = 960
 const ICON_SIZE   = 100
 const ICON_GAP    = 16
 const LABEL_GAP   = 56
-const ROW_Y       = [400, 550, 700]
+const ROW_TOP     = 400
+const ROW_PITCH   = 150
 const FONT        = 'system-ui, -apple-system, "Segoe UI", sans-serif'
 const LABEL_FONT  = `700 46px ${FONT}`
 
@@ -137,22 +138,22 @@ export function drawShareCard(ctx, puzzleNumber, results) {
 
   ctx.fillStyle = COLOR.sub
   ctx.font = `500 38px ${FONT}`
-  ctx.fillText(`Puzzle #${puzzleNumber}  \u00b7  ${unlockedCount(results)}/3 unlocked`, W / 2, 224)
+  ctx.fillText(`Puzzle #${puzzleNumber}  \u00b7  ${unlockedCount(results)}/${LOCK_COUNT} unlocked`, W / 2, 224)
 
-  // Center the widest possible row (label + MAX_TRIES icons) in the card.
+  // Center the widest possible row (label + MAX_GUESSES icons) in the card.
   ctx.font = LABEL_FONT
-  const labelW  = Math.ceil(Math.max(...LENGTHS.map(n => ctx.measureText(`${n} Letters`).width)))
-  const iconsW  = MAX_TRIES * ICON_SIZE + (MAX_TRIES - 1) * ICON_GAP
+  const labelW  = Math.ceil(Math.max(...LOCK_LENGTHS.map(n => ctx.measureText(`${n} Letters`).width)))
+  const iconsW  = MAX_GUESSES * ICON_SIZE + (MAX_GUESSES - 1) * ICON_GAP
   const labelX  = Math.round((W - (labelW + LABEL_GAP + iconsW)) / 2)
   const iconsX  = labelX + labelW + LABEL_GAP
 
   rows.forEach((row, i) => {
-    const y = ROW_Y[i]
+    const y = ROW_TOP + i * ROW_PITCH
 
     ctx.textAlign = 'left'
     ctx.fillStyle = COLOR.label
     ctx.font = LABEL_FONT
-    ctx.fillText(`${LENGTHS[i]} Letters`, labelX, y)
+    ctx.fillText(`${LOCK_LENGTHS[i]} Letters`, labelX, y)
 
     rowIcons(row).forEach((key, n) => {
       drawLock(ctx, iconsX + n * (ICON_SIZE + ICON_GAP), y, COLOR[key])
