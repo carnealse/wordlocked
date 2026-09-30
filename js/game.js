@@ -1,14 +1,15 @@
 /**
  * game.js
  * Core game logic: level progression, guess evaluation, word loading.
- * Zero DOM access — coordinates state and delegates rendering to ui.js.
+ * Coordinates state and binds input events; all rendering is delegated to ui.js.
  */
 
 import { getTodayUTC, getDayIndex, getPuzzleNumber, mulberry32, hashStr } from './seed.js'
 import { buildWheelsForWord, wheelIndexOf, advancePosition } from './dials.js'
 import { storage } from './storage.js'
+import { LOCK_LENGTHS, LOCK_COUNT } from './config.js'
 import {
-  getState,
+  getState, isFinished,
   initState, restoreState, setDialPosition,
   applyGuess, advanceLevel,
   recordLevelResult, setStatus,
@@ -18,7 +19,7 @@ import {
   updateDialDisplay, animateCrack, animateShackleOpen,
   resetShackle, animateShake, flashCorrectDials,
   showToast, buildAndShowEndModal, startCountdownTimer,
-  openModal, closeModal, navigateEndPage, openTrophyCase,
+  openModal, closeModal, navigateEndPage, openTrophyCase, revealStatsActions,
 } from './ui.js'
 import { recordResult, backfillDistribution, loadStats, renderStats } from './stats.js'
 import { shareResult } from './share.js'
@@ -32,15 +33,15 @@ let _focusedDial = 0
 
 // ── BOOT ─────────────────────────────────────────────────────────
 export async function boot() {
-  const todayStr = getTodayUTC()
-  const dayIndex = getDayIndex(todayStr)
+  const todayStr     = getTodayUTC()
+  const dayIndex     = getDayIndex(todayStr)
+  const puzzleNumber = getPuzzleNumber(todayStr)
 
-  const wordObjs = await loadWords(todayStr)
+  const wordObjs = await loadWords(puzzleNumber)
   const words    = wordObjs.map(o => o.word.toUpperCase())
   const hints    = wordObjs.map(o => o.hint)
 
-  const saved    = storage.get(STORAGE_DAILY)
-  const puzzleNumber = getPuzzleNumber(todayStr)
+  const saved     = storage.get(STORAGE_DAILY)
   const isSameDay = saved?.todayStr === todayStr && saved?.puzzleNumber === puzzleNumber
 
   if (isSameDay) {
@@ -64,15 +65,9 @@ export async function boot() {
   renderAll()
   bindEvents()
 
-  const { status, results } = getState()
-  if (status === 'won' || status === 'lost') {
-    const stats = backfillDistribution(todayStr, results)
-    const achievements = awardAchievements({ stats, today: todayContext() })
-    document.getElementById('stats-actions').removeAttribute('hidden')
-    setTimeout(() => {
-      buildAndShowEndModal(status === 'won', { achievements, trophies: trophyEntries() })
-      startCountdownTimer()
-    }, 300)
+  if (isFinished()) {
+    const stats = backfillDistribution(todayStr, getState().results)
+    setTimeout(() => showEndOfDay(stats), 300)
   }
 }
 
@@ -90,22 +85,37 @@ function wordForPuzzle(bank, puzzleNumber) {
   return matches[0]
 }
 
-async function loadWords(todayStr) {
-  const [bank4, bank5, bank6] = await Promise.all([
-    fetch('words/4-letters.json').then(r => r.json()),
-    fetch('words/5-letters.json').then(r => r.json()),
-    fetch('words/6-letters.json').then(r => r.json()),
-  ])
+async function fetchBank(length) {
+  const res = await fetch(`words/${length}-letters.json`)
+  if (!res.ok) throw new Error(`words/${length}-letters.json: HTTP ${res.status}`)
+  return res.json()
+}
 
-  const puzzleNumber = getPuzzleNumber(todayStr)
-  return [bank4, bank5, bank6].map(bank => wordForPuzzle(bank, puzzleNumber))
+/** One word per lock, in LOCK_LENGTHS order. */
+async function loadWords(puzzleNumber) {
+  const banks = await Promise.all(LOCK_LENGTHS.map(fetchBank))
+  return banks.map(bank => wordForPuzzle(bank, puzzleNumber))
 }
 
 // ── END OF DAY ────────────────────────────────────────────────────
-/** The slice of state achievement checks need. */
-function todayContext() {
+/** Records today's result, then shows the end modal. Call once, at the moment the day ends. */
+async function finishDay(won, delayMs) {
+  setStatus(won ? 'won' : 'lost')
+  persist()
+  const { results, todayStr } = getState()
+  const stats = recordResult(won, results, todayStr)
+  renderStats(stats, results)
+  await sleep(delayMs)
+  showEndOfDay(stats)
+}
+
+/** Awards any newly earned achievements and opens the end modal. Safe on every load of a finished day. */
+function showEndOfDay(stats) {
   const { status, results, puzzleNumber } = getState()
-  return { status, results, puzzleNumber }
+  const achievements = awardAchievements({ stats, today: { status, results, puzzleNumber } })
+  revealStatsActions()
+  buildAndShowEndModal(status === 'won', { achievements, trophies: trophyEntries() })
+  startCountdownTimer()
 }
 
 // ── INITIAL POSITIONS ─────────────────────────────────────────────
@@ -212,7 +222,7 @@ async function submitGuess() {
     recordLevelResult(true)
     await animateShackleOpen()
 
-    if (level < 2) {
+    if (level < LOCK_COUNT - 1) {
       const nextLevel  = level + 1
       const nextWord   = words[nextLevel]
       const { dayIndex } = getState()
@@ -226,32 +236,14 @@ async function submitGuess() {
       renderAll()
       showToast('LOCK CRACKED. NEXT LEVEL')
     } else {
-      setStatus('won')
-      persist()
-      const { results, todayStr } = getState()
-      const stats = recordResult(true, results, todayStr)
-      renderStats(stats, results)
-      const achievements = awardAchievements({ stats, today: todayContext() })
-      document.getElementById('stats-actions').removeAttribute('hidden')
-      await sleep(200)
-      buildAndShowEndModal(true, { achievements, trophies: trophyEntries() })
-      startCountdownTimer()
+      await finishDay(true, 200)
     }
   } else {
     animateShake()
 
     if (outOfGuesses) {
       recordLevelResult(false)
-      setStatus('lost')
-      persist()
-      const finished = getState()
-      const stats = recordResult(false, finished.results, finished.todayStr)
-      renderStats(stats, finished.results)
-      const achievements = awardAchievements({ stats, today: todayContext() })
-      document.getElementById('stats-actions').removeAttribute('hidden')
-      await sleep(500)
-      buildAndShowEndModal(false, { achievements, trophies: trophyEntries() })
-      startCountdownTimer()
+      await finishDay(false, 500)
     } else {
       showToast('NOT QUITE. KEEP SPINNING')
     }
@@ -274,13 +266,12 @@ function persist() {
 
 // ── SHARE ─────────────────────────────────────────────────────────
 async function handleShare() {
-  const { todayStr, results, status } = getState()
-  if (status !== 'won' && status !== 'lost') {
-    showToast('FINISH TODAY\'S LOCKS TO SHARE')
+  if (!isFinished()) {
+    showToast("FINISH TODAY'S LOCKS TO SHARE")
     return
   }
 
-  const puzzleNumber = getPuzzleNumber(todayStr || getTodayUTC())
+  const { puzzleNumber, results } = getState()
   const outcome = await shareResult(puzzleNumber, results)
   if (outcome === 'shared')          showToast('SHARED')
   else if (outcome === 'copied-image') showToast('IMAGE COPIED')
@@ -293,9 +284,7 @@ async function handleShare() {
 function bindEvents() {
   document.getElementById('btn-how').addEventListener('click', () => openModal('modal-how'))
   document.getElementById('btn-stats').addEventListener('click', () => {
-    const { status, results } = getState()
-    const highlight = (status === 'won' || status === 'lost') ? results : null
-    renderStats(loadStats(), highlight)
+    renderStats(loadStats(), isFinished() ? getState().results : null)
     openModal('modal-stats')
   })
 

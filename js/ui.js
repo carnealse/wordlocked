@@ -4,7 +4,8 @@
  * All animation is CSS-driven; JS only toggles classes.
  */
 
-import { getState, MAX } from './state.js'
+import { getState } from './state.js'
+import { LOCK_COUNT, MAX_GUESSES } from './config.js'
 import { pickFailMessage, pickConsolation, pickWinMessage } from './messages.js'
 
 // ── TOAST ────────────────────────────────────────────────────────
@@ -35,6 +36,11 @@ export function closeModal(id) {
   document.getElementById(id)?.setAttribute('hidden', '')
 }
 
+/** Shows the share button and countdown in the stats modal. */
+export function revealStatsActions() {
+  document.getElementById('stats-actions').removeAttribute('hidden')
+}
+
 // ── GUESS PIPS ────────────────────────────────────────────────────
 export function renderPips() {
   const { guessesUsed } = getState()
@@ -42,7 +48,7 @@ export function renderPips() {
     pip.className = 'pip'
     if (i < guessesUsed) pip.classList.add('pip--used')
   })
-  const rem = MAX - guessesUsed
+  const rem = MAX_GUESSES - guessesUsed
   document.getElementById('guess-remaining').textContent =
     `${rem} ${rem === 1 ? 'guess' : 'guesses'} left`
 }
@@ -50,7 +56,7 @@ export function renderPips() {
 // ── STAGE CHIPS ───────────────────────────────────────────────────
 export function renderStages() {
   const { level, results, status } = getState()
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < LOCK_COUNT; i++) {
     const chip = document.getElementById(`stage-${i}`)
     const lock = chip.querySelector('.stage-lock')
     chip.className = 'stage-chip'
@@ -294,36 +300,36 @@ let _endPages   = []
  * Builds the end-of-day pages from plain data and opens the modal.
  *
  * Page order:
- *   won:  win message, achievements earned today, trophy case
- *   lost: fail message (with answer), achievements earned today,
+ *   won:  win message, newly unlocked achievements, trophy case
+ *   lost: fail message (with answer), newly unlocked achievements,
  *         consolation prize, trophy case
  *
  * @param {boolean} won
- * @param {{ achievements?: Array, trophies?: Array }} [extras]
+ * @param {{ achievements?: import('./achievements.js').Achievement[],
+ *           trophies?: import('./achievements.js').Trophy[] }} [extras]
  */
 export function buildAndShowEndModal(won, { achievements = [], trophies = [] } = {}) {
-  const { words, hints, level, results, totalGuesses, puzzleNumber } = getState()
+  const { words, hints, level, totalGuesses, puzzleNumber } = getState()
   const pages = []
 
   if (won) {
     const msg = pickWinMessage(puzzleNumber)
     pages.push({
       title: msg.title,
-      body: [...msg.body, `You cracked all 3 locks using ${totalGuesses} total guesses.`],
+      body: [...msg.body, `You cracked all ${LOCK_COUNT} locks using ${totalGuesses} total guesses.`],
     })
   } else {
+    // A loss ends the day on the failed lock, so `level` still points at it.
     const msg = pickFailMessage(puzzleNumber)
-    const failedIdx = results.filter(r => r.solved).length
     pages.push({
       title: msg.title,
       body: msg.body,
-      answerWord: words[failedIdx] ?? words[level],
-      answerHint: hints[failedIdx] ?? hints[level],
+      answerWord: words[level],
+      answerHint: hints[level],
     })
   }
 
   achievements.forEach(a => pages.push({
-    title: 'ACHIEVEMENT UNLOCKED',
     achievement: a.name,
     body: a.body,
     reward: a.reward,
