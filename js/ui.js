@@ -109,6 +109,11 @@ export function renderStages() {
   })
 }
 
+export function renderPuzzleNumber() {
+  const { puzzleNumber } = getState()
+  document.getElementById('puzzle-number').textContent = puzzleNumber ? `PUZZLE #${puzzleNumber}` : ''
+}
+
 // ── HINT ──────────────────────────────────────────────────────────
 export function renderHint() {
   const { hints, level } = getState()

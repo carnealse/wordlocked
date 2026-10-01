@@ -15,7 +15,7 @@ import {
   recordLevelResult, setStatus,
 } from './state.js'
 import {
-  buildHud, renderPips, renderStages, renderHint, renderDials,
+  buildHud, renderPips, renderStages, renderPuzzleNumber, renderHint, renderDials,
   updateDialDisplay, animateCrack, animateShackleOpen,
   renderShackle, animateShake, flashCorrectDials,
   showToast, buildAndShowEndModal, startCountdownTimer,
@@ -136,6 +136,7 @@ function defaultPositions(wheels, word, dayIndex, levelIdx) {
 function renderAll() {
   renderPips()
   renderStages()
+  renderPuzzleNumber()
   renderHint()
   renderShackle()
   renderDials(
