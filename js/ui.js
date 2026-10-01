@@ -7,6 +7,7 @@
 import { getState } from './state.js'
 import { LOCK_LENGTHS, LOCK_COUNT, MAX_GUESSES } from './config.js'
 import { pickFailMessage, pickConsolation, pickWinMessage } from './messages.js'
+import { getNextPuzzleTime } from './seed.js'
 
 // ── TOAST ────────────────────────────────────────────────────────
 let _toastTimer = null
@@ -316,10 +317,14 @@ let _timerInterval = null
 export function startCountdownTimer() {
   const el = document.getElementById('next-timer')
   if (!el) return
+  const next = getNextPuzzleTime()
   const tick = () => {
-    const now  = new Date()
-    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1))
-    const ms   = next - now
+    const ms = next - Date.now()
+    if (ms <= 0) {
+      clearInterval(_timerInterval)
+      location.reload()
+      return
+    }
     const h = String(Math.floor(ms / 3_600_000)).padStart(2, '0')
     const m = String(Math.floor((ms % 3_600_000) / 60_000)).padStart(2, '0')
     const s = String(Math.floor((ms % 60_000) / 1_000)).padStart(2, '0')

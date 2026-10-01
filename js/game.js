@@ -4,7 +4,7 @@
  * Coordinates state and binds input events; all rendering is delegated to ui.js.
  */
 
-import { getTodayUTC, getDayIndex, getPuzzleNumber, mulberry32, hashStr } from './seed.js'
+import { getToday, getDayIndex, getPuzzleNumber, mulberry32, hashStr } from './seed.js'
 import { buildWheelsForWord, wheelIndexOf, advancePosition } from './dials.js'
 import { storage } from './storage.js'
 import { LOCK_LENGTHS, LOCK_COUNT } from './config.js'
@@ -35,7 +35,7 @@ let _focusedDial = 0
 export async function boot() {
   buildHud()
 
-  const todayStr     = getTodayUTC()
+  const todayStr     = getToday()
   const dayIndex     = getDayIndex(todayStr)
   const puzzleNumber = getPuzzleNumber(todayStr)
 

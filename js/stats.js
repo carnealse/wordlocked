@@ -19,7 +19,7 @@ const DAY_MS = 86_400_000
  * @property {number}   wins
  * @property {number}   streak         consecutive days won, reset by a loss or a missed day
  * @property {number}   maxStreak
- * @property {string[]} recordedDates  UTC days already counted, oldest first
+ * @property {string[]} recordedDates  puzzle days already counted, oldest first
  * @property {Array<Record<number, number>>} dist  per lock: guesses -> solves
  */
 
@@ -77,7 +77,7 @@ function addLockResults(stats, results) {
  * Record a completed game result and persist.
  * @param {boolean} won
  * @param {import('./state.js').LevelResult[]} results
- * @param {string} [dateStr]  UTC day, so a reload cannot count the same puzzle twice
+ * @param {string} [dateStr]  puzzle day, so a reload cannot count the same puzzle twice
  * @returns {Stats}
  */
 export function recordResult(won, results, dateStr) {

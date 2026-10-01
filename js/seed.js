@@ -1,21 +1,45 @@
 /**
  * seed.js
  * Deterministic daily puzzle selection.
- * All players on the same UTC date receive identical words.
+ * The puzzle day runs midnight to midnight US Eastern time (EST/EDT), and
+ * all players on the same Eastern date receive identical words.
  */
 
-/** UTC date string → 'YYYY-MM-DD' */
-export function getTodayUTC() {
-  const d = new Date()
-  const y = d.getUTCFullYear()
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(d.getUTCDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
+export const PUZZLE_TIME_ZONE = 'America/New_York'
+
+const _zoneFormat = new Intl.DateTimeFormat('en-US', {
+  timeZone: PUZZLE_TIME_ZONE,
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', second: '2-digit',
+  hourCycle: 'h23',
+})
+
+/** Wall-clock parts in the puzzle time zone, as numbers. */
+function zonedParts(ms) {
+  const parts = {}
+  for (const { type, value } of _zoneFormat.formatToParts(ms)) parts[type] = Number(value)
+  return parts
+}
+
+/** Puzzle-day date string → 'YYYY-MM-DD' */
+export function getToday(now = Date.now()) {
+  const { year, month, day } = zonedParts(now)
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+/** Epoch ms of the next puzzle-day midnight. */
+export function getNextPuzzleTime(now = Date.now()) {
+  const { year, month, day } = zonedParts(now)
+  const midnightAsUtc = Date.UTC(year, month - 1, day + 1)
+  // DST switches at 2am, so the offset a few hours before midnight is the offset at midnight.
+  const p = zonedParts(midnightAsUtc)
+  const offset = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - midnightAsUtc
+  return midnightAsUtc - offset
 }
 
 /**
- * UTC date of public puzzle #1.
- * Puzzle numbers increase by one each UTC midnight after this day.
+ * Puzzle-day date of public puzzle #1.
+ * Puzzle numbers increase by one each Eastern midnight after this day.
  */
 export const LAUNCH_DATE = '2026-09-30'
 
