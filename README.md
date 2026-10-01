@@ -30,7 +30,6 @@ wordlocked/
     messages.js           # Content pools: fail, consolation, win messages
     achievements.js       # Achievement definitions, awarding, trophy case data
     theme.js              # Seasonal themes by puzzle date
-  assets/themes/          # Seasonal theme artwork
 ```
 
 ## Design principles
