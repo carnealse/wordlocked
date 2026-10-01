@@ -5,7 +5,9 @@
  */
 
 import { boot } from './game.js'
+import { applyTheme } from './theme.js'
 
+applyTheme()
 boot().catch(err => {
   console.error('[WORDLOCKED] Boot failed:', err)
   document.getElementById('dials-row').innerHTML =
