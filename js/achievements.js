@@ -134,7 +134,7 @@ export const ACHIEVEMENTS = Object.freeze([
     id: 'last-gasp-sweep',
     name: 'Living on the Edge',
     hint: 'Win all three locks, each on your last guess.',
-    body: ['Three locks, three last guesses. You either love suspense or you hate yourself, and the Lock respects both.'],
+    body: ['Three locks, three last guesses. You either love suspense or you live on the edge of drama, and the Lock respects both.'],
     reward: 'A defibrillator. Gently used.',
     check: ctx => won(ctx) && ctx.today.results.every(r => r.tries === MAX_GUESSES),
   },
