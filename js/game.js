@@ -17,7 +17,7 @@ import {
 import {
   buildHud, renderPips, renderStages, renderHint, renderDials,
   updateDialDisplay, animateCrack, animateShackleOpen,
-  resetShackle, animateShake, flashCorrectDials,
+  renderShackle, animateShake, flashCorrectDials,
   showToast, buildAndShowEndModal, startCountdownTimer,
   openModal, closeModal, navigateEndPage, openTrophyCase, revealStatsActions,
 } from './ui.js'
@@ -137,6 +137,7 @@ function renderAll() {
   renderPips()
   renderStages()
   renderHint()
+  renderShackle()
   renderDials(
     handleSpinLeft,
     handleSpinRight,
@@ -234,7 +235,6 @@ async function submitGuess() {
       advanceLevel(nextWheels, nextPos)
       _focusedDial = 0
 
-      resetShackle()
       renderAll()
       showToast('LOCK CRACKED. NEXT LEVEL')
     } else {

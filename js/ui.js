@@ -290,8 +290,10 @@ export function animateShackleOpen() {
   })
 }
 
-export function resetShackle() {
-  document.getElementById('lock-shackle').classList.remove('lock__shackle--open')
+/** Open only once the whole day is won, so it stays open until the next puzzle. */
+export function renderShackle() {
+  const { status } = getState()
+  document.getElementById('lock-shackle').classList.toggle('lock__shackle--open', status === 'won')
 }
 
 export function animateShake() {
