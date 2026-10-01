@@ -15,9 +15,9 @@ import {
   recordLevelResult, setStatus,
 } from './state.js'
 import {
-  buildHud, renderPips, renderStages, renderHint, renderDials,
+  buildHud, renderPips, renderStages, renderPuzzleNumber, renderHint, renderDials,
   updateDialDisplay, animateCrack, animateShackleOpen,
-  resetShackle, animateShake, flashCorrectDials,
+  renderShackle, animateShake, flashCorrectDials,
   showToast, buildAndShowEndModal, startCountdownTimer,
   openModal, closeModal, navigateEndPage, openTrophyCase, revealStatsActions,
 } from './ui.js'
@@ -137,7 +137,9 @@ function defaultPositions(wheels, word, dayIndex, levelIdx) {
 function renderAll() {
   renderPips()
   renderStages()
+  renderPuzzleNumber()
   renderHint()
+  renderShackle()
   renderDials(
     handleSpinLeft,
     handleSpinRight,
@@ -235,7 +237,6 @@ async function submitGuess() {
       advanceLevel(nextWheels, nextPos)
       _focusedDial = 0
 
-      resetShackle()
       renderAll()
       showToast('LOCK CRACKED. NEXT LEVEL')
     } else {

@@ -109,6 +109,11 @@ export function renderStages() {
   })
 }
 
+export function renderPuzzleNumber() {
+  const { puzzleNumber } = getState()
+  document.getElementById('puzzle-number').textContent = puzzleNumber ? `PUZZLE #${puzzleNumber}` : ''
+}
+
 // ── HINT ──────────────────────────────────────────────────────────
 export function renderHint() {
   const { hints, level } = getState()
@@ -286,13 +291,15 @@ export function animateCrack() {
 
 export function animateShackleOpen() {
   return new Promise(resolve => {
-    document.getElementById('lock-shackle').classList.add('lock-shackle--open')
+    document.getElementById('lock-shackle').classList.add('lock__shackle--open')
     setTimeout(resolve, 600)
   })
 }
 
-export function resetShackle() {
-  document.getElementById('lock-shackle').classList.remove('lock-shackle--open')
+/** Open only once the whole day is won, so it stays open until the next puzzle. */
+export function renderShackle() {
+  const { status } = getState()
+  document.getElementById('lock-shackle').classList.toggle('lock__shackle--open', status === 'won')
 }
 
 export function animateShake() {
