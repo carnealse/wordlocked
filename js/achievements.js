@@ -25,7 +25,9 @@ const KEY = 'achievements'
  * @typedef {Object} CheckContext
  * @property {import('./stats.js').Stats & { losses: number }} stats  already includes today
  * @property {{ status: 'won' | 'lost', results: import('./state.js').LevelResult[], puzzleNumber: number,
- *              date: string }} today  date is the puzzle day, 'YYYY-MM-DD' in Eastern time
+ *              date: string, shared?: boolean }} today
+ *   date is the puzzle day, 'YYYY-MM-DD' in Eastern time.
+ *   shared is true only when the checks run because the share sheet reported a completed share.
  */
 
 /**
@@ -167,6 +169,14 @@ export const ACHIEVEMENTS = Object.freeze([
     body: ['First puzzle of the year, cracked. That is one resolution kept, which already beats last year.'],
     reward: 'A gym membership you will never use.',
     check: wonOn('01-01'),
+  },
+  {
+    id: 'influencer',
+    name: 'Influencer',
+    hint: 'Share your result with someone.',
+    body: ['You shared your result with the world. Somewhere, a group chat just hit mute.'],
+    reward: 'One new follower. It is the Lock. It is watching.',
+    check: ({ today }) => today.shared === true,
   },
 ])
 

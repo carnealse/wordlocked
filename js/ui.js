@@ -381,11 +381,7 @@ export function buildAndShowEndModal(won, { achievements = [], trophies = [] } =
     })
   }
 
-  achievements.forEach(a => pages.push({
-    achievement: a.name,
-    body: a.body,
-    reward: a.reward,
-  }))
+  pages.push(...achievements.map(achievementPage))
 
   if (!won) {
     const c = pickConsolation(puzzleNumber)
@@ -393,7 +389,19 @@ export function buildAndShowEndModal(won, { achievements = [], trophies = [] } =
   }
 
   pages.push({ title: 'TROPHY CASE', trophies })
+  _showEndPages(pages)
+}
 
+/** Opens the end modal on achievements earned outside the end of day, then the trophy case. */
+export function showAchievementPages(achievements, trophies) {
+  _showEndPages([...achievements.map(achievementPage), { title: 'TROPHY CASE', trophies }])
+}
+
+function achievementPage(a) {
+  return { achievement: a.name, body: a.body, reward: a.reward }
+}
+
+function _showEndPages(pages) {
   _endPages   = pages
   _endPageIdx = 0
   _renderEndPages()

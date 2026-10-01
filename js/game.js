@@ -18,7 +18,7 @@ import {
   buildHud, renderPips, renderStages, renderPuzzleNumber, renderHint, renderDials,
   updateDialDisplay, animateCrack, animateShackleOpen,
   renderShackle, animateShake, flashCorrectDials,
-  showToast, buildAndShowEndModal, startCountdownTimer,
+  showToast, buildAndShowEndModal, showAchievementPages, startCountdownTimer,
   openModal, closeModal, navigateEndPage, openTrophyCase, revealStatsActions,
 } from './ui.js'
 import { recordResult, backfillDistribution, loadStats, renderStats } from './stats.js'
@@ -277,11 +277,27 @@ async function handleShare() {
 
   const { puzzleNumber, results } = getState()
   const outcome = await shareResult(puzzleNumber, results)
-  if (outcome === 'shared')          showToast('SHARED')
+  if (outcome === 'shared')          { showToast('SHARED'); awardShareAchievements() }
   else if (outcome === 'copied-image') showToast('IMAGE COPIED')
   else if (outcome === 'copied')     showToast('COPIED TO CLIPBOARD')
   else if (outcome === 'cancelled')  { /* user dismissed share sheet */ }
   else                               showToast('SHARE FAILED. Try manually')
+}
+
+/**
+ * A website only learns that the share sheet finished, not which app was picked
+ * or whether the post went out, so a completed share is the closest signal.
+ * Copy-to-clipboard fallbacks do not count.
+ */
+function awardShareAchievements() {
+  const { status, results, puzzleNumber, todayStr } = getState()
+  const unlocked = awardAchievements({
+    stats: loadStats(),
+    today: { status, results, puzzleNumber, date: todayStr, shared: true },
+  })
+  if (!unlocked.length) return
+  closeModal('modal-stats')
+  showAchievementPages(unlocked, trophyEntries())
 }
 
 // ── EVENTS ────────────────────────────────────────────────────────
