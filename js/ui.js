@@ -285,13 +285,13 @@ export function animateCrack() {
 
 export function animateShackleOpen() {
   return new Promise(resolve => {
-    document.getElementById('lock-shackle').classList.add('lock-shackle--open')
+    document.getElementById('lock-shackle').classList.add('lock__shackle--open')
     setTimeout(resolve, 600)
   })
 }
 
 export function resetShackle() {
-  document.getElementById('lock-shackle').classList.remove('lock-shackle--open')
+  document.getElementById('lock-shackle').classList.remove('lock__shackle--open')
 }
 
 export function animateShake() {
