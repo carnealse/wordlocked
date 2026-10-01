@@ -272,33 +272,82 @@ button {
   width: min(100%, 326px);
 }
 
-/* Shackle — tall U-bar matching target proportions */
+/* Shackle — tall U-bar matching target proportions.
+   Painted as a shaded tube: the transparent border defines the U shape and
+   the mask cuts out the padding box, so only the bar shows. The arc uses a
+   radial gradient and the legs a horizontal one so the shading follows the
+   bar all the way round. Gradient stops depend on --shk-w / --shk-t. */
+@property --shk-hi  { syntax: '<color>'; inherits: false; initial-value: #b4b4d0; }
+@property --shk-mid { syntax: '<color>'; inherits: false; initial-value: #7a7a99; }
+@property --shk-lo  { syntax: '<color>'; inherits: false; initial-value: #4d4d68; }
+@property --shk-in  { syntax: '<color>'; inherits: false; initial-value: #34344a; }
+
 .lock__shackle {
-  width: 152px;
+  --shk-w: 152px;
+  --shk-t: 26px;
+  --shk-hi:  #b4b4d0;
+  --shk-mid: #7a7a99;
+  --shk-lo:  #4d4d68;
+  --shk-in:  #34344a;
+  --shk-r: calc(var(--shk-w) / 2);
+
+  width: var(--shk-w);
   height: 134px;
-  border: 26px solid var(--lock-shackle);
+  border: var(--shk-t) solid transparent;
   border-bottom: none;
   border-radius: 96px 96px 0 0;
-  background: transparent;
-  box-shadow:
-    inset 4px 0 0 rgba(255,255,255,0.2),
-    inset -3px 0 0 rgba(0,0,0,0.28);
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.5), transparent) bottom / 100% 20px no-repeat,
+    radial-gradient(circle at 50% 100%,
+      var(--shk-in)  calc(var(--shk-r) - var(--shk-t)),
+      var(--shk-mid) calc(var(--shk-r) - var(--shk-t) * 0.7),
+      var(--shk-hi)  calc(var(--shk-r) - var(--shk-t) * 0.42),
+      var(--shk-mid) calc(var(--shk-r) - var(--shk-t) * 0.2),
+      var(--shk-lo)  var(--shk-r)
+    ) top / 100% var(--shk-r) no-repeat,
+    linear-gradient(90deg,
+      var(--shk-lo)  0,
+      var(--shk-mid) calc(var(--shk-t) * 0.2),
+      var(--shk-hi)  calc(var(--shk-t) * 0.42),
+      var(--shk-mid) calc(var(--shk-t) * 0.7),
+      var(--shk-in)  var(--shk-t),
+      var(--shk-in)  calc(100% - var(--shk-t)),
+      var(--shk-mid) calc(100% - var(--shk-t) * 0.7),
+      var(--shk-hi)  calc(100% - var(--shk-t) * 0.42),
+      var(--shk-mid) calc(100% - var(--shk-t) * 0.2),
+      var(--shk-lo)  100%
+    ) bottom / 100% calc(100% - var(--shk-r)) no-repeat;
+  background-origin: border-box;
+  -webkit-mask:
+    linear-gradient(#000 0 0) padding-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) padding-box exclude,
+    linear-gradient(#000 0 0);
   transform-origin: center bottom;
-  transition: transform 0.55s var(--ease-spring), border-color var(--t-slow);
+  transition:
+    transform 0.55s var(--ease-spring),
+    --shk-hi var(--t-slow), --shk-mid var(--t-slow),
+    --shk-lo var(--t-slow), --shk-in var(--t-slow);
   will-change: transform;
   position: relative;
-  z-index: 1;
+  z-index: 0;
   margin-bottom: -6px;
 }
 
 .lock__shackle--open {
   transform: rotate(-42deg) translate(-6px, -10px);
-  border-color: var(--c-green);
+  --shk-hi:  #a7f3c0;
+  --shk-mid: var(--c-green);
+  --shk-lo:  #15803d;
+  --shk-in:  var(--c-green-dim);
 }
 
 /* Body — flat slate padlock, no brushed texture */
 .lock__body {
   position: relative;
+  z-index: 1;
   width: 100%;
   background: linear-gradient(180deg,
     var(--lock-body-hi) 0%,
@@ -1035,7 +1084,7 @@ button {
   .wordmark        { font-size: 17px; letter-spacing: 4px; }
   .lock            { width: min(100%, 300px); --lock-row-h: 50px; }
   .lock__btns      { width: 108px; }
-  .lock__shackle   { width: 128px; height: 78px; border-width: 22px; }
+  .lock__shackle   { --shk-w: 128px; --shk-t: 22px; height: 78px; }
   .drum__active    { font-size: 24px; }
   .drum__ghost     { font-size: 13px; }
   .game            { gap: 12px; padding: 14px 12px 28px; }
