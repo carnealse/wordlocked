@@ -1177,22 +1177,48 @@ button {
 }
 
 :root[data-theme="halloween"] body {
-  isolation: isolate;
   background:
     radial-gradient(ellipse 80% 40% at 50% 0%, #2a1240 0%, transparent 60%),
     radial-gradient(ellipse 90% 35% at 50% 100%, rgba(251, 140, 30, 0.10) 0%, transparent 70%),
     var(--c-bg);
 }
 
-/* The pumpkin sits behind everything and never takes taps. */
-:root[data-theme="halloween"] body::before {
+/* Pumpkin and ghost flank the hint pill. Absolutely positioned outside the
+   pill so they never shift the layout; the hint row has nothing beside it. */
+:root[data-theme="halloween"] .hint {
+  --hint-icon: 30px;
+  position: relative;
+  max-width: calc(100% - 2 * (var(--hint-icon) * 1.4 + 6px));
+}
+
+:root[data-theme="halloween"] .hint__text {
+  text-align: center;
+  text-wrap: balance;
+}
+
+:root[data-theme="halloween"] .hint::before,
+:root[data-theme="halloween"] .hint::after {
   content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
+  position: absolute;
+  top: 50%;
+  width: var(--hint-icon);
+  height: var(--hint-icon);
+  transform: translateY(-50%);
+  background: center / contain no-repeat;
   pointer-events: none;
-  background: url('assets/themes/halloween-pumpkin.png') 50% 58% / min(115vw, 620px) no-repeat;
-  opacity: 0.09;
+}
+
+:root[data-theme="halloween"] .hint::before {
+  right: calc(100% + 10px);
+  background-image: url('assets/themes/halloween-pumpkin.png');
+}
+
+/* The ghost artwork has more empty margin than the pumpkin, so it is drawn larger to match. */
+:root[data-theme="halloween"] .hint::after {
+  width: calc(var(--hint-icon) * 1.4);
+  height: calc(var(--hint-icon) * 1.4);
+  left: calc(100% + 2px);
+  background-image: url('assets/themes/halloween-ghost.webp');
 }
 
 :root[data-theme="halloween"] .wordmark {
