@@ -24,7 +24,8 @@ const KEY = 'achievements'
 /**
  * @typedef {Object} CheckContext
  * @property {import('./stats.js').Stats & { losses: number }} stats  already includes today
- * @property {{ status: 'won' | 'lost', results: import('./state.js').LevelResult[], puzzleNumber: number }} today
+ * @property {{ status: 'won' | 'lost', results: import('./state.js').LevelResult[], puzzleNumber: number,
+ *              date: string }} today  date is the puzzle day, 'YYYY-MM-DD' in Eastern time
  */
 
 /**
@@ -42,6 +43,8 @@ const KEY = 'achievements'
 const won    = ({ today }) => today.status === 'won'
 const lost   = ({ today }) => today.status === 'lost'
 const failed = length => ({ today }) => today.results[LOCK_LENGTHS.indexOf(length)]?.solved === false
+/** Won on a given calendar day, any year. monthDay is 'MM-DD'. */
+const wonOn  = monthDay => ctx => won(ctx) && ctx.today.date?.endsWith(`-${monthDay}`)
 
 /** @type {readonly Achievement[]} */
 export const ACHIEVEMENTS = Object.freeze([
@@ -102,6 +105,14 @@ export const ACHIEVEMENTS = Object.freeze([
     check: ({ stats }) => stats.streak >= 7,
   },
   {
+    id: 'dozen-streak',
+    name: 'Dozen Glazed',
+    hint: 'Win 12 days in a row.',
+    body: ['Twelve straight wins. A full dozen, fresh out of the oven, and not a single one dropped on the floor.'],
+    reward: 'A box of a dozen donuts. The Lock already ate the one with sprinkles.',
+    check: ({ stats }) => stats.streak >= 12,
+  },
+  {
     id: 'flawless-vault',
     name: 'Flawless Vault',
     hint: 'Crack all three locks on the first guess.',
@@ -116,6 +127,46 @@ export const ACHIEVEMENTS = Object.freeze([
     body: ['You solved a lock on your very last guess. Your heart rate would like a word.'],
     reward: 'A fresh towel and a glass of water.',
     check: ({ today }) => today.results.some(r => r.solved && r.tries === MAX_GUESSES),
+  },
+  {
+    id: 'last-gasp-sweep',
+    name: 'Living on the Edge',
+    hint: 'Win all three locks, each on your last guess.',
+    body: ['Three locks, three last guesses. You either love suspense or you hate yourself, and the Lock respects both.'],
+    reward: 'A defibrillator. Gently used.',
+    check: ctx => won(ctx) && ctx.today.results.every(r => r.tries === MAX_GUESSES),
+  },
+  {
+    id: 'sixty-seven-wins',
+    name: 'Six Seven',
+    hint: 'Win 67 daily puzzles.',
+    body: ['Sixty-seven wins. Somewhere a middle schooler just yelled "six seven" and nobody, including them, knows why.'],
+    reward: 'The Lock refuses to explain the joke. Nobody can.',
+    check: ({ stats }) => stats.wins >= 67,
+  },
+  {
+    id: 'halloween-win',
+    name: 'Trick or Lock',
+    hint: 'Win the puzzle on Halloween.',
+    body: ['You cracked the vault on Halloween. The Lock dressed up as a harder lock. It did not help.'],
+    reward: 'One fun-size candy bar. The Lock ate the rest.',
+    check: wonOn('10-31'),
+  },
+  {
+    id: 'christmas-win',
+    name: 'Unwrapped',
+    hint: 'Win the puzzle on Christmas Day.',
+    body: ['You spent Christmas breaking into a vault. Santa has questions, and so does the naughty list.'],
+    reward: 'A lump of coal, gift wrapped. It is the thought that counts.',
+    check: wonOn('12-25'),
+  },
+  {
+    id: 'new-years-win',
+    name: 'Resolution Kept',
+    hint: "Win the puzzle on New Year's Day.",
+    body: ['First puzzle of the year, cracked. That is one resolution kept, which already beats last year.'],
+    reward: 'A gym membership you will never use.',
+    check: wonOn('01-01'),
   },
 ])
 

@@ -114,8 +114,8 @@ async function finishDay(won, delayMs) {
 
 /** Awards any newly earned achievements and opens the end modal. Safe on every load of a finished day. */
 function showEndOfDay(stats) {
-  const { status, results, puzzleNumber } = getState()
-  const achievements = awardAchievements({ stats, today: { status, results, puzzleNumber } })
+  const { status, results, puzzleNumber, todayStr } = getState()
+  const achievements = awardAchievements({ stats, today: { status, results, puzzleNumber, date: todayStr } })
   revealStatsActions()
   buildAndShowEndModal(status === 'won', { achievements, trophies: trophyEntries() })
   startCountdownTimer(() => location.reload())
