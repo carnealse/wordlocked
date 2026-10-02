@@ -13,15 +13,22 @@ import { ACHIEVEMENTS, hasEarned } from './achievements.js'
 
 const KEY = 'theme'
 const DEFAULT_ID = 'classic'
-const BLOOD_DROPS = 14
 
-/** @typedef {{ id: string, name: string, unlockedBy: string | null }} Theme */
+/**
+ * decor: class names of the empty spans placed in a background layer behind
+ * the game; their look and motion live in style.css.
+ * @typedef {{ id: string, name: string, unlockedBy: string | null,
+ *             decor?: { className: string, children: string[] } }} Theme
+ */
 
 /** @type {readonly Theme[]} */
 export const THEMES = Object.freeze([
   { id: 'classic',   name: 'Classic',      unlockedBy: null },
   { id: 'halloween', name: 'Halloween',    unlockedBy: 'october-win' },
-  { id: 'bloody',    name: 'Bloody Scary', unlockedBy: 'october-two-wins' },
+  { id: 'bloody',    name: 'Bloody Scary', unlockedBy: 'october-two-wins',
+    decor: { className: 'blood-drops', children: Array(14).fill('') } },
+  { id: 'haunted',   name: 'Haunted',      unlockedBy: 'october-three-wins',
+    decor: { className: 'haunt', children: ['chain', 'chain', 'chain', 'chain', 'chain', 'ghost'] } },
 ])
 
 const isUnlocked = theme => !theme.unlockedBy || hasEarned(theme.unlockedBy)
@@ -59,18 +66,22 @@ export function applyTheme() {
   const root = document.documentElement
   if (id === DEFAULT_ID) delete root.dataset.theme
   else root.dataset.theme = id
-  syncBloodDrops(id === 'bloody')
+  syncDecor(THEMES.find(t => t.id === id)?.decor)
 }
 
-/** Empty spans for the background drips; their placement and timing live in style.css. */
-function syncBloodDrops(on) {
-  const existing = document.getElementById('blood-drops')
-  if (!on) { existing?.remove(); return }
-  if (existing) return
+function syncDecor(decor) {
+  const existing = document.getElementById('theme-decor')
+  if (existing?.className === decor?.className) return
+  existing?.remove()
+  if (!decor) return
   const layer = document.createElement('div')
-  layer.id = 'blood-drops'
-  layer.className = 'blood-drops'
+  layer.id = 'theme-decor'
+  layer.className = decor.className
   layer.setAttribute('aria-hidden', 'true')
-  for (let i = 0; i < BLOOD_DROPS; i++) layer.append(document.createElement('span'))
+  for (const name of decor.children) {
+    const child = document.createElement('span')
+    if (name) child.className = name
+    layer.append(child)
+  }
   document.body.prepend(layer)
 }

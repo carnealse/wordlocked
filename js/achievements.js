@@ -192,6 +192,14 @@ export const ACHIEVEMENTS = Object.freeze([
     check: ctx => octoberWins(ctx) >= 2,
   },
   {
+    id: 'october-three-wins',
+    name: "Third Time's the Haunt",
+    hint: 'Win 3 puzzles in the same October.',
+    body: ['Three October wins. Something in the attic is rattling its chains, and it sounds proud of you.'],
+    reward: 'The Haunted theme. Chains, a ghost, and zero rent. Find it under Themes.',
+    check: ctx => octoberWins(ctx) >= 3,
+  },
+  {
     id: 'influencer',
     name: 'Influencer',
     hint: 'Share your result with someone.',
