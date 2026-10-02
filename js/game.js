@@ -43,6 +43,9 @@ let _vault
 let _stats
 let _award
 let _today = { todayStr: '', puzzleNumber: 0 }
+/* False when today's result was already counted before this game finished, e.g. the
+   saved game was erased and the day replayed. A replay never awards achievements. */
+let _rewarded = false
 
 // ── BOOT ─────────────────────────────────────────────────────────
 /** @param {import('./vault.js').VaultWriter} vault  claimed by main.js at startup */
@@ -72,6 +75,7 @@ export async function boot(vault) {
       : defaultPositions(wheels, words[saved.level], dayIndex, saved.level)
 
     restoreState({ ...saved, words, hints, wheels, positions })
+    _rewarded = saved.rewarded === true
   } else {
     const wheels    = buildWheelsForWord(words[0], dayIndex, 0)
     const positions = defaultPositions(wheels, words[0], dayIndex, 0)
@@ -123,6 +127,7 @@ async function loadWords(puzzleNumber) {
 /** Records today's result, then shows the end modal. Call once, at the moment the day ends. */
 async function finishDay(won, delayMs) {
   setStatus(won ? 'won' : 'lost')
+  _rewarded = !loadStats().recordedDates.includes(_today.todayStr)
   persist()
   const { results } = getState()
   const stats = _stats.recordResult(won, results, _today.todayStr)
@@ -131,11 +136,13 @@ async function finishDay(won, delayMs) {
   showEndOfDay(stats)
 }
 
-/** Awards any newly earned achievements and opens the end modal. Safe on every load of a finished day. */
+/** Awards any newly earned achievements (unless today is a replay) and opens the end modal. Safe on every load of a finished day. */
 function showEndOfDay(stats) {
   const { status, results } = getState()
   const { puzzleNumber, todayStr } = _today
-  const achievements = _award({ stats, today: { status, results, puzzleNumber, date: todayStr } })
+  const achievements = _rewarded
+    ? _award({ stats, today: { status, results, puzzleNumber, date: todayStr } })
+    : []
   revealStatsActions()
   buildAndShowEndModal(status === 'won', { achievements, trophies: trophyEntries() })
   startCountdownTimer(() => location.reload())
@@ -284,7 +291,7 @@ function persist() {
           positions, correct, results, status } = getState()
   _vault.write(STORAGE_DAILY, {
     todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
-    positions, correct, results, status,
+    positions, correct, results, status, rewarded: _rewarded,
   })
 }
 
@@ -310,6 +317,7 @@ async function handleShare() {
  * Copy-to-clipboard fallbacks do not count.
  */
 function awardShareAchievements() {
+  if (!_rewarded) return
   const { status, results } = getState()
   const { puzzleNumber, todayStr } = _today
   const unlocked = _award({
