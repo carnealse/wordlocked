@@ -1296,7 +1296,7 @@ button {
   --lock-body:        #e9761f;
   --lock-body-hi:     #f7983a;
   --lock-body-lo:     #b4500e;
-  --lock-well:        rgba(60, 22, 2, 0.72);
+  --lock-well:        #3a1503;
   --lock-btn:         #5c2a09;
   --lock-btn-hi:      #77380f;
   --lock-btn-border:  #8f4a17;
@@ -1305,16 +1305,14 @@ button {
   --lock-arrow:       #ffd3a3;
 }
 
-/* Rounder, gourd-like body. Each rib is a lit bulge with dark creases at its edges. */
+/* Rounder, gourd-like body: ribs bow outward from the center over a round, lit-from-above shading. */
 :root[data-theme="halloween"] .lock__body {
   border-radius: 40px / 30px;
   border-color: rgba(255, 200, 140, 0.12);
   background:
-    radial-gradient(ellipse 70% 45% at 35% 12%, rgba(255, 225, 160, 0.30), transparent 70%),
-    radial-gradient(ellipse 50% 90% at 50% 45%,
-      rgba(255, 196, 120, 0.22) 0%, rgba(255, 196, 120, 0) 55%, rgba(105, 38, 0, 0.45) 100%
-    ) 0 0 / 20% 100% repeat-x,
-    linear-gradient(90deg, rgba(90, 30, 0, 0.45), transparent 9%, transparent 91%, rgba(90, 30, 0, 0.45)),
+    radial-gradient(ellipse 60% 40% at 38% 10%, rgba(255, 225, 160, 0.35), transparent 70%),
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none' fill='none'><g stroke='rgba(255,205,140,0.28)' stroke-width='5' vector-effect='non-scaling-stroke' transform='translate(2.4 0)'><path d='M50 -2V102' vector-effect='non-scaling-stroke'/><path d='M31 -2Q21 50 31 102' vector-effect='non-scaling-stroke'/><path d='M69 -2Q79 50 69 102' vector-effect='non-scaling-stroke'/><path d='M13 4Q0 50 13 96' vector-effect='non-scaling-stroke'/><path d='M87 4Q100 50 87 96' vector-effect='non-scaling-stroke'/></g><g stroke='rgba(105,36,0,0.55)' stroke-width='4' vector-effect='non-scaling-stroke'><path d='M50 -2V102' vector-effect='non-scaling-stroke'/><path d='M31 -2Q21 50 31 102' vector-effect='non-scaling-stroke'/><path d='M69 -2Q79 50 69 102' vector-effect='non-scaling-stroke'/><path d='M13 4Q0 50 13 96' vector-effect='non-scaling-stroke'/><path d='M87 4Q100 50 87 96' vector-effect='non-scaling-stroke'/></g></svg>") center / 100% 100% no-repeat,
+    radial-gradient(ellipse 75% 90% at 50% 40%, transparent 55%, rgba(95, 32, 0, 0.5) 100%),
     linear-gradient(180deg, var(--lock-body-hi), var(--lock-body) 45%, var(--lock-body-lo));
 }
 
