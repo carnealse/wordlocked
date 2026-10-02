@@ -34,17 +34,17 @@ export const THEMES = Object.freeze([
       'ghost',
     ] } },
   { id: 'graveyard', name: 'Graveyard Fog', unlockedBy: 'october-four-wins',
-    decor: { className: 'graveyard', children: ['tombs', 'fog', 'fog', 'fog'] } },
+    decor: { className: 'graveyard', children: ['tombs', 'fog', 'fog', 'fog', 'fog fog--mid', 'fog fog--mid'] } },
   { id: 'witching',  name: 'Witching Hour', unlockedBy: 'october-five-wins',
-    decor: { className: 'witching', children: ['stars', 'stars', 'moon', 'witch'] } },
+    decor: { className: 'witching', children: ['stars', 'stars', 'moon', 'witch', ...Array(28).fill('twinkle')] } },
   { id: 'spider',    name: "Spider's Den",  unlockedBy: 'october-streak-5',
     decor: { className: 'den', children: ['web', 'web', 'web web--side', 'web web--side', 'spider'] } },
   { id: 'bats',      name: 'Bat Swarm',     unlockedBy: 'october-streak-3',
     decor: { className: 'bats', children: ['bat', 'bat', 'bat', 'bat', 'bat', 'bat'] } },
   { id: 'franken',   name: 'Frankenlock',   unlockedBy: 'october-efficient',
-    decor: { className: 'storm', children: ['flash', 'bolt'] } },
+    decor: { className: 'storm', children: ['flash', 'bolt bolt--a', 'bolt bolt--b', 'bolt bolt--c'] } },
   { id: 'final',     name: 'The Final Lock', unlockedBy: 'halloween-win',
-    decor: { className: 'lanterns', children: ['eyes', 'eyes', 'eyes', 'eyes', 'eyes eyes--side', 'eyes eyes--side'] } },
+    decor: { className: 'lanterns', children: [...Array(10).fill('eyes'), 'eyes eyes--side', 'eyes eyes--side'] } },
 ])
 
 const isUnlocked = theme => !theme.unlockedBy || hasEarned(theme.unlockedBy)

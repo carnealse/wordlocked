@@ -1722,6 +1722,8 @@ button {
 .graveyard .fog:nth-child(2) { --b: -4vh; --h: 28vh; --o: 1;    --d: 70s; }
 .graveyard .fog:nth-child(3) { --b: 2vh;  --h: 22vh; --o: 0.7;  --d: 48s; animation-direction: reverse; }
 .graveyard .fog:nth-child(4) { --b: 10vh; --h: 18vh; --o: 0.45; --d: 95s; }
+.graveyard .fog:nth-child(5) { --b: 52vh; --h: 24vh; --o: 0.5; --d: 120s; }
+.graveyard .fog:nth-child(6) { --b: 62vh; --h: 18vh; --o: 0.35; --d: 90s; animation-direction: reverse; }
 
 @keyframes fog-drift {
   from { translate: 0 0; }
@@ -1801,8 +1803,7 @@ button {
     radial-gradient(circle at 93% 36%, #fff 0 1px, transparent 1.6px),
     radial-gradient(circle at 15% 52%, #fff 0 1px, transparent 1.6px),
     radial-gradient(circle at 74% 48%, #fff 0 1px, transparent 1.6px);
-  opacity: 0.5;
-  animation: twinkle 3.4s ease-in-out infinite alternate;
+  opacity: 0.45;
 }
 
 .witching .stars:nth-child(2) {
@@ -1814,13 +1815,57 @@ button {
     radial-gradient(circle at 88% 24%, #fff 0 1.2px, transparent 1.8px),
     radial-gradient(circle at 46% 60%, #fff 0 1px, transparent 1.6px),
     radial-gradient(circle at 97% 58%, #fff 0 1px, transparent 1.6px);
-  animation-duration: 4.6s;
-  animation-delay: -2s;
+  opacity: 0.3;
 }
 
+/* Each star sits dim and flares briefly once per cycle. Uneven cycle lengths and delays
+   mean only one or two flare at a time. Positions avoid the area behind the lock body. */
+.witching .twinkle {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: calc(3px * var(--s, 1));
+  height: calc(3px * var(--s, 1));
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px 1px rgba(255, 250, 220, 0.7);
+  opacity: 0.25;
+  animation: twinkle var(--d) ease-in-out var(--delay) infinite;
+}
+
+.witching .twinkle:nth-child(5) { --x: 2%; --y: 89vh; --d: 7.6s; --delay: -2.9s; }
+.witching .twinkle:nth-child(6) { --x: 53%; --y: 33vh; --d: 11.8s; --delay: -10.6s; }
+.witching .twinkle:nth-child(7) { --x: 80%; --y: 25vh; --d: 8.4s; --delay: -9.9s; }
+.witching .twinkle:nth-child(8) { --x: 7%; --y: 67vh; --d: 9.2s; --delay: -12.9s; }
+.witching .twinkle:nth-child(9) { --x: 90%; --y: 88vh; --d: 8.4s; --delay: -4.7s; }
+.witching .twinkle:nth-child(10) { --x: 34%; --y: 16vh; --d: 7.7s; --delay: -6.0s; --s: 1.4; }
+.witching .twinkle:nth-child(11) { --x: 8%; --y: 28vh; --d: 10.0s; --delay: -7.1s; }
+.witching .twinkle:nth-child(12) { --x: 21%; --y: 88vh; --d: 5.5s; --delay: -5.1s; }
+.witching .twinkle:nth-child(13) { --x: 66%; --y: 90vh; --d: 9.6s; --delay: -2.3s; }
+.witching .twinkle:nth-child(14) { --x: 29%; --y: 37vh; --d: 8.8s; --delay: -4.7s; }
+.witching .twinkle:nth-child(15) { --x: 61%; --y: 24vh; --d: 13.2s; --delay: -6.4s; }
+.witching .twinkle:nth-child(16) { --x: 68%; --y: 91vh; --d: 8.6s; --delay: -9.9s; --s: 1.4; }
+.witching .twinkle:nth-child(17) { --x: 58%; --y: 35vh; --d: 8.0s; --delay: -5.5s; }
+.witching .twinkle:nth-child(18) { --x: 86%; --y: 13vh; --d: 12.4s; --delay: -1.1s; }
+.witching .twinkle:nth-child(19) { --x: 17%; --y: 9vh; --d: 14.0s; --delay: -3.1s; }
+.witching .twinkle:nth-child(20) { --x: 59%; --y: 15vh; --d: 13.3s; --delay: -12.4s; }
+.witching .twinkle:nth-child(21) { --x: 87%; --y: 88vh; --d: 11.9s; --delay: -3.9s; --s: 1.4; }
+.witching .twinkle:nth-child(22) { --x: 26%; --y: 9vh; --d: 5.0s; --delay: -8.6s; --s: 1.4; }
+.witching .twinkle:nth-child(23) { --x: 68%; --y: 25vh; --d: 12.9s; --delay: -3.3s; }
+.witching .twinkle:nth-child(24) { --x: 88%; --y: 13vh; --d: 9.4s; --delay: -0.0s; }
+.witching .twinkle:nth-child(25) { --x: 63%; --y: 90vh; --d: 5.2s; --delay: -12.6s; --s: 1.4; }
+.witching .twinkle:nth-child(26) { --x: 95%; --y: 56vh; --d: 11.1s; --delay: -3.7s; --s: 1.4; }
+.witching .twinkle:nth-child(27) { --x: 7%; --y: 75vh; --d: 11.3s; --delay: -10.0s; }
+.witching .twinkle:nth-child(28) { --x: 5%; --y: 12vh; --d: 13.3s; --delay: -1.8s; }
+.witching .twinkle:nth-child(29) { --x: 88%; --y: 6vh; --d: 12.9s; --delay: -12.1s; }
+.witching .twinkle:nth-child(30) { --x: 94%; --y: 75vh; --d: 8.8s; --delay: -3.5s; }
+.witching .twinkle:nth-child(31) { --x: 87%; --y: 40vh; --d: 7.1s; --delay: -5.7s; }
+.witching .twinkle:nth-child(32) { --x: 56%; --y: 35vh; --d: 10.6s; --delay: -10.3s; }
+
 @keyframes twinkle {
-  from { opacity: 0.2; }
-  to   { opacity: 0.65; }
+  0%, 84%, 100% { opacity: 0.25; scale: 1; }
+  90% { opacity: 1; scale: 2; }
+  95% { opacity: 0.4; scale: 1.1; }
 }
 
 /* Centered on the game column so the lock's shackle sits against it. */
@@ -1956,6 +2001,28 @@ button {
 
 .den .web:nth-child(3) { top: 46vh; left: calc(var(--gutter) * 0.25); --w: 150px; rotate: -20deg; opacity: 0.2; }
 .den .web:nth-child(4) { top: 62vh; left: auto; right: calc(var(--gutter) * 0.2); --w: 170px; scale: -1 1; rotate: 15deg; opacity: 0.2; }
+
+/* A web hanging from the right end of the hint down to the lock body. It passes behind
+   the shackle's right leg, and anything below the body's top edge is hidden behind it. */
+:root[data-theme="spider"] .hint {
+  position: relative;
+}
+
+:root[data-theme="spider"] .hint::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 75%;
+  width: 110px;
+  height: 150px;
+  opacity: 0.45;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 110 150' preserveAspectRatio='none'><path d='M45 95L4 0M45 95L22 0M45 95L50 48M45 95L79 98M45 95L108 148M45 95L72 148M45 95L40 148M45 95L28 100M45 95L26 50M4 0L26 50L28 100L40 148M22 0L108 148M38.4 79.8Q40.4 81.3 41.3 79.8Q43.7 84.8 45.8 87.5Q47.8 91.8 50.4 95.5Q52 99 55.1 103.5Q51.5 102.6 49.3 103.5Q46.6 102.6 44.2 103.5Q43.4 99.2 42.3 95.8Q42.4 92.1 42 87.8Q40.7 84.9 38.4 79.8M31.9 64.6Q35.8 67.6 37.6 64.6Q42.4 74.6 46.6 80Q50.6 88.7 55.9 96Q59 103.1 65.2 112Q58 110.3 53.6 112Q48.2 110.3 43.4 112Q41.8 103.4 39.6 96.6Q39.8 89.2 38.9 80.6Q36.4 74.8 31.9 64.6M25.3 49.4Q31.2 54 34 49.4Q41.1 64.3 47.4 72.4Q53.4 85.5 61.3 96.4Q66 107.1 75.2 120.4Q64.4 117.9 58 120.4Q49.8 117.9 42.6 120.4Q40.2 107.5 36.8 97.4Q37.2 86.4 35.9 73.4Q32 64.8 25.3 49.4M18.8 34.2Q26.6 40.3 30.3 34.2Q39.8 54.1 48.2 64.9Q56.2 82.3 66.8 96.9Q72.9 111.1 85.3 128.9Q70.9 125.5 62.3 128.9Q51.3 125.5 41.8 128.9Q38.7 111.7 34.1 98.2Q34.6 83.5 32.8 66.2Q27.7 54.7 18.8 34.2M12.2 19Q22 26.6 26.6 19Q38.5 43.9 49 57.4Q59 79.2 72.2 97.4Q79.9 115.2 95.4 137.4Q77.4 133.2 66.6 137.4Q52.9 133.2 41 137.4Q37.1 115.9 31.4 99Q32 80.6 29.8 59Q23.4 44.6 12.2 19M6.5 5.7Q17.9 14.6 23.4 5.7Q37.4 34.9 49.7 50.8Q61.5 76.4 77 97.8Q86 118.7 104.2 144.8Q83.1 139.8 70.4 144.8Q54.3 139.8 40.3 144.8Q35.7 119.5 29 99.7Q29.8 78.1 27.1 52.7Q19.6 35.8 6.5 5.7' fill='none' stroke='%23dcdcdc' stroke-width='0.8' vector-effect='non-scaling-stroke'/></svg>") top left / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+@media (max-width: 360px) {
+  :root[data-theme="spider"] .hint::after { width: 90px; height: 90px; }
+}
 
 /* The element's height is the thread length; the spider rides its bottom end. */
 .den .spider {
@@ -2231,31 +2298,48 @@ button {
   pointer-events: none;
 }
 
-/* A faint double flicker every 11 seconds, with the bolt showing during the flicker. */
+/* Three bolts share a 73 second cycle, striking at 8, 32 and 56 seconds, so a player sees
+   about three during a full game. The screen flash peaks with each strike. */
 .storm .flash {
   position: absolute;
   inset: 0;
   opacity: 0;
-  background: radial-gradient(ellipse 90% 60% at 75% 0%, rgba(210, 255, 190, 0.5), transparent 70%);
-  animation: storm-flash 11s linear 3s infinite;
+  background: radial-gradient(ellipse 100% 70% at 50% 20%, rgba(210, 255, 190, 0.4), transparent 75%);
+  animation: storm-flash 73s linear infinite;
 }
 
 .storm .bolt {
   position: absolute;
-  top: 0;
-  left: calc(50% + min(100%, var(--max-w)) * 0.3);
-  width: 34px;
-  height: 22vh;
+  top: var(--y);
+  left: var(--x);
+  height: var(--h);
+  aspect-ratio: var(--ar);
   opacity: 0;
-  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 120'><path d='M24 0L10 48H20L6 120L34 40H22L32 0Z' fill='%23e9ffd6'/></svg>") top / 100% 100% no-repeat;
+  background: var(--art) top / 100% 100% no-repeat;
   filter: drop-shadow(0 0 8px rgba(210, 255, 190, 0.8));
-  animation: storm-flash 11s linear 3s infinite;
+  animation: bolt-strike 73s linear var(--delay) infinite;
+}
+
+.storm .bolt--a { --x: 5%;  --y: 9vh;  --h: 26vh; --ar: 60 / 160; --delay: 8s;
+  --art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 160' fill='none' stroke-linecap='round' stroke-linejoin='round'><path d='M34 0L22 38L36 44L16 92L30 98L12 160' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='9'/><path d='M34 0L22 38L36 44L16 92L30 98L12 160' stroke='%23f4ffe9' stroke-width='3'/></svg>"); }
+.storm .bolt--b { --x: 72%; --y: 18vh; --h: 28vh; --ar: 80 / 160; --delay: 32s;
+  --art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 160' fill='none' stroke-linecap='round' stroke-linejoin='round'><path d='M40 0L46 26L36 48L48 70L38 98L50 124L44 160' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='6.6000000000000005'/><path d='M40 0L46 26L36 48L48 70L38 98L50 124L44 160' stroke='%23f4ffe9' stroke-width='2.2'/><path d='M36 48L20 62L24 80L10 96' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='4.199999999999999'/><path d='M36 48L20 62L24 80L10 96' stroke='%23f4ffe9' stroke-width='1.4'/><path d='M48 70L64 84L60 104' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='3.5999999999999996'/><path d='M48 70L64 84L60 104' stroke='%23f4ffe9' stroke-width='1.2'/></svg>"); }
+.storm .bolt--c { --x: 16%; --y: 82vh; --h: 20vh; --ar: 90 / 150; --delay: 56s;
+  --art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 150' fill='none' stroke-linecap='round' stroke-linejoin='round'><path d='M46 0L38 30L52 52L40 78' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='7.800000000000001'/><path d='M46 0L38 30L52 52L40 78' stroke='%23f4ffe9' stroke-width='2.6'/><path d='M40 78L22 104L28 120L14 150' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='6'/><path d='M40 78L22 104L28 120L14 150' stroke='%23f4ffe9' stroke-width='2'/><path d='M40 78L60 98L54 118L72 150' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='6'/><path d='M40 78L60 98L54 118L72 150' stroke='%23f4ffe9' stroke-width='2'/></svg>"); }
+
+/* 1% of the cycle is about 0.7 seconds: a strike, a quick dim, a second flicker, gone. */
+@keyframes bolt-strike {
+  0%, 1.8%, 100% { opacity: 0; }
+  0.3% { opacity: 1; }
+  0.7% { opacity: 0.15; }
+  1%   { opacity: 0.9; }
 }
 
 @keyframes storm-flash {
-  0%, 60%, 62%, 63.5%, 66%, 100% { opacity: 0; }
-  61%   { opacity: 0.35; }
-  64.5% { opacity: 0.5; }
+  0%, 10.9%, 12.8%, 43.8%, 45.7%, 76.7%, 78.6%, 100% { opacity: 0; }
+  11.3%, 44.2%, 77.1% { opacity: 0.35; }
+  11.7%, 44.6%, 77.5% { opacity: 0.05; }
+  12%,   44.9%, 77.8% { opacity: 0.45; }
 }
 
 /* The Final Lock: pitch black, an ember-rimmed lock, carved eyes blinking in the dark. */
@@ -2335,10 +2419,16 @@ button {
     eyes-blink var(--blink) linear var(--delay) infinite;
 }
 
-.lanterns .eyes:nth-child(1) { --x: 5%;  --y: 27vh; --s: 0.8;  --blink: 7s;   --delay: -1s; }
-.lanterns .eyes:nth-child(2) { --x: 80%; --y: 31vh; --s: 1;    --blink: 9s;   --delay: -4s; }
-.lanterns .eyes:nth-child(3) { --x: 8%;  --y: 93vh; --s: 0.65; --blink: 6s;   --delay: -2.5s; }
-.lanterns .eyes:nth-child(4) { --x: 74%; --y: 95vh; --s: 0.9;  --blink: 8.5s; --delay: -6s; }
+.lanterns .eyes:nth-child(1)  { --x: 4%;  --y: 21vh; --s: 0.7;  --blink: 7s;   --delay: -1s; }
+.lanterns .eyes:nth-child(2)  { --x: 76%; --y: 23vh; --s: 0.8;  --blink: 9s;   --delay: -4s; }
+.lanterns .eyes:nth-child(3)  { --x: 9%;  --y: 34vh; --s: 1;    --blink: 6s;   --delay: -2.5s; }
+.lanterns .eyes:nth-child(4)  { --x: 77%; --y: 37vh; --s: 0.9;  --blink: 8.5s; --delay: -6s; }
+.lanterns .eyes:nth-child(5)  { --x: 22%; --y: 28vh; --s: 0.55; --blink: 10s;  --delay: -3s; }
+.lanterns .eyes:nth-child(6)  { --x: 1%;  --y: 56vh; --s: 0.5;  --blink: 7.5s; --delay: -5s; }
+.lanterns .eyes:nth-child(7)  { --x: 93%; --y: 67vh; --s: 0.5;  --blink: 6.5s; --delay: -0.5s; }
+.lanterns .eyes:nth-child(8)  { --x: 10%; --y: 93vh; --s: 0.8;  --blink: 9.5s; --delay: -7s; }
+.lanterns .eyes:nth-child(9)  { --x: 70%; --y: 95vh; --s: 0.7;  --blink: 8s;   --delay: -2s; }
+.lanterns .eyes:nth-child(10) { --x: 42%; --y: 98vh; --s: 0.6;  --blink: 11s;  --delay: -8s; }
 
 .lanterns .eyes--side { display: none; }
 
@@ -2346,8 +2436,8 @@ button {
   .lanterns .eyes--side { display: block; }
 }
 
-.lanterns .eyes:nth-child(5) { --x: calc(var(--gutter) * 0.4); --y: 42vh; --s: 1.3; --blink: 10s; --delay: -3s; }
-.lanterns .eyes:nth-child(6) { --x: calc(100% - var(--gutter) * 0.5); --y: 58vh; --s: 1.1; --blink: 7.5s; --delay: -5s; }
+.lanterns .eyes:nth-child(11) { --x: calc(var(--gutter) * 0.4); --y: 42vh; --s: 1.3; --blink: 10s; --delay: -3s; }
+.lanterns .eyes:nth-child(12) { --x: calc(100% - var(--gutter) * 0.5); --y: 58vh; --s: 1.1; --blink: 7.5s; --delay: -5s; }
 
 @keyframes eyes-glow {
   from { opacity: 0.25; }
@@ -2368,7 +2458,7 @@ button {
   .storm { display: none; }
   .haunt .chain,
   .graveyard .fog,
-  .witching .stars,
+  .witching .twinkle,
   .witching .moon,
   .lanterns .eyes,
   :root[data-theme="bats"] .header::before,
