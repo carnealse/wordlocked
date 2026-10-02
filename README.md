@@ -29,6 +29,7 @@ wordlocked/
     share.js              # Spoiler-free share text + image card
     messages.js           # Content pools: fail, consolation, win messages
     achievements.js       # Achievement definitions, awarding, trophy case data
+    theme.js              # Seasonal themes by puzzle date
 ```
 
 ## Design principles
@@ -55,3 +56,4 @@ Once the game is live, ids that have already been played must never change. Afte
 
 - **Messages** live in `js/messages.js`. Append `{ title, body: [] }` to a pool. Picks are seeded by puzzle number, so a reload never changes the message.
 - **Achievements** live in `js/achievements.js`. Append `{ id, name, hint, body, reward, check }`. `check({ stats, today })` runs for every achievement not yet earned each time a finished day loads, and the popup shows only the first time it passes. `stats` holds lifetime totals (`played`, `wins`, `losses`, `streak`, `maxStreak`) and already includes today; `today` holds `status` (`'won'` or `'lost'`), `results` (one `{ solved, tries }` per lock), `puzzleNumber`, `date` (`'YYYY-MM-DD'`, Eastern time), and `shared` (true only when the checks re-run after the share sheet reports a completed share). Never rename an `id`, it is the storage key.
+- **Seasonal themes** live in `js/theme.js`. Append `{ id, from, to }` with `'MM-DD'` dates (inclusive, Eastern time) and style it in `style.css` under `:root[data-theme="<id>"]`. Halloween runs October 1–31. Preview any theme with `?theme=<id>` and the default look with `?theme=none`.

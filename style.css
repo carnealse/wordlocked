@@ -1159,3 +1159,30 @@ button {
 
 .trophy--locked { opacity: 0.6; }
 .trophy--locked .trophy__name { letter-spacing: 3px; color: var(--c-text-muted); }
+
+/* ── SEASONAL THEMES (applied by js/theme.js) ───────────────────── */
+/* Halloween: October 1–31. Overrides tokens only; layout is untouched. */
+:root[data-theme="halloween"] {
+  --c-bg:          #0b0810;
+  --c-bg-2:        #130d1a;
+  --c-bg-3:        #1c1326;
+  --c-surface:     #221830;
+  --c-surface-2:   #2b1f3b;
+  --c-border:      #3d2c52;
+  --c-border-2:    #5a417a;
+  --c-text-muted:  #8c74ad;
+  --c-text-faint:  #44345c;
+  --c-gold:        #fb8c1e;
+  --c-gold-dim:    #7c2d12;
+}
+
+:root[data-theme="halloween"] body {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #2a1240 0%, transparent 60%),
+    radial-gradient(ellipse 90% 35% at 50% 100%, rgba(251, 140, 30, 0.10) 0%, transparent 70%),
+    var(--c-bg);
+}
+
+:root[data-theme="halloween"] .wordmark {
+  text-shadow: 0 0 18px rgba(251, 140, 30, 0.35);
+}
