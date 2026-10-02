@@ -6,7 +6,7 @@
 
 import { getPuzzleDate, getDayIndex, getPuzzleNumber, mulberry32, hashStr } from './seed.js'
 import { buildWheelsForWord, wheelIndexOf, advancePosition } from './dials.js'
-import { storage } from './storage.js'
+import { readSealed } from './vault.js'
 import { LOCK_LENGTHS, LOCK_COUNT } from './config.js'
 import {
   getState, isFinished,
@@ -23,9 +23,9 @@ import {
   renderThemePicker,
 } from './ui.js'
 import { themeEntries, selectTheme } from './theme.js'
-import { recordResult, backfillDistribution, loadStats, renderStats } from './stats.js'
+import { createStatsRecorder, loadStats, renderStats } from './stats.js'
 import { shareResult } from './share.js'
-import { awardAchievements, trophyEntries } from './achievements.js'
+import { createAchievementAwarder, trophyEntries } from './achievements.js'
 
 const STORAGE_DAILY = 'daily'
 
@@ -33,19 +33,36 @@ const STORAGE_DAILY = 'daily'
 const _swipe = { active: false, startY: 0, lastY: 0, dialIdx: -1 }
 let _focusedDial = 0
 
+/*
+ * Progress writers and today's puzzle identity live here, out of reach of the
+ * console. Results are recorded against _today rather than game state, which
+ * can be changed through state.js.
+ */
+/** @type {import('./vault.js').VaultWriter} */
+let _vault
+let _stats
+let _award
+let _today = { todayStr: '', puzzleNumber: 0 }
+
 // ── BOOT ─────────────────────────────────────────────────────────
-export async function boot() {
+/** @param {import('./vault.js').VaultWriter} vault  claimed by main.js at startup */
+export async function boot(vault) {
+  if (_vault) return
+  _vault = vault
+  _stats = createStatsRecorder(vault)
+  _award = createAchievementAwarder(vault)
   buildHud()
 
   const todayStr     = getPuzzleDate()
   const dayIndex     = getDayIndex(todayStr)
   const puzzleNumber = getPuzzleNumber(todayStr)
+  _today = Object.freeze({ todayStr, puzzleNumber })
 
   const wordObjs = await loadWords(puzzleNumber)
   const words    = wordObjs.map(o => o.word.toUpperCase())
   const hints    = wordObjs.map(o => o.hint)
 
-  const saved     = storage.get(STORAGE_DAILY)
+  const saved     = readSealed(STORAGE_DAILY)
   const isSameDay = saved?.todayStr === todayStr && saved?.puzzleNumber === puzzleNumber
 
   if (isSameDay) {
@@ -70,7 +87,7 @@ export async function boot() {
   bindEvents()
 
   if (isFinished()) {
-    const stats = backfillDistribution(todayStr, getState().results)
+    const stats = _stats.backfillDistribution(todayStr, getState().results)
     setTimeout(() => showEndOfDay(stats), 300)
   }
 }
@@ -107,8 +124,8 @@ async function loadWords(puzzleNumber) {
 async function finishDay(won, delayMs) {
   setStatus(won ? 'won' : 'lost')
   persist()
-  const { results, todayStr } = getState()
-  const stats = recordResult(won, results, todayStr)
+  const { results } = getState()
+  const stats = _stats.recordResult(won, results, _today.todayStr)
   renderStats(stats, results)
   await sleep(delayMs)
   showEndOfDay(stats)
@@ -116,8 +133,9 @@ async function finishDay(won, delayMs) {
 
 /** Awards any newly earned achievements and opens the end modal. Safe on every load of a finished day. */
 function showEndOfDay(stats) {
-  const { status, results, puzzleNumber, todayStr } = getState()
-  const achievements = awardAchievements({ stats, today: { status, results, puzzleNumber, date: todayStr } })
+  const { status, results } = getState()
+  const { puzzleNumber, todayStr } = _today
+  const achievements = _award({ stats, today: { status, results, puzzleNumber, date: todayStr } })
   revealStatsActions()
   buildAndShowEndModal(status === 'won', { achievements, trophies: trophyEntries() })
   startCountdownTimer(() => location.reload())
@@ -264,7 +282,7 @@ async function submitGuess() {
 function persist() {
   const { todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
           positions, correct, results, status } = getState()
-  storage.set(STORAGE_DAILY, {
+  _vault.write(STORAGE_DAILY, {
     todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
     positions, correct, results, status,
   })
@@ -292,8 +310,9 @@ async function handleShare() {
  * Copy-to-clipboard fallbacks do not count.
  */
 function awardShareAchievements() {
-  const { status, results, puzzleNumber, todayStr } = getState()
-  const unlocked = awardAchievements({
+  const { status, results } = getState()
+  const { puzzleNumber, todayStr } = _today
+  const unlocked = _award({
     stats: loadStats(),
     today: { status, results, puzzleNumber, date: todayStr, shared: true },
   })

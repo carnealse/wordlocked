@@ -1,7 +1,7 @@
 /**
  * achievements.js
  * Achievement definitions, one-time awarding, and trophy case data.
- * Pure logic plus localStorage. No DOM access.
+ * Pure logic plus sealed storage (see vault.js). No DOM access.
  *
  * To add an achievement, append an object to ACHIEVEMENTS:
  *   id      unique and permanent (it is the storage key, never rename it)
@@ -16,7 +16,7 @@
  * saved stats, so long-time players earn them on their next finished day.
  */
 
-import { storage } from './storage.js'
+import { readSealed } from './vault.js'
 import { LOCK_LENGTHS, MAX_GUESSES } from './config.js'
 
 const KEY = 'achievements'
@@ -264,7 +264,7 @@ export const ACHIEVEMENTS = Object.freeze([
 
 /** @returns {Record<string, number>} achievement id -> puzzle number it was earned on */
 function loadEarned() {
-  const earned = storage.get(KEY)?.earned
+  const earned = readSealed(KEY)?.earned
   return earned?.constructor === Object ? earned : {}
 }
 
@@ -272,19 +272,30 @@ function loadEarned() {
  * Evaluate every unearned achievement for a finished puzzle and persist any
  * that pass. Idempotent: calling again for the same day returns [].
  *
+ * @param {import('./vault.js').VaultWriter} vault
  * @param {{ stats: import('./stats.js').Stats, today: CheckContext['today'] }} ctx
  * @returns {Achievement[]} achievements unlocked by this call
  */
-export function awardAchievements({ stats, today }) {
+function awardAchievements(vault, { stats, today }) {
   const earned = loadEarned()
   const ctx = { stats: { ...stats, losses: stats.played - stats.wins }, today }
   const unlocked = ACHIEVEMENTS.filter(def => !Object.hasOwn(earned, def.id) && def.check(ctx))
 
   if (unlocked.length) {
     unlocked.forEach(def => { earned[def.id] = today.puzzleNumber })
-    storage.set(KEY, { earned })
+    vault.write(KEY, { earned })
   }
   return unlocked
+}
+
+/**
+ * Awarding bound to the vault writer, so only code handed the writer at startup can
+ * grant achievements.
+ * @param {import('./vault.js').VaultWriter} vault
+ * @returns {(ctx: { stats: import('./stats.js').Stats, today: CheckContext['today'] }) => Achievement[]}
+ */
+export function createAchievementAwarder(vault) {
+  return ctx => awardAchievements(vault, ctx)
 }
 
 /** @param {string} id */

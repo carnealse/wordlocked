@@ -1,12 +1,12 @@
 /**
  * stats.js
- * Tracks game statistics in localStorage and renders the stats modal.
+ * Tracks game statistics in sealed storage (see vault.js) and renders the stats modal.
  *
  * Guess distribution is per lock. Each solved lock adds one count to the
  * bucket for how many guesses that lock took.
  */
 
-import { storage } from './storage.js'
+import { readSealed } from './vault.js'
 import { LOCK_LENGTHS, LOCK_COUNT, MAX_GUESSES } from './config.js'
 
 const KEY = 'stats'
@@ -42,7 +42,7 @@ const count = n => (Number.isInteger(n) && n > 0 ? n : 0)
 
 /** @returns {Stats} */
 export function loadStats() {
-  const saved = storage.get(KEY) ?? {}
+  const saved = readSealed(KEY) ?? {}
   return {
     played:        count(saved.played),
     wins:          count(saved.wins),
@@ -77,12 +77,13 @@ function addLockResults(stats, results) {
 
 /**
  * Record a completed game result and persist.
+ * @param {import('./vault.js').VaultWriter} vault
  * @param {boolean} won
  * @param {import('./state.js').LevelResult[]} results
  * @param {string} [dateStr]  puzzle day, so a reload cannot count the same puzzle twice
  * @returns {Stats}
  */
-export function recordResult(won, results, dateStr) {
+function recordResult(vault, won, results, dateStr) {
   const stats = loadStats()
   if (dateStr && stats.recordedDates.includes(dateStr)) return stats
 
@@ -102,25 +103,38 @@ export function recordResult(won, results, dateStr) {
   addLockResults(stats, results)
   if (dateStr) stats.recordedDates.push(dateStr)
 
-  storage.set(KEY, stats)
+  vault.write(KEY, stats)
   return stats
 }
 
 /**
  * Fold a game that was already counted by an older build into the per-lock chart.
  * Does not change played / wins / streak.
+ * @param {import('./vault.js').VaultWriter} vault
  * @param {string} dateStr
  * @param {Array<{ solved?: boolean, tries?: number }>} results
  * @returns {Stats}
  */
-export function backfillDistribution(dateStr, results) {
+function backfillDistribution(vault, dateStr, results) {
   const stats = loadStats()
   if (!dateStr || stats.recordedDates.includes(dateStr)) return stats
 
   addLockResults(stats, results)
   stats.recordedDates.push(dateStr)
-  storage.set(KEY, stats)
+  vault.write(KEY, stats)
   return stats
+}
+
+/**
+ * The functions that change stats, bound to the vault writer. Only code that was
+ * handed the writer at startup can record results.
+ * @param {import('./vault.js').VaultWriter} vault
+ */
+export function createStatsRecorder(vault) {
+  return Object.freeze({
+    recordResult:         (won, results, dateStr) => recordResult(vault, won, results, dateStr),
+    backfillDistribution: (dateStr, results) => backfillDistribution(vault, dateStr, results),
+  })
 }
 
 /**
