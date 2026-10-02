@@ -6,8 +6,6 @@
  *
  * To add a theme, append { id, name, unlockedBy } and style it in style.css
  * under :root[data-theme="<id>"], plus a .theme-swatch--<id> preview.
- *
- * ?theme=<id> previews any theme without saving it, locked or not.
  */
 
 import { storage } from './storage.js'
@@ -57,8 +55,7 @@ export function selectTheme(id) {
 }
 
 export function applyTheme() {
-  const preview = new URLSearchParams(location.search).get('theme')
-  const id = THEMES.some(t => t.id === preview) ? preview : selectedThemeId()
+  const id = selectedThemeId()
   const root = document.documentElement
   if (id === DEFAULT_ID) delete root.dataset.theme
   else root.dataset.theme = id
