@@ -40,7 +40,7 @@ export const THEMES = Object.freeze([
   { id: 'spider',    name: "Spider's Den",  unlockedBy: 'october-streak-5',
     decor: { className: 'den', children: ['web', 'web', 'web web--side', 'web web--side', 'spider'] } },
   { id: 'bats',      name: 'Bat Swarm',     unlockedBy: 'october-streak-3',
-    decor: { className: 'bats', children: ['bat', 'bat', 'bat', 'bat', 'bat', 'bat'] } },
+    decor: { className: 'bats', children: ['bat', 'bat', 'bat'] } },
   { id: 'franken',   name: 'Frankenlock',   unlockedBy: 'october-efficient',
     decor: { className: 'storm', children: ['flash', 'bolt bolt--a', 'bolt bolt--b', 'bolt bolt--c'] } },
   { id: 'final',     name: 'The Final Lock', unlockedBy: 'halloween-win',
