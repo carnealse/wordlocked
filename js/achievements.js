@@ -1,7 +1,7 @@
 /**
  * achievements.js
  * Achievement definitions, one-time awarding, and trophy case data.
- * Pure logic plus localStorage. No DOM access.
+ * Pure logic plus sealed storage (see vault.js). No DOM access.
  *
  * To add an achievement, append an object to ACHIEVEMENTS:
  *   id      unique and permanent (it is the storage key, never rename it)
@@ -16,7 +16,7 @@
  * saved stats, so long-time players earn them on their next finished day.
  */
 
-import { storage } from './storage.js'
+import { readSealed } from './vault.js'
 import { LOCK_LENGTHS, MAX_GUESSES } from './config.js'
 
 const KEY = 'achievements'
@@ -47,6 +47,24 @@ const lost   = ({ today }) => today.status === 'lost'
 const failed = length => ({ today }) => today.results[LOCK_LENGTHS.indexOf(length)]?.solved === false
 /** Won on a given calendar day, any year. monthDay is 'MM-DD'. */
 const wonOn  = monthDay => ctx => won(ctx) && ctx.today.date?.endsWith(`-${monthDay}`)
+const inOctober = ({ today }) => today.date?.slice(5, 7) === '10'
+/** Consecutive daily wins ending today, counting October days only. */
+const octoberRun = ({ stats, today }) => {
+  if (!today.date) return 0
+  const wonDays = new Set(stats.wonDates ?? [])
+  let run = 0
+  for (let day = Date.parse(`${today.date}T00:00:00Z`); ; day -= 86_400_000) {
+    const date = new Date(day).toISOString().slice(0, 10)
+    if (date.slice(5, 7) !== '10' || !wonDays.has(date)) return run
+    run++
+  }
+}
+/** Wins in the same October as today's puzzle, today included. Zero outside October. */
+const octoberWins = ({ stats, today }) => {
+  if (!inOctober({ today })) return 0
+  const prefix = `${today.date.slice(0, 4)}-10-`
+  return (stats.wonDates ?? []).filter(d => d.startsWith(prefix)).length
+}
 
 /** @type {readonly Achievement[]} */
 export const ACHIEVEMENTS = Object.freeze([
@@ -151,7 +169,7 @@ export const ACHIEVEMENTS = Object.freeze([
     name: 'Trick or Lock',
     hint: 'Win the puzzle on Halloween.',
     body: ['You cracked the vault on Halloween. The Lock dressed up as a harder lock. It did not help.'],
-    reward: 'One fun-size candy bar. The Lock ate the rest.',
+    reward: 'One fun-size candy bar, plus The Final Lock theme. The Lock ate the rest of the candy. Find the theme under Themes.',
     check: wonOn('10-31'),
   },
   {
@@ -171,6 +189,70 @@ export const ACHIEVEMENTS = Object.freeze([
     check: wonOn('01-01'),
   },
   {
+    id: 'october-win',
+    name: 'Pumpkin Patch',
+    hint: 'Win a puzzle in October.',
+    body: ['An October win. The Lock has been carved, scooped out, and left on the porch to think about what it did.'],
+    reward: 'The Halloween theme. Your lock is now a gourd. Find it under Themes.',
+    check: ctx => octoberWins(ctx) >= 1,
+  },
+  {
+    id: 'october-two-wins',
+    name: 'Out for Blood',
+    hint: 'Win 2 puzzles in the same October.',
+    body: ['Two October wins. The Lock is now bleeding from places a lock should not have.'],
+    reward: 'The Bloody Scary theme. Mop not included. Find it under Themes.',
+    check: ctx => octoberWins(ctx) >= 2,
+  },
+  {
+    id: 'october-three-wins',
+    name: "Third Time's the Haunt",
+    hint: 'Win 3 puzzles in the same October.',
+    body: ['Three October wins. Something in the attic is rattling its chains, and it sounds proud of you.'],
+    reward: 'The Haunted theme. Chains, a ghost, and zero rent. Find it under Themes.',
+    check: ctx => octoberWins(ctx) >= 3,
+  },
+  {
+    id: 'october-four-wins',
+    name: 'Grave Concerns',
+    hint: 'Win 4 puzzles in the same October.',
+    body: ['Four October wins. The Lock has started digging, and it will not say what for.'],
+    reward: 'The Graveyard Fog theme. Wipe your feet. Find it under Themes.',
+    check: ctx => octoberWins(ctx) >= 4,
+  },
+  {
+    id: 'october-five-wins',
+    name: 'Which Witch',
+    hint: 'Win 5 puzzles in the same October.',
+    body: ['Five October wins. At this point the Lock suspects witchcraft and has filed a formal complaint.'],
+    reward: 'The Witching Hour theme. Broom sold separately. Find it under Themes.',
+    check: ctx => octoberWins(ctx) >= 5,
+  },
+  {
+    id: 'october-streak-5',
+    name: 'Caught in the Web',
+    hint: 'Win 5 days in a row in October.',
+    body: ['Five October days in a row. You are now so tangled up in this game that a spider moved in.'],
+    reward: "The Spider's Den theme. The spider pays no rent either. Find it under Themes.",
+    check: ctx => octoberRun(ctx) >= 5,
+  },
+  {
+    id: 'october-streak-3',
+    name: 'Gone Batty',
+    hint: 'Win 3 days in a row in October.',
+    body: ['Three October days in a row. Something in the rafters is applauding with its wings.'],
+    reward: 'The Bat Swarm theme. Do not look up with your mouth open. Find it under Themes.',
+    check: ctx => octoberRun(ctx) >= 3,
+  },
+  {
+    id: 'october-efficient',
+    name: "It's Alive!",
+    hint: 'Win an October puzzle using 6 guesses or fewer in total.',
+    body: ['Three locks, six guesses or fewer. The Lock has been stitched back together and it is furious about it.'],
+    reward: 'The Frankenlock theme. Bolts included. Find it under Themes.',
+    check: ctx => won(ctx) && inOctober(ctx) && ctx.today.results.reduce((n, r) => n + r.tries, 0) <= 6,
+  },
+  {
     id: 'influencer',
     name: 'Influencer',
     hint: 'Share your result with someone.',
@@ -182,7 +264,7 @@ export const ACHIEVEMENTS = Object.freeze([
 
 /** @returns {Record<string, number>} achievement id -> puzzle number it was earned on */
 function loadEarned() {
-  const earned = storage.get(KEY)?.earned
+  const earned = readSealed(KEY)?.earned
   return earned?.constructor === Object ? earned : {}
 }
 
@@ -190,19 +272,35 @@ function loadEarned() {
  * Evaluate every unearned achievement for a finished puzzle and persist any
  * that pass. Idempotent: calling again for the same day returns [].
  *
+ * @param {import('./vault.js').VaultWriter} vault
  * @param {{ stats: import('./stats.js').Stats, today: CheckContext['today'] }} ctx
  * @returns {Achievement[]} achievements unlocked by this call
  */
-export function awardAchievements({ stats, today }) {
+function awardAchievements(vault, { stats, today }) {
   const earned = loadEarned()
   const ctx = { stats: { ...stats, losses: stats.played - stats.wins }, today }
   const unlocked = ACHIEVEMENTS.filter(def => !Object.hasOwn(earned, def.id) && def.check(ctx))
 
   if (unlocked.length) {
     unlocked.forEach(def => { earned[def.id] = today.puzzleNumber })
-    storage.set(KEY, { earned })
+    vault.write(KEY, { earned })
   }
   return unlocked
+}
+
+/**
+ * Awarding bound to the vault writer, so only code handed the writer at startup can
+ * grant achievements.
+ * @param {import('./vault.js').VaultWriter} vault
+ * @returns {(ctx: { stats: import('./stats.js').Stats, today: CheckContext['today'] }) => Achievement[]}
+ */
+export function createAchievementAwarder(vault) {
+  return ctx => awardAchievements(vault, ctx)
+}
+
+/** @param {string} id */
+export function hasEarned(id) {
+  return Object.hasOwn(loadEarned(), id)
 }
 
 /** @returns {Trophy[]} every achievement, earned or not, in definition order */

@@ -6,7 +6,7 @@
 
 import { getPuzzleDate, getDayIndex, getPuzzleNumber, mulberry32, hashStr } from './seed.js'
 import { buildWheelsForWord, wheelIndexOf, advancePosition } from './dials.js'
-import { storage } from './storage.js'
+import { readSealed } from './vault.js'
 import { LOCK_LENGTHS, LOCK_COUNT } from './config.js'
 import {
   getState, isFinished,
@@ -20,10 +20,12 @@ import {
   renderShackle, animateShake, flashCorrectDials,
   showToast, buildAndShowEndModal, showAchievementPages, startCountdownTimer,
   openModal, closeModal, navigateEndPage, openTrophyCase, revealStatsActions,
+  renderThemePicker,
 } from './ui.js'
-import { recordResult, backfillDistribution, loadStats, renderStats } from './stats.js'
+import { themeEntries, selectTheme } from './theme.js'
+import { createStatsRecorder, loadStats, renderStats } from './stats.js'
 import { shareResult } from './share.js'
-import { awardAchievements, trophyEntries } from './achievements.js'
+import { createAchievementAwarder, trophyEntries } from './achievements.js'
 
 const STORAGE_DAILY = 'daily'
 
@@ -31,19 +33,39 @@ const STORAGE_DAILY = 'daily'
 const _swipe = { active: false, startY: 0, lastY: 0, dialIdx: -1 }
 let _focusedDial = 0
 
+/*
+ * Progress writers and today's puzzle identity live here, out of reach of the
+ * console. Results are recorded against _today rather than game state, which
+ * can be changed through state.js.
+ */
+/** @type {import('./vault.js').VaultWriter} */
+let _vault
+let _stats
+let _award
+let _today = { todayStr: '', puzzleNumber: 0 }
+/* False when today's result was already counted before this game finished, e.g. the
+   saved game was erased and the day replayed. A replay never awards achievements. */
+let _rewarded = false
+
 // ── BOOT ─────────────────────────────────────────────────────────
-export async function boot() {
+/** @param {import('./vault.js').VaultWriter} vault  claimed by main.js at startup */
+export async function boot(vault) {
+  if (_vault) return
+  _vault = vault
+  _stats = createStatsRecorder(vault)
+  _award = createAchievementAwarder(vault)
   buildHud()
 
   const todayStr     = getPuzzleDate()
   const dayIndex     = getDayIndex(todayStr)
   const puzzleNumber = getPuzzleNumber(todayStr)
+  _today = Object.freeze({ todayStr, puzzleNumber })
 
   const wordObjs = await loadWords(puzzleNumber)
   const words    = wordObjs.map(o => o.word.toUpperCase())
   const hints    = wordObjs.map(o => o.hint)
 
-  const saved     = storage.get(STORAGE_DAILY)
+  const saved     = readSealed(STORAGE_DAILY)
   const isSameDay = saved?.todayStr === todayStr && saved?.puzzleNumber === puzzleNumber
 
   if (isSameDay) {
@@ -53,6 +75,7 @@ export async function boot() {
       : defaultPositions(wheels, words[saved.level], dayIndex, saved.level)
 
     restoreState({ ...saved, words, hints, wheels, positions })
+    _rewarded = saved.rewarded === true
   } else {
     const wheels    = buildWheelsForWord(words[0], dayIndex, 0)
     const positions = defaultPositions(wheels, words[0], dayIndex, 0)
@@ -68,7 +91,7 @@ export async function boot() {
   bindEvents()
 
   if (isFinished()) {
-    const stats = backfillDistribution(todayStr, getState().results)
+    const stats = _stats.backfillDistribution(todayStr, getState().results)
     setTimeout(() => showEndOfDay(stats), 300)
   }
 }
@@ -104,18 +127,22 @@ async function loadWords(puzzleNumber) {
 /** Records today's result, then shows the end modal. Call once, at the moment the day ends. */
 async function finishDay(won, delayMs) {
   setStatus(won ? 'won' : 'lost')
+  _rewarded = !loadStats().recordedDates.includes(_today.todayStr)
   persist()
-  const { results, todayStr } = getState()
-  const stats = recordResult(won, results, todayStr)
+  const { results } = getState()
+  const stats = _stats.recordResult(won, results, _today.todayStr)
   renderStats(stats, results)
   await sleep(delayMs)
   showEndOfDay(stats)
 }
 
-/** Awards any newly earned achievements and opens the end modal. Safe on every load of a finished day. */
+/** Awards any newly earned achievements (unless today is a replay) and opens the end modal. Safe on every load of a finished day. */
 function showEndOfDay(stats) {
-  const { status, results, puzzleNumber, todayStr } = getState()
-  const achievements = awardAchievements({ stats, today: { status, results, puzzleNumber, date: todayStr } })
+  const { status, results } = getState()
+  const { puzzleNumber, todayStr } = _today
+  const achievements = _rewarded
+    ? _award({ stats, today: { status, results, puzzleNumber, date: todayStr } })
+    : []
   revealStatsActions()
   buildAndShowEndModal(status === 'won', { achievements, trophies: trophyEntries() })
   startCountdownTimer(() => location.reload())
@@ -262,9 +289,9 @@ async function submitGuess() {
 function persist() {
   const { todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
           positions, correct, results, status } = getState()
-  storage.set(STORAGE_DAILY, {
+  _vault.write(STORAGE_DAILY, {
     todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
-    positions, correct, results, status,
+    positions, correct, results, status, rewarded: _rewarded,
   })
 }
 
@@ -290,8 +317,10 @@ async function handleShare() {
  * Copy-to-clipboard fallbacks do not count.
  */
 function awardShareAchievements() {
-  const { status, results, puzzleNumber, todayStr } = getState()
-  const unlocked = awardAchievements({
+  if (!_rewarded) return
+  const { status, results } = getState()
+  const { puzzleNumber, todayStr } = _today
+  const unlocked = _award({
     stats: loadStats(),
     today: { status, results, puzzleNumber, date: todayStr, shared: true },
   })
@@ -311,6 +340,19 @@ function bindEvents() {
   document.getElementById('btn-trophies').addEventListener('click', () => {
     closeModal('modal-stats')
     openTrophyCase(trophyEntries())
+  })
+
+  document.getElementById('btn-themes').addEventListener('click', () => {
+    closeModal('modal-stats')
+    renderThemePicker(themeEntries())
+    openModal('modal-themes')
+  })
+
+  document.getElementById('theme-list').addEventListener('click', e => {
+    const card = e.target.closest('[data-theme-id]')
+    if (!card || card.disabled) return
+    selectTheme(card.dataset.themeId)
+    renderThemePicker(themeEntries())
   })
 
   document.querySelectorAll('[data-close]').forEach(btn =>

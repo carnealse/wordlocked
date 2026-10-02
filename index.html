@@ -126,7 +126,10 @@
         <div class="dist__cols" id="dist-bars"></div>
       </div>
 
-      <button class="btn-ghost stats-trophies" id="btn-trophies">TROPHY CASE</button>
+      <div class="stats-links">
+        <button class="btn-ghost" id="btn-trophies">TROPHY CASE</button>
+        <button class="btn-ghost" id="btn-themes">THEMES</button>
+      </div>
 
       <div class="modal-actions" id="stats-actions" hidden>
         <button class="btn-share" data-action="share">SHARE RESULT</button>
@@ -147,6 +150,18 @@
       <div id="trophy-list">
         <!-- Injected by ui.js -->
       </div>
+    </div>
+  </div>
+
+  <!-- ── THEMES ─────────────────────────────────────── -->
+  <div class="modal-overlay" id="modal-themes" role="dialog" aria-modal="true"
+       aria-labelledby="themes-title" hidden>
+    <div class="modal">
+      <button class="modal__close" data-close="modal-themes" aria-label="Close">✕</button>
+      <h2 class="modal__title" id="themes-title">THEMES</h2>
+      <ul class="theme-list" id="theme-list">
+        <!-- Injected by ui.js -->
+      </ul>
     </div>
   </div>
 

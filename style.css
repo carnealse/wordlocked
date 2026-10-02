@@ -300,6 +300,9 @@ button {
   --shk-lo:  #4d4d68;
   --shk-in:  #34344a;
   --shk-r: calc(var(--shk-w) / 2);
+  /* Optional theme texture layers, drawn over the shading: one for the arc, one for the legs. */
+  --shk-tex-arc:  none;
+  --shk-tex-legs: none;
 
   width: var(--shk-w);
   height: 134px;
@@ -307,6 +310,8 @@ button {
   border-bottom: none;
   border-radius: 96px 96px 0 0;
   background:
+    var(--shk-tex-arc),
+    var(--shk-tex-legs),
     linear-gradient(to top, rgba(0,0,0,0.5), transparent) bottom / 100% 20px no-repeat,
     radial-gradient(circle at 50% 100%,
       var(--shk-in)  calc(var(--shk-r) - var(--shk-t)),
@@ -1112,7 +1117,13 @@ button {
 }
 
 /* ── TROPHY CASE ────────────────────────────────────────────────── */
-.stats-trophies { margin-top: 16px; }
+.stats-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.stats-links .btn-ghost { flex: 1 1 0; min-width: 0; }
 
 .end-page__reward { font-style: italic; }
 
@@ -1160,8 +1171,151 @@ button {
 .trophy--locked { opacity: 0.6; }
 .trophy--locked .trophy__name { letter-spacing: 3px; color: var(--c-text-muted); }
 
-/* ── SEASONAL THEMES (applied by js/theme.js) ───────────────────── */
-/* Halloween: October 1–31. Overrides tokens only; layout is untouched. */
+/* ── THEME PICKER ───────────────────────────────────────────────── */
+.theme-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  color: inherit;
+  text-align: left;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+
+.theme-card:hover:not(:disabled) { background: var(--c-surface-2); }
+.theme-card--selected { border-color: var(--c-gold); }
+.theme-card--locked { opacity: 0.6; cursor: default; }
+
+.theme-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.theme-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+.theme-card--selected .theme-card__name { color: var(--c-gold); }
+
+.theme-card__meta {
+  font-size: 11px;
+  color: var(--c-text-muted);
+}
+
+/* Mini padlock preview: a body block with a U shackle drawn by ::before. */
+.theme-swatch {
+  --sw-body: #4c4c65;
+  --sw-body-lo: #3c3c55;
+  --sw-shackle: #9a9ab8;
+  position: relative;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 40px;
+}
+
+.theme-swatch::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  width: 18px;
+  height: 22px;
+  border: 5px solid var(--sw-shackle);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+}
+
+.theme-swatch::after {
+  content: '';
+  position: absolute;
+  inset: 16px 0 0;
+  border-radius: 6px;
+  background: var(--sw-art, none), linear-gradient(180deg, var(--sw-body), var(--sw-body-lo));
+}
+
+.theme-swatch--halloween {
+  --sw-body: #f08a2a;
+  --sw-body-lo: #b94f0c;
+  --sw-shackle: #5f7f2f;
+}
+
+.theme-swatch--halloween::after { border-radius: 12px / 9px; }
+
+.theme-swatch--bloody {
+  --sw-body: #45434d;
+  --sw-body-lo: #2a2830;
+  --sw-shackle: #8a8794;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 48' preserveAspectRatio='none'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%239b0f17'/><stop offset='1' stop-color='%235c050b'/></linearGradient></defs><g fill='url(%23g)'><path d='M0 0H300V5Q225 9 150 6T0 6Z'/><rect x='5.5' y='2' width='7' height='40.5' rx='3.5'/><circle cx='9' cy='40.15' r='4.7250000000000005'/><rect x='30.5' y='2' width='5' height='13.5' rx='2.5'/><circle cx='33' cy='13.25' r='3.375'/><rect x='52.5' y='2' width='9' height='19.5' rx='4.5'/><circle cx='57' cy='19.05' r='6.075'/><rect x='84.5' y='2' width='5' height='9.5' rx='2.5'/><circle cx='87' cy='9.25' r='3.375'/><rect x='108' y='2' width='6' height='17' rx='3'/><circle cx='111' cy='16.7' r='4.050000000000001'/><rect x='125' y='2' width='8' height='42' rx='4'/><circle cx='129' cy='41.6' r='5.4'/><rect x='153.5' y='2' width='5' height='11.5' rx='2.5'/><circle cx='156' cy='11.25' r='3.375'/><rect x='176.5' y='2' width='7' height='18.5' rx='3.5'/><circle cx='180' cy='18.15' r='4.7250000000000005'/><rect x='201.5' y='2' width='5' height='7.5' rx='2.5'/><circle cx='204' cy='7.25' r='3.375'/><rect x='223.5' y='2' width='9' height='21.5' rx='4.5'/><circle cx='228' cy='21.05' r='6.075'/><rect x='252.5' y='2' width='5' height='12.5' rx='2.5'/><circle cx='255' cy='12.25' r='3.375'/><rect x='270' y='2' width='6' height='17' rx='3'/><circle cx='273' cy='16.7' r='4.050000000000001'/><rect x='287.5' y='2' width='7' height='36.5' rx='3.5'/><circle cx='291' cy='36.15' r='4.7250000000000005'/></g><g fill='rgba(255,170,170,0.35)'><ellipse cx='7.6' cy='37.7' rx='1.26' ry='2.1'/><ellipse cx='55.2' cy='15.9' rx='1.6199999999999999' ry='2.6999999999999997'/><ellipse cx='109.8' cy='14.6' rx='1.08' ry='1.7999999999999998'/><ellipse cx='127.4' cy='38.8' rx='1.44' ry='2.4'/><ellipse cx='178.6' cy='15.7' rx='1.26' ry='2.1'/><ellipse cx='226.2' cy='17.9' rx='1.6199999999999999' ry='2.6999999999999997'/><ellipse cx='271.8' cy='14.6' rx='1.08' ry='1.7999999999999998'/><ellipse cx='289.6' cy='33.7' rx='1.26' ry='2.1'/></g></svg>") top / 100% 70% no-repeat;
+}
+
+.theme-swatch--haunted {
+  --sw-body: #3f454d;
+  --sw-body-lo: #262a30;
+  --sw-shackle: #7d8791;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 72'><defs><radialGradient id='b' cx='0.4' cy='0.3' r='0.8'><stop offset='0' stop-color='%23ffffff'/><stop offset='0.7' stop-color='%23dbe9ee'/><stop offset='1' stop-color='%23a9c2cc'/></radialGradient></defs><path d='M6 34C6 14 17 4 30 4S54 14 54 34V64Q49.5 70 45 64T35 64Q30 70 25 64T15 64Q10.5 70 6 64Z' fill='url(%23b)'/><ellipse cx='22' cy='30' rx='3.6' ry='5' fill='%231c2a33'/><ellipse cx='38' cy='30' rx='3.6' ry='5' fill='%231c2a33'/><ellipse cx='30' cy='45' rx='3.2' ry='4.4' fill='%231c2a33'/></svg>") center 55% / 46% auto no-repeat;
+}
+
+.theme-swatch--graveyard {
+  --sw-body: #7a7f7a;
+  --sw-body-lo: #4f544f;
+  --sw-shackle: #3d423f;
+  --sw-art: radial-gradient(circle at 0 100%, #4f6b3a 0 9px, transparent 10px);
+}
+
+.theme-swatch--witching {
+  --sw-body: #5b3285;
+  --sw-body-lo: #301a4a;
+  --sw-shackle: #e8bf4a;
+  --sw-art: radial-gradient(circle at 70% 40%, #fff4c7 0 5px, transparent 6px);
+}
+
+.theme-swatch--spider {
+  --sw-body: #45403d;
+  --sw-body-lo: #2a2624;
+  --sw-shackle: #77706b;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><path d='M0 0L118.0 0.0M0 0L114.0 30.5M0 0L102.2 59.0M0 0L83.4 83.4M0 0L59.0 102.2M0 0L30.5 114.0M0 0L0.0 118.0M22.0 0.0Q18.6 2.4 21.3 5.7Q17.3 7.2 19.1 11.0Q14.9 11.4 15.6 15.6Q11.4 14.9 11.0 19.1Q7.2 17.3 5.7 21.3Q2.4 18.6 0.0 22.0M44.0 0.0Q37.2 4.9 42.5 11.4Q34.7 14.4 38.1 22.0Q29.8 22.8 31.1 31.1Q22.8 29.8 22.0 38.1Q14.4 34.7 11.4 42.5Q4.9 37.2 0.0 44.0M66.0 0.0Q55.8 7.3 63.8 17.1Q52.0 21.5 57.2 33.0Q44.6 34.3 46.7 46.7Q34.3 44.6 33.0 57.2Q21.5 52.0 17.1 63.8Q7.3 55.8 0.0 66.0M88.0 0.0Q74.4 9.8 85.0 22.8Q69.3 28.7 76.2 44.0Q59.5 45.7 62.2 62.2Q45.7 59.5 44.0 76.2Q28.7 69.3 22.8 85.0Q9.8 74.4 0.0 88.0M110.0 0.0Q93.0 12.2 106.3 28.5Q86.7 35.9 95.3 55.0Q74.4 57.1 77.8 77.8Q57.1 74.4 55.0 95.3Q35.9 86.7 28.5 106.3Q12.2 93.0 0.0 110.0' fill='none' stroke='%23d8d8d8' stroke-width='0.9'/></svg>") 0 0 / 70% auto no-repeat;
+}
+
+.theme-swatch--bats {
+  --sw-body: #4a2a45;
+  --sw-body-lo: #2b1528;
+  --sw-shackle: #8f6f8a;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><path fill='%23120a14' d='M30 9Q27 4 26 8Q22 2 12 3Q14 8 8 9Q4 10 0 8Q6 14 10 22Q14 17 19 21Q22 16 26 20Q28 14 30 22Q32 14 34 20Q38 16 41 21Q46 17 50 22Q54 14 60 8Q56 10 52 9Q46 8 48 3Q38 2 34 8Q33 4 30 9Z'/></svg>") center 60% / 80% auto no-repeat;
+}
+
+.theme-swatch--franken {
+  --sw-body: #5f8a4a;
+  --sw-body-lo: #3d5e2e;
+  --sw-shackle: #5b6168;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><g fill='none' stroke='%231d2a16' stroke-width='2' stroke-dasharray='4 3' vector-effect='non-scaling-stroke'><path d='M45 0V46M0 42H52M45 50H100M52 42V100' vector-effect='non-scaling-stroke'/></g></svg>") center / 100% 100% no-repeat;
+}
+
+.theme-swatch--final {
+  --sw-body: #1d1a18;
+  --sw-body-lo: #0c0b0a;
+  --sw-shackle: #3a3530;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 24'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23ffe08a'/><stop offset='1' stop-color='%23ff7a10'/></linearGradient></defs><path d='M2 22L24 4L26 22Z' fill='url(%23g)'/><path d='M62 22L40 4L38 22Z' fill='url(%23g)'/></svg>") center 55% / 80% auto no-repeat;
+}
+
+/* ── THEMES (selected on the Themes page, applied by js/theme.js) ── */
+/* Themes override tokens and add decoration only; layout is untouched. */
+
+/* Halloween: purple night, pumpkin-orange accents, a pumpkin lock with a stem shackle. */
 :root[data-theme="halloween"] {
   --c-bg:          #0b0810;
   --c-bg-2:        #130d1a;
@@ -1185,4 +1339,1256 @@ button {
 
 :root[data-theme="halloween"] .wordmark {
   text-shadow: 0 0 18px rgba(251, 140, 30, 0.35);
+}
+
+:root[data-theme="halloween"] .lock {
+  --lock-body:        #e9761f;
+  --lock-body-hi:     #f7983a;
+  --lock-body-lo:     #b4500e;
+  --lock-well:        #3a1503;
+  --lock-btn:         #5c2a09;
+  --lock-btn-hi:      #77380f;
+  --lock-btn-border:  #8f4a17;
+  --lock-drum:        #140803;
+  --lock-drum-border: #4d2409;
+  --lock-arrow:       #ffd3a3;
+}
+
+/* Rounder, gourd-like body: ribs bow outward from the center over a round, lit-from-above shading. */
+:root[data-theme="halloween"] .lock__body {
+  border-radius: 40px / 30px;
+  border-color: rgba(255, 200, 140, 0.12);
+  background:
+    radial-gradient(ellipse 60% 40% at 38% 10%, rgba(255, 225, 160, 0.35), transparent 70%),
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none' fill='none'><g stroke='rgba(255,205,140,0.28)' stroke-width='5' vector-effect='non-scaling-stroke' transform='translate(2.4 0)'><path d='M50 -2V102' vector-effect='non-scaling-stroke'/><path d='M31 -2Q21 50 31 102' vector-effect='non-scaling-stroke'/><path d='M69 -2Q79 50 69 102' vector-effect='non-scaling-stroke'/><path d='M13 4Q0 50 13 96' vector-effect='non-scaling-stroke'/><path d='M87 4Q100 50 87 96' vector-effect='non-scaling-stroke'/></g><g stroke='rgba(105,36,0,0.55)' stroke-width='4' vector-effect='non-scaling-stroke'><path d='M50 -2V102' vector-effect='non-scaling-stroke'/><path d='M31 -2Q21 50 31 102' vector-effect='non-scaling-stroke'/><path d='M69 -2Q79 50 69 102' vector-effect='non-scaling-stroke'/><path d='M13 4Q0 50 13 96' vector-effect='non-scaling-stroke'/><path d='M87 4Q100 50 87 96' vector-effect='non-scaling-stroke'/></g></svg>") center / 100% 100% no-repeat,
+    radial-gradient(ellipse 75% 90% at 50% 40%, transparent 55%, rgba(95, 32, 0, 0.5) 100%),
+    linear-gradient(180deg, var(--lock-body-hi), var(--lock-body) 45%, var(--lock-body-lo));
+}
+
+:root[data-theme="halloween"] .drum-btn:active,
+:root[data-theme="halloween"] .drum-btn--pressed {
+  background: linear-gradient(180deg, #a2531a 0%, #7c3d10 100%);
+  border-color: #c06a2a;
+}
+
+/* Green stem: fibers run along the bar, rings on the arc and stripes on the legs. */
+:root[data-theme="halloween"] .lock__shackle {
+  --shk-hi:  #a3c46a;
+  --shk-mid: #607f31;
+  --shk-lo:  #3a4f1b;
+  --shk-in:  #26340f;
+  --shk-tex-arc:
+    repeating-radial-gradient(circle at 50% 100%,
+      rgba(25, 35, 5, 0) 0 3px, rgba(25, 35, 5, 0.28) 3px 4.5px
+    ) top / 100% var(--shk-r) no-repeat;
+  --shk-tex-legs:
+    repeating-linear-gradient(90deg,
+      rgba(25, 35, 5, 0) 0 3px, rgba(25, 35, 5, 0.28) 3px 4.5px
+    ) bottom / 100% calc(100% - var(--shk-r)) no-repeat;
+}
+
+/* Bloody Scary: near-black red, drips falling behind the game, blood running off the lock. */
+:root[data-theme="bloody"] {
+  --c-bg:          #0a0507;
+  --c-bg-2:        #12080b;
+  --c-bg-3:        #1b0c10;
+  --c-surface:     #211015;
+  --c-surface-2:   #2c151b;
+  --c-border:      #4a1d26;
+  --c-border-2:    #6e2a36;
+  --c-text-muted:  #a1707b;
+  --c-text-faint:  #4d2a32;
+  --c-gold:        #f43f5e;
+  --c-gold-dim:    #7f1d2d;
+}
+
+:root[data-theme="bloody"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #3a0a12 0%, transparent 60%),
+    var(--c-bg);
+}
+
+:root[data-theme="bloody"] .wordmark {
+  text-shadow: 0 0 16px rgba(220, 20, 40, 0.45);
+}
+
+:root[data-theme="bloody"] .lock {
+  --lock-body:        #44424c;
+  --lock-body-hi:     #4e4b56;
+  --lock-body-lo:     #2e2c34;
+  --lock-well:        #16121a;
+  --lock-btn:         #2c2830;
+  --lock-btn-hi:      #3d3742;
+  --lock-btn-border:  #4a434f;
+}
+
+:root[data-theme="bloody"] .lock__shackle {
+  --shk-hi:  #a9a6b4;
+  --shk-mid: #6c6975;
+  --shk-lo:  #43404b;
+  --shk-in:  #2c2a32;
+}
+
+/* Blood runs off the top edge and behind the controls, so it never covers them. */
+:root[data-theme="bloody"] .lock__body::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  border-radius: 16px 16px 0 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 48' preserveAspectRatio='none'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%239b0f17'/><stop offset='1' stop-color='%235c050b'/></linearGradient></defs><g fill='url(%23g)'><path d='M0 0H300V5Q225 9 150 6T0 6Z'/><rect x='5.5' y='2' width='7' height='40.5' rx='3.5'/><circle cx='9' cy='40.15' r='4.7250000000000005'/><rect x='30.5' y='2' width='5' height='13.5' rx='2.5'/><circle cx='33' cy='13.25' r='3.375'/><rect x='52.5' y='2' width='9' height='19.5' rx='4.5'/><circle cx='57' cy='19.05' r='6.075'/><rect x='84.5' y='2' width='5' height='9.5' rx='2.5'/><circle cx='87' cy='9.25' r='3.375'/><rect x='108' y='2' width='6' height='17' rx='3'/><circle cx='111' cy='16.7' r='4.050000000000001'/><rect x='125' y='2' width='8' height='42' rx='4'/><circle cx='129' cy='41.6' r='5.4'/><rect x='153.5' y='2' width='5' height='11.5' rx='2.5'/><circle cx='156' cy='11.25' r='3.375'/><rect x='176.5' y='2' width='7' height='18.5' rx='3.5'/><circle cx='180' cy='18.15' r='4.7250000000000005'/><rect x='201.5' y='2' width='5' height='7.5' rx='2.5'/><circle cx='204' cy='7.25' r='3.375'/><rect x='223.5' y='2' width='9' height='21.5' rx='4.5'/><circle cx='228' cy='21.05' r='6.075'/><rect x='252.5' y='2' width='5' height='12.5' rx='2.5'/><circle cx='255' cy='12.25' r='3.375'/><rect x='270' y='2' width='6' height='17' rx='3'/><circle cx='273' cy='16.7' r='4.050000000000001'/><rect x='287.5' y='2' width='7' height='36.5' rx='3.5'/><circle cx='291' cy='36.15' r='4.7250000000000005'/></g><g fill='rgba(255,170,170,0.35)'><ellipse cx='7.6' cy='37.7' rx='1.26' ry='2.1'/><ellipse cx='55.2' cy='15.9' rx='1.6199999999999999' ry='2.6999999999999997'/><ellipse cx='109.8' cy='14.6' rx='1.08' ry='1.7999999999999998'/><ellipse cx='127.4' cy='38.8' rx='1.44' ry='2.4'/><ellipse cx='178.6' cy='15.7' rx='1.26' ry='2.1'/><ellipse cx='226.2' cy='17.9' rx='1.6199999999999999' ry='2.6999999999999997'/><ellipse cx='271.8' cy='14.6' rx='1.08' ry='1.7999999999999998'/><ellipse cx='289.6' cy='33.7' rx='1.26' ry='2.1'/></g></svg>") top / 100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Background drips. Each drop beads at the top edge, swells, stretches, then falls fast.
+   Uneven positions, sizes, speeds and delays keep them from looking like a pattern. */
+.blood-drops {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+/* The span moves and stretches; its ::after is the teardrop, so the stretch stays vertical. */
+.blood-drops span {
+  position: absolute;
+  top: 0;
+  left: var(--x);
+  transform-origin: 50% 0;
+  animation: blood-drip var(--d) var(--delay) infinite;
+}
+
+.blood-drops span::after {
+  content: '';
+  display: block;
+  width: calc(11px * var(--s, 1));
+  height: calc(11px * var(--s, 1));
+  border-radius: 0 50% 50% 50%;
+  rotate: 45deg;
+  background: radial-gradient(circle at 60% 60%, #d62a3a 0%, #a10d1e 45%, #6d0712 100%);
+}
+
+.blood-drops span:nth-child(1)  { --x:  4%; --d: 3.1s; --delay: -0.4s; --s: 0.8; }
+.blood-drops span:nth-child(2)  { --x: 13%; --d: 4.3s; --delay: -2.9s; }
+.blood-drops span:nth-child(3)  { --x: 21%; --d: 2.7s; --delay: -1.6s; --s: 0.6; }
+.blood-drops span:nth-child(4)  { --x: 28%; --d: 4.9s; --delay: -3.8s; --s: 1.2; }
+.blood-drops span:nth-child(5)  { --x: 36%; --d: 3.7s; --delay: -0.9s; --s: 0.7; }
+.blood-drops span:nth-child(6)  { --x: 44%; --d: 4.1s; --delay: -2.2s; }
+.blood-drops span:nth-child(7)  { --x: 51%; --d: 2.9s; --delay: -2.5s; --s: 0.9; }
+.blood-drops span:nth-child(8)  { --x: 58%; --d: 4.6s; --delay: -0.2s; --s: 0.6; }
+.blood-drops span:nth-child(9)  { --x: 65%; --d: 3.3s; --delay: -1.9s; --s: 1.1; }
+.blood-drops span:nth-child(10) { --x: 72%; --d: 3.9s; --delay: -3.3s; --s: 0.8; }
+.blood-drops span:nth-child(11) { --x: 79%; --d: 2.8s; --delay: -1.1s; }
+.blood-drops span:nth-child(12) { --x: 86%; --d: 4.4s; --delay: -2.7s; --s: 0.7; }
+.blood-drops span:nth-child(13) { --x: 92%; --d: 3.5s; --delay: -0.6s; --s: 1.2; }
+.blood-drops span:nth-child(14) { --x: 97%; --d: 4.0s; --delay: -3.1s; --s: 0.6; }
+
+/* About two thirds of each cycle is the bead forming; the fall itself takes roughly a second. */
+@keyframes blood-drip {
+  0%   { translate: 0 -14px; scale: 0.15; opacity: 0; animation-timing-function: ease-out; }
+  10%  { opacity: 1; }
+  52%  { translate: 0 -2px;  scale: 1;        animation-timing-function: ease-in-out; }
+  64%  { translate: 0 3px;   scale: 0.85 1.35; animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  92%  { translate: 0 calc(100dvh + 30px); scale: 0.8 1.5; opacity: 1; }
+  100% { translate: 0 calc(100dvh + 30px); opacity: 0; }
+}
+
+/* Haunted: cold night, old iron lock, chains swaying from the top and a ghost drifting past. */
+:root[data-theme="haunted"] {
+  --c-bg:          #06090c;
+  --c-bg-2:        #0d1318;
+  --c-bg-3:        #141c22;
+  --c-surface:     #18222a;
+  --c-surface-2:   #202c35;
+  --c-border:      #2a3a45;
+  --c-border-2:    #3d5361;
+  --c-text-muted:  #7d95a3;
+  --c-text-faint:  #33444f;
+  --c-gold:        #9fe3d5;
+  --c-gold-dim:    #24564e;
+}
+
+:root[data-theme="haunted"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #15262e 0%, transparent 60%),
+    radial-gradient(ellipse 90% 30% at 50% 100%, rgba(140, 200, 210, 0.07) 0%, transparent 70%),
+    var(--c-bg);
+}
+
+:root[data-theme="haunted"] .wordmark {
+  text-shadow: 0 0 16px rgba(160, 230, 220, 0.35);
+}
+
+:root[data-theme="haunted"] .lock {
+  --lock-body:        #3d434b;
+  --lock-body-hi:     #484f58;
+  --lock-body-lo:     #2a2e34;
+  --lock-well:        #12171b;
+  --lock-btn:         #262c32;
+  --lock-btn-hi:      #343c44;
+  --lock-btn-border:  #3f4952;
+}
+
+:root[data-theme="haunted"] .lock__shackle {
+  --shk-hi:  #9ba5ae;
+  --shk-mid: #5f6870;
+  --shk-lo:  #3b4148;
+  --shk-in:  #272b30;
+}
+
+/* Background layer. The five main chains stay within the game column (the width of the
+   header divider). Side chains fill the empty space beside it on wide screens only.
+   Chains with z-index 3 pass in front of the ghost; the rest sit behind it. */
+.haunt {
+  --col: min(100%, var(--max-w));
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.haunt .chain {
+  position: absolute;
+  top: -4px;
+  left: calc(50% + (var(--x) - 0.5) * var(--col) - 6.5px);
+  width: 13px;
+  height: var(--len);
+  z-index: 1;
+  opacity: 0.55;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 28'><defs><linearGradient id='m' x1='0' x2='1'><stop offset='0' stop-color='%235a636c'/><stop offset='0.45' stop-color='%23b9c2cb'/><stop offset='1' stop-color='%233f464d'/></linearGradient></defs><ellipse cx='8' cy='7.5' rx='4.6' ry='6.6' fill='none' stroke='url(%23m)' stroke-width='2.4'/><rect x='6.7' y='10' width='2.6' height='19' rx='1.3' fill='url(%23m)'/></svg>") top / 13px 22.75px repeat-y;
+  transform-origin: 50% 0;
+  animation: chain-sway var(--d) ease-in-out var(--delay) infinite alternate;
+}
+
+.haunt .chain:nth-child(1) { --x: 0.06; --len: 26vh; --d: 7.3s;  --delay: -2.1s; }
+.haunt .chain:nth-child(2) { --x: 0.27; --len: 44vh; --d: 9.1s;  --delay: -5.4s; z-index: 3; }
+.haunt .chain:nth-child(3) { --x: 0.50; --len: 17vh; --d: 6.4s;  --delay: -1.2s; }
+.haunt .chain:nth-child(4) { --x: 0.73; --len: 35vh; --d: 8.2s;  --delay: -3.7s; }
+.haunt .chain:nth-child(5) { --x: 0.94; --len: 52vh; --d: 10.3s; --delay: -6.6s; z-index: 3; }
+
+.haunt .chain--side { display: none; --gutter: calc((100% - var(--col)) / 2); }
+
+@media (min-width: 700px) {
+  .haunt .chain--side { display: block; }
+}
+
+/* Three in the left gutter, two in the right, placed as a fraction of the gutter width. */
+.haunt .chain:nth-child(6)  { left: calc(var(--gutter) * 0.18); --len: 38vh; --d: 8.7s;  --delay: -4.2s; }
+.haunt .chain:nth-child(7)  { left: calc(var(--gutter) * 0.50); --len: 21vh; --d: 6.9s;  --delay: -0.8s; z-index: 3; }
+.haunt .chain:nth-child(8)  { left: calc(var(--gutter) * 0.80); --len: 47vh; --d: 9.7s;  --delay: -7.1s; }
+.haunt .chain:nth-child(9)  { left: calc(100% - var(--gutter) * 0.70); --len: 31vh; --d: 7.7s; --delay: -2.9s; z-index: 3; }
+.haunt .chain:nth-child(10) { left: calc(100% - var(--gutter) * 0.30); --len: 55vh; --d: 10.9s; --delay: -5.9s; }
+
+@keyframes chain-sway {
+  from { rotate: -1.6deg; }
+  to   { rotate: 1.6deg; }
+}
+
+/* The ghost crosses in the first 40% of each cycle (about 16 seconds), then waits off screen.
+   Alternating direction sends it back the other way on the next pass. */
+.haunt .ghost {
+  position: absolute;
+  top: 20vh;
+  left: 0;
+  width: 84px;
+  height: 101px;
+  z-index: 2;
+  opacity: 0;
+  animation: ghost-cross 40s linear 3s infinite alternate;
+}
+
+.haunt .ghost::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 72'><defs><radialGradient id='b' cx='0.4' cy='0.3' r='0.8'><stop offset='0' stop-color='%23ffffff'/><stop offset='0.7' stop-color='%23dbe9ee'/><stop offset='1' stop-color='%23a9c2cc'/></radialGradient></defs><path d='M6 34C6 14 17 4 30 4S54 14 54 34V64Q49.5 70 45 64T35 64Q30 70 25 64T15 64Q10.5 70 6 64Z' fill='url(%23b)'/><ellipse cx='22' cy='30' rx='3.6' ry='5' fill='%231c2a33'/><ellipse cx='38' cy='30' rx='3.6' ry='5' fill='%231c2a33'/><ellipse cx='30' cy='45' rx='3.2' ry='4.4' fill='%231c2a33'/></svg>") center / contain no-repeat;
+  filter: drop-shadow(0 0 14px rgba(190, 235, 245, 0.45));
+  animation: ghost-bob 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes ghost-cross {
+  0%   { translate: -110px 0;                  opacity: 0; }
+  3%   { opacity: 0.6; }
+  37%  { opacity: 0.6; }
+  40%  { translate: calc(100vw + 110px) 40px; opacity: 0; }
+  100% { translate: calc(100vw + 110px) 40px; opacity: 0; }
+}
+
+@keyframes ghost-bob {
+  from { translate: 0 -9px; rotate: -4deg; }
+  to   { translate: 0 9px;  rotate: 4deg; }
+}
+
+/* Graveyard Fog: grey-green night, weathered stone lock, headstones and drifting fog. */
+:root[data-theme="graveyard"] {
+  --c-bg:          #070a09;
+  --c-bg-2:        #0e1311;
+  --c-bg-3:        #151c19;
+  --c-surface:     #1a221f;
+  --c-surface-2:   #222c28;
+  --c-border:      #2e3b36;
+  --c-border-2:    #45564f;
+  --c-text-muted:  #8a9a93;
+  --c-text-faint:  #3a4741;
+  --c-gold:        #b8d4c4;
+  --c-gold-dim:    #34483f;
+}
+
+:root[data-theme="graveyard"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #1b2622 0%, transparent 60%),
+    var(--c-bg);
+}
+
+:root[data-theme="graveyard"] .wordmark {
+  text-shadow: 0 0 16px rgba(190, 220, 205, 0.3);
+}
+
+:root[data-theme="graveyard"] .lock {
+  --lock-body:        #6c716d;
+  --lock-body-hi:     #7d827e;
+  --lock-body-lo:     #4c514d;
+  --lock-well:        #1a1e1c;
+  --lock-btn:         #383d3a;
+  --lock-btn-hi:      #4a504c;
+  --lock-btn-border:  #555c58;
+}
+
+/* Speckled granite with moss creeping in from the bottom corners. */
+:root[data-theme="graveyard"] .lock__body {
+  border-color: rgba(220, 230, 225, 0.08);
+  background:
+    radial-gradient(ellipse 30% 22% at 0% 100%, rgba(72, 104, 52, 0.75), transparent 70%),
+    radial-gradient(ellipse 22% 16% at 100% 100%, rgba(72, 104, 52, 0.6), transparent 70%),
+    radial-gradient(ellipse 14% 8% at 8% 0%, rgba(72, 104, 52, 0.45), transparent 70%),
+    radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.25) 0 1px, transparent 1.5px) 0 0 / 13px 11px,
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.10) 0 1px, transparent 1.5px) 0 0 / 17px 15px,
+    linear-gradient(180deg, var(--lock-body-hi), var(--lock-body) 45%, var(--lock-body-lo));
+}
+
+:root[data-theme="graveyard"] .lock__shackle {
+  --shk-hi:  #8d938f;
+  --shk-mid: #555b57;
+  --shk-lo:  #363a37;
+  --shk-in:  #242725;
+}
+
+.graveyard {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.graveyard .tombs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80px;
+  opacity: 0.85;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 70'><g fill='%2318201d'><path d='M0 62Q60 54 120 60T240 62V70H0Z'/><path d='M18 60V30Q18 16 32 16T46 30V60Z' transform='rotate(-4 32 60)'/><path d='M78 60V34H70V26H78V16H86V26H94V34H86V60Z' transform='rotate(5 82 60)'/><path d='M128 60V24Q128 8 146 8T164 24V60Z'/><path d='M196 60V40Q196 30 206 30T216 40V60Z' transform='rotate(-7 206 60)'/></g></svg>") left bottom / 240px 70px repeat-x;
+}
+
+/* Each fog bank is two screens wide and tiles every screen width, so sliding it left by
+   one screen width loops seamlessly. Fog sits in front of the headstones. */
+.graveyard .fog {
+  position: absolute;
+  left: 0;
+  bottom: var(--b);
+  width: 200vw;
+  height: var(--h);
+  opacity: var(--o);
+  background:
+    radial-gradient(ellipse 22% 45% at 15% 60%, rgba(205, 220, 214, 0.3), transparent 70%),
+    radial-gradient(ellipse 28% 38% at 48% 55%, rgba(205, 220, 214, 0.26), transparent 70%),
+    radial-gradient(ellipse 20% 50% at 80% 65%, rgba(205, 220, 214, 0.28), transparent 70%);
+  background-size: 100vw 100%;
+  background-repeat: repeat-x;
+  animation: fog-drift var(--d) linear infinite;
+}
+
+.graveyard .fog:nth-child(2) { --b: -4vh; --h: 28vh; --o: 1;    --d: 70s; }
+.graveyard .fog:nth-child(3) { --b: 2vh;  --h: 22vh; --o: 0.7;  --d: 48s; animation-direction: reverse; }
+.graveyard .fog:nth-child(4) { --b: 10vh; --h: 18vh; --o: 0.45; --d: 95s; }
+.graveyard .fog:nth-child(5) { --b: 52vh; --h: 24vh; --o: 0.5; --d: 120s; }
+.graveyard .fog:nth-child(6) { --b: 62vh; --h: 18vh; --o: 0.35; --d: 90s; animation-direction: reverse; }
+
+@keyframes fog-drift {
+  from { translate: 0 0; }
+  to   { translate: -100vw 0; }
+}
+
+/* Witching Hour: indigo sky, a full moon rising behind the lock, a witch crossing it. */
+:root[data-theme="witching"] {
+  --c-bg:          #08061a;
+  --c-bg-2:        #100c26;
+  --c-bg-3:        #181232;
+  --c-surface:     #1e173c;
+  --c-surface-2:   #271e4a;
+  --c-border:      #382c63;
+  --c-border-2:    #52428a;
+  --c-text-muted:  #9b8fc7;
+  --c-text-faint:  #3f3566;
+  --c-gold:        #f5c84c;
+  --c-gold-dim:    #6b5216;
+}
+
+:root[data-theme="witching"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 90% 45% at 50% 0%, #241a52 0%, transparent 65%),
+    var(--c-bg);
+}
+
+:root[data-theme="witching"] .wordmark {
+  text-shadow: 0 0 18px rgba(245, 200, 76, 0.35);
+}
+
+:root[data-theme="witching"] .lock {
+  --lock-body:        #4f2d78;
+  --lock-body-hi:     #603a8f;
+  --lock-body-lo:     #33194f;
+  --lock-well:        #170b26;
+  --lock-btn:         #2f1a4a;
+  --lock-btn-hi:      #44275f;
+  --lock-btn-border:  #5c3a80;
+  --lock-arrow:       #f5d77f;
+}
+
+/* Potion glass: a glossy highlight and a gold rim. */
+:root[data-theme="witching"] .lock__body {
+  border-color: rgba(245, 200, 76, 0.45);
+  background:
+    radial-gradient(ellipse 50% 30% at 30% 8%, rgba(230, 200, 255, 0.28), transparent 70%),
+    radial-gradient(ellipse 80% 50% at 50% 110%, rgba(180, 90, 255, 0.25), transparent 70%),
+    linear-gradient(180deg, var(--lock-body-hi), var(--lock-body) 45%, var(--lock-body-lo));
+}
+
+:root[data-theme="witching"] .lock__shackle {
+  --shk-hi:  #fff0b0;
+  --shk-mid: #d9a93a;
+  --shk-lo:  #8a6416;
+  --shk-in:  #5c410c;
+}
+
+.witching {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.witching .stars {
+  position: absolute;
+  inset: 0 0 40%;
+  background:
+    radial-gradient(circle at 8% 12%,  #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 23% 31%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 41% 7%,  #fff 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 64% 22%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 82% 9%,  #fff 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 93% 36%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 15% 52%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 74% 48%, #fff 0 1px, transparent 1.6px);
+  opacity: 0.45;
+}
+
+.witching .stars:nth-child(2) {
+  background:
+    radial-gradient(circle at 4% 38%,  #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 32% 16%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 53% 40%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 4%,  #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 88% 24%, #fff 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 46% 60%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 97% 58%, #fff 0 1px, transparent 1.6px);
+  opacity: 0.3;
+}
+
+/* Each star sits dim and flares briefly once per cycle. Uneven cycle lengths and delays
+   mean only one or two flare at a time. Positions avoid the area behind the lock body. */
+.witching .twinkle {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: calc(3px * var(--s, 1));
+  height: calc(3px * var(--s, 1));
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px 1px rgba(255, 250, 220, 0.7);
+  opacity: 0.25;
+  animation: twinkle var(--d) ease-in-out var(--delay) infinite;
+}
+
+.witching .twinkle:nth-child(5) { --x: 2%; --y: 89vh; --d: 7.6s; --delay: -2.9s; }
+.witching .twinkle:nth-child(6) { --x: 53%; --y: 33vh; --d: 11.8s; --delay: -10.6s; }
+.witching .twinkle:nth-child(7) { --x: 80%; --y: 25vh; --d: 8.4s; --delay: -9.9s; }
+.witching .twinkle:nth-child(8) { --x: 7%; --y: 67vh; --d: 9.2s; --delay: -12.9s; }
+.witching .twinkle:nth-child(9) { --x: 90%; --y: 88vh; --d: 8.4s; --delay: -4.7s; }
+.witching .twinkle:nth-child(10) { --x: 34%; --y: 16vh; --d: 7.7s; --delay: -6.0s; --s: 1.4; }
+.witching .twinkle:nth-child(11) { --x: 8%; --y: 28vh; --d: 10.0s; --delay: -7.1s; }
+.witching .twinkle:nth-child(12) { --x: 21%; --y: 88vh; --d: 5.5s; --delay: -5.1s; }
+.witching .twinkle:nth-child(13) { --x: 66%; --y: 90vh; --d: 9.6s; --delay: -2.3s; }
+.witching .twinkle:nth-child(14) { --x: 29%; --y: 37vh; --d: 8.8s; --delay: -4.7s; }
+.witching .twinkle:nth-child(15) { --x: 61%; --y: 24vh; --d: 13.2s; --delay: -6.4s; }
+.witching .twinkle:nth-child(16) { --x: 68%; --y: 91vh; --d: 8.6s; --delay: -9.9s; --s: 1.4; }
+.witching .twinkle:nth-child(17) { --x: 58%; --y: 35vh; --d: 8.0s; --delay: -5.5s; }
+.witching .twinkle:nth-child(18) { --x: 86%; --y: 13vh; --d: 12.4s; --delay: -1.1s; }
+.witching .twinkle:nth-child(19) { --x: 17%; --y: 9vh; --d: 14.0s; --delay: -3.1s; }
+.witching .twinkle:nth-child(20) { --x: 59%; --y: 15vh; --d: 13.3s; --delay: -12.4s; }
+.witching .twinkle:nth-child(21) { --x: 87%; --y: 88vh; --d: 11.9s; --delay: -3.9s; --s: 1.4; }
+.witching .twinkle:nth-child(22) { --x: 26%; --y: 9vh; --d: 5.0s; --delay: -8.6s; --s: 1.4; }
+.witching .twinkle:nth-child(23) { --x: 68%; --y: 25vh; --d: 12.9s; --delay: -3.3s; }
+.witching .twinkle:nth-child(24) { --x: 88%; --y: 13vh; --d: 9.4s; --delay: -0.0s; }
+.witching .twinkle:nth-child(25) { --x: 63%; --y: 90vh; --d: 5.2s; --delay: -12.6s; --s: 1.4; }
+.witching .twinkle:nth-child(26) { --x: 95%; --y: 56vh; --d: 11.1s; --delay: -3.7s; --s: 1.4; }
+.witching .twinkle:nth-child(27) { --x: 7%; --y: 75vh; --d: 11.3s; --delay: -10.0s; }
+.witching .twinkle:nth-child(28) { --x: 5%; --y: 12vh; --d: 13.3s; --delay: -1.8s; }
+.witching .twinkle:nth-child(29) { --x: 88%; --y: 6vh; --d: 12.9s; --delay: -12.1s; }
+.witching .twinkle:nth-child(30) { --x: 94%; --y: 75vh; --d: 8.8s; --delay: -3.5s; }
+.witching .twinkle:nth-child(31) { --x: 87%; --y: 40vh; --d: 7.1s; --delay: -5.7s; }
+.witching .twinkle:nth-child(32) { --x: 56%; --y: 35vh; --d: 10.6s; --delay: -10.3s; }
+
+@keyframes twinkle {
+  0%, 84%, 100% { opacity: 0.25; scale: 1; }
+  90% { opacity: 1; scale: 2; }
+  95% { opacity: 0.4; scale: 1.1; }
+}
+
+/* Centered on the game column so the lock's shackle sits against it. */
+.witching .moon {
+  position: absolute;
+  top: 9vh;
+  left: calc(50% - 95px);
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 34% 40%, rgba(170, 150, 100, 0.35) 0 13px, transparent 14px),
+    radial-gradient(circle at 62% 30%, rgba(170, 150, 100, 0.3) 0 8px, transparent 9px),
+    radial-gradient(circle at 58% 66%, rgba(170, 150, 100, 0.3) 0 18px, transparent 19px),
+    radial-gradient(circle at 40% 38%, #fffbe8, #f3e3a8 60%, #d9c27a);
+  box-shadow: 0 0 60px 10px rgba(255, 236, 170, 0.25);
+  animation: moon-rise 26s ease-in-out infinite alternate;
+}
+
+@keyframes moon-rise {
+  from { translate: 0 40px; }
+  to   { translate: 0 -10px; }
+}
+
+/* Flies across the lower half of the moon, the part left visible beside the shackle, in the
+   first third of the cycle, then waits off screen. */
+.witching .witch {
+  position: absolute;
+  top: calc(9vh + 110px);
+  left: 0;
+  width: 110px;
+  height: 55px;
+  opacity: 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'><g fill='%230a0610'><path d='M4 40L26 42L26 50L2 55Z'/><rect x='22' y='44' width='94' height='3.4' rx='1.7' transform='rotate(-5 68 46)'/><path d='M48 46Q46 30 58 21L72 21Q81 32 79 46Z'/><path d='M56 25Q40 27 28 41Q44 34 58 34Z'/><circle cx='69' cy='16' r='6.5'/><path d='M55 12L85 9L85 12.5L55 15.5Z'/><path d='M60 12Q65 5 55 0Q70 3 77 11Z'/><path d='M72 32L84 43L81 45L69 35Z'/><path d='M72 43L83 50L88 49L86 53L71 48Z'/></g></svg>") center / contain no-repeat;
+  animation: witch-fly 36s linear 4s infinite;
+}
+
+@keyframes witch-fly {
+  0%   { translate: -120px 30px; rotate: -6deg; opacity: 0; }
+  2%   { opacity: 0.85; }
+  15%  { translate: 50vw -10px; rotate: -2deg; }
+  28%  { opacity: 0.85; }
+  30%  { translate: calc(100vw + 120px) 20px; rotate: 4deg; opacity: 0; }
+  100% { translate: calc(100vw + 120px) 20px; opacity: 0; }
+}
+
+/* Spider's Den: dusty brown-black, webs in the corners, a spider dropping on its thread. */
+:root[data-theme="spider"] {
+  --c-bg:          #0a0908;
+  --c-bg-2:        #12100e;
+  --c-bg-3:        #1a1715;
+  --c-surface:     #201c1a;
+  --c-surface-2:   #2a2522;
+  --c-border:      #3a3330;
+  --c-border-2:    #554b46;
+  --c-text-muted:  #a0958e;
+  --c-text-faint:  #463e3a;
+  --c-gold:        #e2d9cf;
+  --c-gold-dim:    #4b423c;
+}
+
+:root[data-theme="spider"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #241e1b 0%, transparent 60%),
+    var(--c-bg);
+}
+
+:root[data-theme="spider"] .wordmark {
+  text-shadow: 0 0 14px rgba(230, 220, 210, 0.25);
+}
+
+:root[data-theme="spider"] .lock {
+  --lock-body:        #45403d;
+  --lock-body-hi:     #514b47;
+  --lock-body-lo:     #2e2a28;
+  --lock-well:        #151211;
+  --lock-btn:         #2c2826;
+  --lock-btn-hi:      #3c3734;
+  --lock-btn-border:  #4a4441;
+}
+
+:root[data-theme="spider"] .lock__shackle {
+  --shk-hi:  #a49c96;
+  --shk-mid: #6b645f;
+  --shk-lo:  #45403c;
+  --shk-in:  #2d2926;
+}
+
+/* Strands across the top edge, behind the controls like the Bloody Scary drips. */
+:root[data-theme="spider"] .lock__body::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  border-radius: 16px 16px 0 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 48' preserveAspectRatio='none'><g fill='none' stroke='rgba(225,225,225,0.55)' stroke-width='0.8'><path d='M0 0Q40 26 92 0M60 0Q120 34 190 0M150 0Q210 22 262 0M230 0Q268 30 300 6'/><path d='M0 0L34 0M0 0L30 14M0 0L18 28M0 0L0 34M8 0Q9 6 7 9Q4 10 0 9M18 0Q19 12 14 19Q7 21 0 20M28 0Q30 18 22 28Q10 31 0 30'/></g></svg>") top / 100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.den {
+  --col: min(100%, var(--max-w));
+  --gutter: calc((100% - var(--col)) / 2);
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.den .web {
+  position: absolute;
+  top: 0;
+  width: var(--w, 130px);
+  height: var(--w, 130px);
+  opacity: 0.32;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><path d='M0 0L118.0 0.0M0 0L114.0 30.5M0 0L102.2 59.0M0 0L83.4 83.4M0 0L59.0 102.2M0 0L30.5 114.0M0 0L0.0 118.0M22.0 0.0Q18.6 2.4 21.3 5.7Q17.3 7.2 19.1 11.0Q14.9 11.4 15.6 15.6Q11.4 14.9 11.0 19.1Q7.2 17.3 5.7 21.3Q2.4 18.6 0.0 22.0M44.0 0.0Q37.2 4.9 42.5 11.4Q34.7 14.4 38.1 22.0Q29.8 22.8 31.1 31.1Q22.8 29.8 22.0 38.1Q14.4 34.7 11.4 42.5Q4.9 37.2 0.0 44.0M66.0 0.0Q55.8 7.3 63.8 17.1Q52.0 21.5 57.2 33.0Q44.6 34.3 46.7 46.7Q34.3 44.6 33.0 57.2Q21.5 52.0 17.1 63.8Q7.3 55.8 0.0 66.0M88.0 0.0Q74.4 9.8 85.0 22.8Q69.3 28.7 76.2 44.0Q59.5 45.7 62.2 62.2Q45.7 59.5 44.0 76.2Q28.7 69.3 22.8 85.0Q9.8 74.4 0.0 88.0M110.0 0.0Q93.0 12.2 106.3 28.5Q86.7 35.9 95.3 55.0Q74.4 57.1 77.8 77.8Q57.1 74.4 55.0 95.3Q35.9 86.7 28.5 106.3Q12.2 93.0 0.0 110.0' fill='none' stroke='%23d8d8d8' stroke-width='0.9'/></svg>") 0 0 / 100% 100% no-repeat;
+}
+
+.den .web:nth-child(1) { left: 0; }
+.den .web:nth-child(2) { right: 0; scale: -1 1; --w: 110px; }
+
+/* Desktop only: webs strung in the empty space beside the game column. */
+.den .web--side { display: none; }
+
+@media (min-width: 700px) {
+  .den .web--side { display: block; }
+}
+
+.den .web:nth-child(3) { top: 46vh; left: calc(var(--gutter) * 0.25); --w: 150px; rotate: -20deg; opacity: 0.2; }
+.den .web:nth-child(4) { top: 62vh; left: auto; right: calc(var(--gutter) * 0.2); --w: 170px; scale: -1 1; rotate: 15deg; opacity: 0.2; }
+
+/* A web hanging from the right end of the hint down to the lock body. It passes behind
+   the shackle's right leg, and anything below the body's top edge is hidden behind it. */
+:root[data-theme="spider"] .hint {
+  position: relative;
+}
+
+:root[data-theme="spider"] .hint::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 75%;
+  width: 110px;
+  height: 150px;
+  opacity: 0.45;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 110 150' preserveAspectRatio='none'><path d='M45 95L4 0M45 95L22 0M45 95L50 48M45 95L79 98M45 95L108 148M45 95L72 148M45 95L40 148M45 95L28 100M45 95L26 50M4 0L26 50L28 100L40 148M22 0L108 148M38.4 79.8Q40.4 81.3 41.3 79.8Q43.7 84.8 45.8 87.5Q47.8 91.8 50.4 95.5Q52 99 55.1 103.5Q51.5 102.6 49.3 103.5Q46.6 102.6 44.2 103.5Q43.4 99.2 42.3 95.8Q42.4 92.1 42 87.8Q40.7 84.9 38.4 79.8M31.9 64.6Q35.8 67.6 37.6 64.6Q42.4 74.6 46.6 80Q50.6 88.7 55.9 96Q59 103.1 65.2 112Q58 110.3 53.6 112Q48.2 110.3 43.4 112Q41.8 103.4 39.6 96.6Q39.8 89.2 38.9 80.6Q36.4 74.8 31.9 64.6M25.3 49.4Q31.2 54 34 49.4Q41.1 64.3 47.4 72.4Q53.4 85.5 61.3 96.4Q66 107.1 75.2 120.4Q64.4 117.9 58 120.4Q49.8 117.9 42.6 120.4Q40.2 107.5 36.8 97.4Q37.2 86.4 35.9 73.4Q32 64.8 25.3 49.4M18.8 34.2Q26.6 40.3 30.3 34.2Q39.8 54.1 48.2 64.9Q56.2 82.3 66.8 96.9Q72.9 111.1 85.3 128.9Q70.9 125.5 62.3 128.9Q51.3 125.5 41.8 128.9Q38.7 111.7 34.1 98.2Q34.6 83.5 32.8 66.2Q27.7 54.7 18.8 34.2M12.2 19Q22 26.6 26.6 19Q38.5 43.9 49 57.4Q59 79.2 72.2 97.4Q79.9 115.2 95.4 137.4Q77.4 133.2 66.6 137.4Q52.9 133.2 41 137.4Q37.1 115.9 31.4 99Q32 80.6 29.8 59Q23.4 44.6 12.2 19M6.5 5.7Q17.9 14.6 23.4 5.7Q37.4 34.9 49.7 50.8Q61.5 76.4 77 97.8Q86 118.7 104.2 144.8Q83.1 139.8 70.4 144.8Q54.3 139.8 40.3 144.8Q35.7 119.5 29 99.7Q29.8 78.1 27.1 52.7Q19.6 35.8 6.5 5.7' fill='none' stroke='%23dcdcdc' stroke-width='0.8' vector-effect='non-scaling-stroke'/></svg>") top left / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+@media (max-width: 360px) {
+  :root[data-theme="spider"] .hint::after { width: 90px; height: 90px; }
+}
+
+/* The element's height is the thread length; the spider rides its bottom end. */
+.den .spider {
+  position: absolute;
+  top: 0;
+  left: calc(50% + var(--col) * 0.36);
+  width: 26px;
+  height: 0;
+  filter: drop-shadow(0 0 4px rgba(230, 220, 210, 0.25));
+  animation: spider-drop 22s ease-in-out 2s infinite;
+}
+
+.den .spider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 12px;
+  left: 50%;
+  width: 1px;
+  background: rgba(220, 215, 210, 0.35);
+}
+
+.den .spider::after {
+  content: '';
+  position: absolute;
+  bottom: -14px;
+  left: -4px;
+  width: 34px;
+  height: 34px;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><g stroke='%234a423d' stroke-width='2' fill='none' stroke-linecap='round'><path d='M16 18L8 12L4 16M16 21L6 20L2 25M17 24L9 28L6 34M18 26L14 32L13 38'/><path d='M24 18L32 12L36 16M24 21L34 20L38 25M23 24L31 28L34 34M22 26L26 32L27 38'/></g><defs><radialGradient id='b' cx='0.4' cy='0.35' r='0.7'><stop offset='0' stop-color='%236b615b'/><stop offset='1' stop-color='%232a2522'/></radialGradient></defs><ellipse cx='20' cy='25' rx='6.5' ry='8' fill='url(%23b)'/><circle cx='20' cy='15.5' r='4.2' fill='url(%23b)'/><path d='M18 22L20 26L22 22Z' fill='%23b3261e'/><circle cx='18.4' cy='15' r='1' fill='%23e04030'/><circle cx='21.6' cy='15' r='1' fill='%23e04030'/></svg>") center / contain no-repeat;
+  animation: spider-wiggle 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes spider-drop {
+  0%   { height: 0; }
+  22%  { height: 34vh; }
+  26%  { height: 31vh; }
+  30%  { height: 34vh; }
+  48%  { height: 34vh; }
+  70%  { height: 0; }
+  100% { height: 0; }
+}
+
+@keyframes spider-wiggle {
+  from { rotate: -8deg; }
+  to   { rotate: 8deg; }
+}
+
+/* Bat Swarm: dusk purple, bats roosting under the divider and flocks crossing the sky. */
+:root[data-theme="bats"] {
+  --c-bg:          #0b060c;
+  --c-bg-2:        #140a15;
+  --c-bg-3:        #1d0f1e;
+  --c-surface:     #241327;
+  --c-surface-2:   #2f1a32;
+  --c-border:      #452848;
+  --c-border-2:    #643b68;
+  --c-text-muted:  #ad8bb0;
+  --c-text-faint:  #4d3250;
+  --c-gold:        #f0a5c8;
+  --c-gold-dim:    #6b2f4c;
+}
+
+:root[data-theme="bats"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 90% 40% at 50% 0%, #3a1a3c 0%, transparent 60%),
+    radial-gradient(ellipse 90% 30% at 50% 100%, rgba(240, 120, 90, 0.08) 0%, transparent 70%),
+    var(--c-bg);
+}
+
+:root[data-theme="bats"] .wordmark {
+  text-shadow: 0 0 16px rgba(240, 165, 200, 0.35);
+}
+
+:root[data-theme="bats"] .lock {
+  --lock-body:        #4a2a45;
+  --lock-body-hi:     #573452;
+  --lock-body-lo:     #321a2e;
+  --lock-well:        #180b17;
+  --lock-btn:         #2f1a2c;
+  --lock-btn-hi:      #42263e;
+  --lock-btn-border:  #563351;
+}
+
+:root[data-theme="bats"] .lock__shackle {
+  --shk-hi:  #c4a3bf;
+  --shk-mid: #81637c;
+  --shk-lo:  #533e50;
+  --shk-in:  #382935;
+}
+
+/* Roosting bats hang from the header divider, behind the game content. Now and then one
+   stretches, drops, opens its wings and flies up off the top of the screen, then later
+   settles back in. The flight stays within the header's width so the page never scrolls
+   sideways. */
+:root[data-theme="bats"] .header {
+  position: relative;
+}
+
+:root[data-theme="bats"] .header::before,
+:root[data-theme="bats"] .header::after {
+  --roost: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-11 0 38 28'><g fill='%23140b16'><path d='M6 0V4M10 0V4' stroke='%23140b16' stroke-width='1.2'/><path d='M8 3Q2 4 2 12Q2 20 5 24L8 28L11 24Q14 20 14 12Q14 4 8 3Z'/><path d='M5 25L6 21L8 23L10 21L11 25Z' fill='%231c1020'/></g></svg>");
+  --bat-up: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><g fill='%23140b16'><path d='M27 11.5Q18 -1 9 1Q12.5 2.4 16 10.3Q19 9.5 21.9 15Q24.7 13.1 27.5 17.5ZM33 11.5Q42 -1 51 1Q47.5 2.4 44 10.3Q41 9.5 38 15Q35.3 13.1 32.5 17.5Z'/><ellipse cx='30' cy='15' rx='3.6' ry='5.2'/><path d='M27.4 11.2L27.8 7.4L29.3 10.2H30.7L32.2 7.4L32.6 11.2Z'/></g></svg>");
+  --bat-mid: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><g fill='%23140b16'><path d='M27 11.5Q14.5 7 2 10Q6.8 9.7 11.7 15.8Q15.8 13.6 19.8 17.8Q23.7 14.4 27.5 17.5ZM33 11.5Q45.5 7 58 10Q53.2 9.7 48.3 15.8Q44.2 13.6 40.2 17.8Q36.3 14.4 32.5 17.5Z'/><ellipse cx='30' cy='15' rx='3.6' ry='5.2'/><path d='M27.4 11.2L27.8 7.4L29.3 10.2H30.7L32.2 7.4L32.6 11.2Z'/></g></svg>");
+  --bat-down: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><g fill='%23140b16'><path d='M27 11.5Q17.5 13.5 8 25Q11.7 21.9 15.4 25.1Q18.5 20.5 21.6 22.3Q24.6 16.7 27.5 17.5ZM33 11.5Q42.5 13.5 52 25Q48.3 21.9 44.6 25.1Q41.5 20.5 38.4 22.3Q35.4 16.7 32.5 17.5Z'/><ellipse cx='30' cy='15' rx='3.6' ry='5.2'/><path d='M27.4 11.2L27.8 7.4L29.3 10.2H30.7L32.2 7.4L32.6 11.2Z'/></g></svg>");
+  content: '';
+  position: absolute;
+  top: calc(100% + 1px);
+  z-index: -1;
+  width: 28px;
+  height: 21px;
+  margin-left: -14px;
+  background: var(--roost) top center / contain no-repeat;
+  filter: drop-shadow(0 0 3px rgba(240, 165, 200, 0.5));
+  transform-origin: 50% 0;
+  pointer-events: none;
+  animation: roost-cycle var(--d) linear var(--delay) infinite;
+}
+
+:root[data-theme="bats"] .header::before { left: 29%; --dir: 1;  --d: 37s; --delay: -14s; }
+:root[data-theme="bats"] .header::after  { left: 67%; --dir: -1; --d: 29s; --delay: -2s; width: 24px; height: 18px; margin-left: -12px; }
+
+@keyframes roost-cycle {
+  0% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 0px; scale: 1; rotate: 0deg; opacity: 0.9; }
+  18% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 0px; scale: 1; rotate: 0deg; opacity: 0.9; }
+  20% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 0px; scale: 1.5 0.95; rotate: -6deg; opacity: 0.9; }
+  22% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 0px; scale: 1; rotate: 4deg; opacity: 0.9; }
+  24% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 0px; scale: 1.4 0.95; rotate: 0deg; opacity: 0.9; }
+  26% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 0px; scale: 1; rotate: 0deg; opacity: 0.9; }
+  54% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 0px; scale: 1; rotate: 0deg; opacity: 0.9; }
+  56% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 10px; scale: 1; rotate: 0deg; opacity: 0.9; }
+  56.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 0px) 10px; scale: 1; rotate: 0deg; opacity: 0.9; }
+  57% { background-image: var(--bat-down); translate: calc(var(--dir) * 4.3px) 15.4px; scale: 1; rotate: 3.1deg; opacity: 0.9; }
+  57.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 9.6px) 19.9px; scale: 1; rotate: 5.6deg; opacity: 0.9; }
+  58% { background-image: var(--bat-up); translate: calc(var(--dir) * 15.4px) 23.3px; scale: 1; rotate: 7.4deg; opacity: 0.9; }
+  58.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 21.4px) 25.4px; scale: 1; rotate: 8deg; opacity: 0.9; }
+  59% { background-image: var(--bat-down); translate: calc(var(--dir) * 27.7px) 26px; scale: 1; rotate: 7.4deg; opacity: 0.9; }
+  59.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 34.1px) 24.9px; scale: 1; rotate: 5.7deg; opacity: 0.9; }
+  60% { background-image: var(--bat-up); translate: calc(var(--dir) * 40.7px) 22.1px; scale: 1; rotate: 3.1deg; opacity: 0.9; }
+  60.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 47.5px) 17.4px; scale: 1; rotate: 0.1deg; opacity: 0.9; }
+  61% { background-image: var(--bat-down); translate: calc(var(--dir) * 54.4px) 11px; scale: 1; rotate: -3deg; opacity: 0.9; }
+  61.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 61.4px) 2.9px; scale: 1; rotate: -5.6deg; opacity: 0.9; }
+  62% { background-image: var(--bat-up); translate: calc(var(--dir) * 68.5px) -6.8px; scale: 1; rotate: -7.3deg; opacity: 0.9; }
+  62.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 75.7px) -17.9px; scale: 1; rotate: -8deg; opacity: 0.9; }
+  63% { background-image: var(--bat-down); translate: calc(var(--dir) * 83px) -30.2px; scale: 1; rotate: -7.4deg; opacity: 0.9; }
+  63.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 90.4px) -43.4px; scale: 1; rotate: -5.8deg; opacity: 0.9; }
+  64% { background-image: var(--bat-up); translate: calc(var(--dir) * 97.9px) -53.8px; scale: 1; rotate: -3.2deg; opacity: 0.9; }
+  64.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 105.4px) -62.6px; scale: 1; rotate: -0.2deg; opacity: 0.9; }
+  65% { background-image: var(--bat-down); translate: calc(var(--dir) * 113px) -71.9px; scale: 1; rotate: 2.9deg; opacity: 0.9; }
+  65.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 120.7px) -81.9px; scale: 1; rotate: 5.5deg; opacity: 0.9; }
+  66% { background-image: var(--bat-up); translate: calc(var(--dir) * 128.4px) -92.4px; scale: 1; rotate: 7.3deg; opacity: 0.9; }
+  66.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 136.2px) -103.4px; scale: 1; rotate: 8deg; opacity: 0.9; }
+  67% { background-image: var(--bat-down); translate: calc(var(--dir) * 144.1px) -115px; scale: 1; rotate: 7.5deg; opacity: 0.9; }
+  67.5% { background-image: var(--bat-mid); translate: calc(var(--dir) * 152px) -127.2px; scale: 1; rotate: 5.8deg; opacity: 0.9; }
+  68% { background-image: var(--bat-up); translate: calc(var(--dir) * 160px) -140px; scale: 1; rotate: 3.3deg; opacity: 0.9; }
+  68.5% { background-image: var(--roost); translate: calc(var(--dir) * 0px) -14px; scale: 1; rotate: 0deg; opacity: 0; }
+  88% { background-image: var(--roost); translate: calc(var(--dir) * 0px) -14px; scale: 1; rotate: 0deg; opacity: 0; }
+  92% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 0px; scale: 1; rotate: 0deg; opacity: 0.9; }
+  100% { background-image: var(--roost); translate: calc(var(--dir) * 0px) 0px; scale: 1; rotate: 0deg; opacity: 0.9; }
+}
+
+/* The flock: three bats on one 18 second cycle, so at most three cross at once (four if a
+   roosting bat takes off at the same moment). */
+.bats {
+  --bat-up: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><g fill='%23140b16'><path d='M27 11.5Q18 -1 9 1Q12.5 2.4 16 10.3Q19 9.5 21.9 15Q24.7 13.1 27.5 17.5ZM33 11.5Q42 -1 51 1Q47.5 2.4 44 10.3Q41 9.5 38 15Q35.3 13.1 32.5 17.5Z'/><ellipse cx='30' cy='15' rx='3.6' ry='5.2'/><path d='M27.4 11.2L27.8 7.4L29.3 10.2H30.7L32.2 7.4L32.6 11.2Z'/></g></svg>");
+  --bat-mid: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><g fill='%23140b16'><path d='M27 11.5Q14.5 7 2 10Q6.8 9.7 11.7 15.8Q15.8 13.6 19.8 17.8Q23.7 14.4 27.5 17.5ZM33 11.5Q45.5 7 58 10Q53.2 9.7 48.3 15.8Q44.2 13.6 40.2 17.8Q36.3 14.4 32.5 17.5Z'/><ellipse cx='30' cy='15' rx='3.6' ry='5.2'/><path d='M27.4 11.2L27.8 7.4L29.3 10.2H30.7L32.2 7.4L32.6 11.2Z'/></g></svg>");
+  --bat-down: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><g fill='%23140b16'><path d='M27 11.5Q17.5 13.5 8 25Q11.7 21.9 15.4 25.1Q18.5 20.5 21.6 22.3Q24.6 16.7 27.5 17.5ZM33 11.5Q42.5 13.5 52 25Q48.3 21.9 44.6 25.1Q41.5 20.5 38.4 22.3Q35.4 16.7 32.5 17.5Z'/><ellipse cx='30' cy='15' rx='3.6' ry='5.2'/><path d='M27.4 11.2L27.8 7.4L29.3 10.2H30.7L32.2 7.4L32.6 11.2Z'/></g></svg>");
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bats .bat {
+  position: absolute;
+  top: var(--y);
+  left: 0;
+  width: calc(44px * var(--s, 1));
+  height: calc(21px * var(--s, 1));
+  opacity: 0;
+  animation: bat-cross 18s linear var(--delay) infinite;
+}
+
+/* Wing beats flip between drawn frames; the flutter adds a bat's jittery bob and tilt. */
+.bats .bat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bat-mid) center / contain no-repeat;
+  filter: drop-shadow(0 0 3px rgba(240, 165, 200, 0.55));
+  animation:
+    bat-wings var(--flap, 0.3s) linear infinite,
+    bat-flutter var(--bob, 0.9s) ease-in-out infinite alternate;
+}
+
+.bats .bat:nth-child(1) { --y: 15vh; --delay: 1s;   --s: 1;    }
+.bats .bat:nth-child(2) { --y: 22vh; --delay: 1.8s; --s: 0.75; --flap: 0.26s; --bob: 0.7s; }
+.bats .bat:nth-child(3) { --y: 48vh; --delay: 9s;   --s: 0.85; --flap: 0.34s; --bob: 1.1s; animation-name: bat-cross-back; }
+
+@keyframes bat-wings {
+  0%, 100% { background-image: var(--bat-up); }
+  25%, 75% { background-image: var(--bat-mid); }
+  50%      { background-image: var(--bat-down); }
+}
+
+@keyframes bat-flutter {
+  0%   { translate: 0 -5px; rotate: -7deg; }
+  40%  { translate: 0 3px;  rotate: 4deg; }
+  100% { translate: 0 6px;  rotate: -2deg; }
+}
+
+@keyframes bat-cross {
+  0%   { translate: -60px 0;     opacity: 0; }
+  2%   { opacity: 0.9; }
+  6%   { translate: 16vw -24px; }
+  10%  { translate: 30vw 14px; }
+  14%  { translate: 46vw -18px; }
+  19%  { translate: 63vw 20px; }
+  24%  { translate: 80vw -10px; }
+  28%  { opacity: 0.9; }
+  30%  { translate: calc(100vw + 60px) -26px; opacity: 0; }
+  100% { translate: calc(100vw + 60px) -26px; opacity: 0; }
+}
+
+@keyframes bat-cross-back {
+  0%   { translate: calc(100vw + 60px) 0; scale: -1 1; opacity: 0; }
+  2%   { opacity: 0.8; }
+  8%   { translate: 72vw -30px; scale: -1 1; }
+  13%  { translate: 50vw 10px;  scale: -1 1; }
+  19%  { translate: 26vw -22px; scale: -1 1; }
+  24%  { opacity: 0.8; }
+  26%  { translate: -60px -8px; scale: -1 1; opacity: 0; }
+  100% { translate: -60px -8px; scale: -1 1; opacity: 0; }
+}
+
+/* Frankenlock: lab green, a stitched patchwork lock with bolts, lightning in the distance. */
+:root[data-theme="franken"] {
+  --c-bg:          #050a06;
+  --c-bg-2:        #0b130c;
+  --c-bg-3:        #111c13;
+  --c-surface:     #152218;
+  --c-surface-2:   #1c2c1f;
+  --c-border:      #273c2b;
+  --c-border-2:    #3a5840;
+  --c-text-muted:  #8fae94;
+  --c-text-faint:  #344a38;
+  --c-gold:        #b6f27a;
+  --c-gold-dim:    #3c5c22;
+}
+
+:root[data-theme="franken"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #15301c 0%, transparent 60%),
+    var(--c-bg);
+}
+
+:root[data-theme="franken"] .wordmark {
+  text-shadow: 0 0 16px rgba(182, 242, 122, 0.35);
+}
+
+:root[data-theme="franken"] .lock {
+  --lock-body:        #5a8346;
+  --lock-body-hi:     #6a9554;
+  --lock-body-lo:     #3e5e30;
+  --lock-well:        #16220f;
+  --lock-btn:         #2d4223;
+  --lock-btn-hi:      #3d562f;
+  --lock-btn-border:  #4c6a3b;
+}
+
+/* Four mismatched patches of skin with stitched seams between them. */
+:root[data-theme="franken"] .lock__body {
+  border-color: rgba(20, 35, 15, 0.6);
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><g fill='none' stroke='%231d2a16' stroke-width='2' stroke-dasharray='4 3' vector-effect='non-scaling-stroke'><path d='M45 0V46M0 42H52M45 50H100M52 42V100' vector-effect='non-scaling-stroke'/></g></svg>") center / 100% 100% no-repeat,
+    linear-gradient(#64904e, #4f7a3c) 0 0 / 45% 42% no-repeat,
+    linear-gradient(#6d9a56, #577f42) 100% 0 / 55% 50% no-repeat,
+    linear-gradient(#557c42, #3f6131) 0 100% / 52% 58% no-repeat,
+    linear-gradient(#5f8a4a, #446a35) 100% 100% / 48% 50% no-repeat,
+    var(--lock-body);
+}
+
+/* Neck bolts on each side. They spark when a lock opens. */
+:root[data-theme="franken"] .lock__body::before,
+:root[data-theme="franken"] .lock__body::after {
+  content: '';
+  position: absolute;
+  top: calc(50% - 9px);
+  width: 10px;
+  height: 18px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #c9ced3, #7a8087 55%, #4a4f55);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+:root[data-theme="franken"] .lock__body::before { left: -9px; border-radius: 3px 0 0 3px; }
+:root[data-theme="franken"] .lock__body::after  { right: -9px; border-radius: 0 3px 3px 0; }
+
+:root[data-theme="franken"] .lock:has(.lock__shackle--open) .lock__body::before,
+:root[data-theme="franken"] .lock:has(.lock__shackle--open) .lock__body::after {
+  animation: bolt-spark 0.9s ease-out;
+}
+
+@keyframes bolt-spark {
+  0%, 100% { box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.3); filter: none; }
+  15% { box-shadow: 0 0 14px 4px rgba(190, 255, 130, 0.9); filter: brightness(1.8); }
+  30% { box-shadow: 0 0 2px rgba(190, 255, 130, 0.4); filter: none; }
+  45% { box-shadow: 0 0 10px 3px rgba(190, 255, 130, 0.8); filter: brightness(1.5); }
+}
+
+:root[data-theme="franken"] .lock__shackle {
+  --shk-hi:  #a3a9b0;
+  --shk-mid: #5d636a;
+  --shk-lo:  #3b4046;
+  --shk-in:  #272a2e;
+}
+
+.storm {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Six bolts share a 59 second cycle, striking at 3, 12, 19, 31, 39 and 52 seconds, so the
+   gaps between strikes are an uneven 7 to 13 seconds. Bolts are placed within the game column
+   (the phone-width area), in the gaps around the lock, and sit behind the game. */
+.storm .flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse 100% 70% at 50% 20%, rgba(225, 235, 255, 0.35), transparent 75%);
+  animation: storm-flash 59s linear infinite;
+}
+
+.storm .bolt {
+  position: absolute;
+  top: var(--y);
+  left: calc(50% + (var(--x) - 0.5) * min(100%, var(--max-w)));
+  height: var(--h);
+  aspect-ratio: 1 / 3;
+  opacity: 0;
+  background: center / 100% 100% no-repeat;
+  filter: drop-shadow(0 0 4px rgba(220, 235, 255, 0.85));
+  animation: var(--flicker) 59s linear var(--delay) infinite;
+}
+
+.storm .bolt:nth-child(2) { --x: 0.06; --y: 0px; --h: 300px; --delay: 3s; --flicker: bolt-strike-2; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M49.2 88.1L49.2 98.3L43.9 108.3L35.1 114.4L23.4 129.4' stroke-width='0.85'/><path d='M62.4 202.7L59.3 212.1L50.8 222.7' stroke-width='0.425'/><path d='M40.4 159.8L41 171.9L44.6 181.9L53.1 189.5L62.4 202.7' stroke-width='0.85'/><path d='M50 0L43 10.7L46.3 19.1L44.6 26.9L51.2 37.5L47.8 44.4L53.4 54.5L49.9 62.2L44.3 75.5L49.2 88.1L53.2 99.2L54.9 108.3L51.6 117.5L49.7 124L44.9 134.1L40.6 140.6L41.3 147.4L40.4 159.8L40.7 166.7L38.5 179.6L35.3 191.6L41.1 201.8L40.2 216.1L39.8 230.9L37.3 244L42.4 256.7L43.2 270.2' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(3) { --x: 0.7; --y: 40px; --h: 320px; --delay: 12s; --flicker: bolt-strike-1; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M66.5 159.2L75.9 170.1L83.4 178.6L92.1 186.8L101.5 194.5L111.3 204.2' stroke-width='0.85'/><path d='M49.3 202.8L39.1 215.5L29.3 227.5' stroke-width='0.425'/><path d='M65.8 167.6L58.8 180.5L57.1 187.9L53.1 194.6L49.3 202.8' stroke-width='0.85'/><path d='M50 0L43 7.6L49.2 17.3L49.6 31.7L53.6 42.2L60.1 49.8L56.1 58L51.2 69L46.5 77L46.1 87L40.2 100.3L39.2 107.8L45.8 120.6L50.5 131.4L54.9 137.8L61 147.2L66.5 159.2L65.8 167.6L69 181L75.4 193.2L79.5 203.1L80.3 211.1L86.3 219.7L88.9 231.8L84.4 239L87.2 245.5L89.9 256.1' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(4) { --x: 0.12; --y: 120px; --h: 260px; --delay: 19s; --flicker: bolt-strike-3; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M27.7 88.9L28.7 99.3L36.3 107.1L35.3 120.6L38.1 130.7' stroke-width='0.85'/><path d='M32.8 98.9L41.8 110.9L41.5 120.8L48.5 135.5L50.7 144.9' stroke-width='0.85'/><path d='M29.3 108.6L39.3 116.7L45.5 122.9' stroke-width='0.85'/><path d='M2.5 207.9L7.1 222.7L19.1 232.8' stroke-width='0.425'/><path d='M33 163.5L25.2 177.5L20.3 190.2L9.9 200.1L2.5 207.9' stroke-width='0.85'/><path d='M50 0L43.2 8.1L41.1 16.9L38.5 24.4L34.6 30.6L39.1 38.5L44.3 53.3L38.9 62.9L32.3 71.5L25.7 78.3L27.7 88.9L32.8 98.9L29.3 108.6L24.5 123.3L31 136.6L33 145.1L32 155.6L33 163.5L38.1 173.2L31.8 181.2L26.2 194L26.2 200.6L23.7 215L18.5 221.3L12.5 235.4L15.6 249.7L17.7 260.6' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(5) { --x: 0.74; --y: 0px; --h: 340px; --delay: 31s; --flicker: bolt-strike-1; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M31.3 47.7L25.2 55.9L18.4 62.4L7.4 73.3L0.1 83.7' stroke-width='0.85'/><path d='M35.3 77.3L35.7 88.9L24.6 95.4' stroke-width='0.85'/><path d='M46.3 104.6L45.1 111.3L45.6 121.8' stroke-width='0.85'/><path d='M42.2 147.7L52.8 162.2L52.6 174.8' stroke-width='0.85'/><path d='M43.4 159L35.7 167.1L33.8 177.9' stroke-width='0.85'/><path d='M42 165.8L31.8 176.4L33 182.7L33.5 195.9L35.4 202.9' stroke-width='0.85'/><path d='M41.3 179.1L43.5 191.7L43.6 200.6L45.8 213.3L48 223.1' stroke-width='0.85'/><path d='M50 0L43 6.5L36.6 18.5L33.3 31.3L31.6 41.1L31.3 47.7L30.5 60.7L33.8 68.8L35.3 77.3L41.3 91.6L46.3 104.6L41.2 118L37 131.9L42.5 139.5L42.2 147.7L43.4 159L42 165.8L41.3 179.1L42.3 188.8L39.2 203.7L41.2 218.6L40.3 225.8L47.3 238.4L44.2 250.7L47.2 257.1L50.4 264.9L43.8 273.7' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(6) { --x: 0.4; --y: 0px; --h: 220px; --delay: 39s; --flicker: bolt-strike-3; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M51.7 63.3L42 69.7L35.6 82.6' stroke-width='0.85'/><path d='M57.7 158.9L66.5 169.8L71.4 177.7' stroke-width='0.85'/><path d='M50 0L43 12.9L48.2 24.5L43.8 35.9L50.6 44.2L52.4 50.7L51.7 63.3L50.6 72.6L54.4 79.2L57.7 91.8L52.3 97.8L59.2 108L56.2 121.9L58.6 129.6L54.1 143L54.5 151.4L57.7 158.9L62.6 165.7L69.5 177L72.3 189.5L70.6 200.8L76.2 215L76.9 225.6L70.9 239L66.5 246.1L70.1 258.9L63.8 273.8' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(7) { --x: 0.66; --y: 150px; --h: 280px; --delay: 52s; --flicker: bolt-strike-2; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M-0.1 88.8L10.7 96L12 103.3L21.7 117.8' stroke-width='0.425'/><path d='M41.7 38.3L38.9 46.6L29.4 60L17.5 73.3L9.2 79.7L-0.1 88.8' stroke-width='0.85'/><path d='M46.5 153.3L41.6 159.5L30.4 169.3' stroke-width='0.85'/><path d='M50 0L43 10.3L45.7 21.6L40.3 31.6L41.7 38.3L47.5 52.6L40.8 60.1L43.9 72.3L42.5 82L44.1 89.4L43.7 96.1L48.5 102.6L42.7 111.8L44.9 122.6L50.7 129.2L45.8 140.1L46.5 153.3L40.5 159.4L47.4 171.7L43 179L39.7 189.9L38.4 200.6L37 206.9L39.3 221.7L35.3 236.1L34.1 250.5L33.4 257.4' stroke-width='1.7'/></svg>"); }
+
+/* Each bolt flashes one to three times in quick succession; the screen flash matches. */
+@keyframes bolt-strike-1 {
+  0%, 100% { opacity: 0; }
+  0.01% { opacity: 0; }
+  0.03% { opacity: 1; }
+  0.11% { opacity: 0.5; }
+  0.31% { opacity: 0; }
+}
+
+@keyframes bolt-strike-2 {
+  0%, 100% { opacity: 0; }
+  0.01% { opacity: 0; }
+  0.03% { opacity: 1; }
+  0.11% { opacity: 0.05; }
+  0.21% { opacity: 0; }
+  0.23% { opacity: 0.85; }
+  0.31% { opacity: 0.5; }
+  0.51% { opacity: 0; }
+}
+
+@keyframes bolt-strike-3 {
+  0%, 100% { opacity: 0; }
+  0.01% { opacity: 0; }
+  0.03% { opacity: 1; }
+  0.11% { opacity: 0.05; }
+  0.21% { opacity: 0; }
+  0.23% { opacity: 0.85; }
+  0.31% { opacity: 0.05; }
+  0.41% { opacity: 0; }
+  0.43% { opacity: 0.85; }
+  0.51% { opacity: 0.5; }
+  0.71% { opacity: 0; }
+}
+
+@keyframes storm-flash {
+  0%, 100% { opacity: 0; }
+  5.08% { opacity: 0; }
+  5.1% { opacity: 0.35; }
+  5.18% { opacity: 0.05; }
+  5.28% { opacity: 0; }
+  5.3% { opacity: 0.2975; }
+  5.38% { opacity: 0.175; }
+  5.58% { opacity: 0; }
+  20.34% { opacity: 0; }
+  20.36% { opacity: 0.35; }
+  20.44% { opacity: 0.175; }
+  20.64% { opacity: 0; }
+  32.2% { opacity: 0; }
+  32.22% { opacity: 0.35; }
+  32.3% { opacity: 0.05; }
+  32.4% { opacity: 0; }
+  32.42% { opacity: 0.2975; }
+  32.5% { opacity: 0.05; }
+  32.6% { opacity: 0; }
+  32.62% { opacity: 0.2975; }
+  32.7% { opacity: 0.175; }
+  32.9% { opacity: 0; }
+  52.54% { opacity: 0; }
+  52.56% { opacity: 0.35; }
+  52.64% { opacity: 0.175; }
+  52.84% { opacity: 0; }
+  66.1% { opacity: 0; }
+  66.12% { opacity: 0.35; }
+  66.2% { opacity: 0.05; }
+  66.3% { opacity: 0; }
+  66.32% { opacity: 0.2975; }
+  66.4% { opacity: 0.05; }
+  66.5% { opacity: 0; }
+  66.52% { opacity: 0.2975; }
+  66.6% { opacity: 0.175; }
+  66.8% { opacity: 0; }
+  88.14% { opacity: 0; }
+  88.16% { opacity: 0.35; }
+  88.24% { opacity: 0.05; }
+  88.34% { opacity: 0; }
+  88.36% { opacity: 0.2975; }
+  88.44% { opacity: 0.175; }
+  88.64% { opacity: 0; }
+}
+
+/* The Final Lock: pitch black, an ember-rimmed lock, carved eyes blinking in the dark. */
+:root[data-theme="final"] {
+  --c-bg:          #050404;
+  --c-bg-2:        #0c0a09;
+  --c-bg-3:        #141110;
+  --c-surface:     #191513;
+  --c-surface-2:   #221c19;
+  --c-border:      #33291f;
+  --c-border-2:    #4f3c2b;
+  --c-text-muted:  #b0937a;
+  --c-text-faint:  #4a3a2d;
+  --c-gold:        #ff8a1f;
+  --c-gold-dim:    #6b330a;
+}
+
+:root[data-theme="final"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 90% 35% at 50% 100%, rgba(255, 120, 20, 0.08) 0%, transparent 70%),
+    var(--c-bg);
+}
+
+:root[data-theme="final"] .wordmark {
+  text-shadow: 0 0 18px rgba(255, 138, 31, 0.5);
+}
+
+:root[data-theme="final"] .lock {
+  --lock-body:        #1a1715;
+  --lock-body-hi:     #24201d;
+  --lock-body-lo:     #0e0c0b;
+  --lock-well:        #060505;
+  --lock-btn:         #1c1816;
+  --lock-btn-hi:      #2a2421;
+  --lock-btn-border:  #3a2c22;
+  --lock-arrow:       #ffb066;
+}
+
+:root[data-theme="final"] .lock__body {
+  border-color: rgba(255, 138, 31, 0.35);
+  animation: ember-pulse 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes ember-pulse {
+  from { box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 14px rgba(255, 120, 20, 0.12), inset 0 1px 0 rgba(255, 160, 80, 0.12); }
+  to   { box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 120, 20, 0.32), inset 0 1px 0 rgba(255, 160, 80, 0.12); }
+}
+
+:root[data-theme="final"] .lock__shackle {
+  --shk-hi:  #6a5a4c;
+  --shk-mid: #2e2622;
+  --shk-lo:  #171311;
+  --shk-in:  #0e0b0a;
+}
+
+.lanterns {
+  --col: min(100%, var(--max-w));
+  --gutter: calc((100% - var(--col)) / 2);
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.lanterns .eyes {
+  position: absolute;
+  top: calc(var(--y) * var(--k, 1));
+  left: calc(50% + (var(--x) - 0.5) * var(--col));
+  width: calc(46px * var(--s, 1));
+  height: calc(17px * var(--s, 1));
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 24'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23ffe08a'/><stop offset='1' stop-color='%23ff7a10'/></linearGradient></defs><path d='M2 22L24 4L26 22Z' fill='url(%23g)'/><path d='M62 22L40 4L38 22Z' fill='url(%23g)'/></svg>") center / contain no-repeat;
+  filter: drop-shadow(0 0 6px rgba(255, 140, 30, 0.8));
+  animation:
+    eyes-glow 4s ease-in-out var(--delay) infinite alternate,
+    eyes-blink var(--blink) linear var(--delay) infinite;
+}
+
+.lanterns .eyes:nth-child(1) { --x: 0.05; --y: 182px; --s: 0.7; --blink: 7s; --delay: -1s; }
+.lanterns .eyes:nth-child(2) { --x: 0.72; --y: 186px; --s: 0.75; --blink: 9s; --delay: -4s; }
+.lanterns .eyes:nth-child(3) { --x: 0.1; --y: 238px; --s: 1; --blink: 6s; --delay: -2.5s; }
+.lanterns .eyes:nth-child(4) { --x: 0.74; --y: 252px; --s: 0.9; --blink: 8.5s; --delay: -6s; }
+.lanterns .eyes:nth-child(5) { --x: 0.2; --y: 300px; --s: 0.6; --blink: 10s; --delay: -3s; }
+.lanterns .eyes:nth-child(6) { --x: 0.8; --y: 318px; --s: 0.65; --blink: 7.5s; --delay: -5s; }
+.lanterns .eyes:nth-child(7) { --x: 0.015; --y: 420px; --s: 0.42; --blink: 6.5s; --delay: -0.5s; }
+.lanterns .eyes:nth-child(8) { --x: 0.93; --y: 520px; --s: 0.42; --blink: 9.5s; --delay: -7s; }
+.lanterns .eyes:nth-child(9) { --x: 0.12; --y: 770px; --s: 0.8; --blink: 8s; --delay: -2s; }
+.lanterns .eyes:nth-child(10) { --x: 0.68; --y: 785px; --s: 0.7; --blink: 11s; --delay: -8s; }
+.lanterns .eyes:nth-child(11) { --x: 0.42; --y: 805px; --s: 0.55; --blink: 7.2s; --delay: -4.5s; }
+
+/* The game is shorter on small phones, so the eyes move up with it. */
+@media (max-width: 360px) {
+  .lanterns { --k: 0.83; }
+}
+
+/* Desktop only: two more pairs in the empty space beside the game column. */
+.lanterns .eyes--side { display: none; }
+
+@media (min-width: 700px) {
+  .lanterns .eyes--side { display: block; }
+}
+
+.lanterns .eyes:nth-child(12) { left: calc(var(--gutter) * 0.4); --y: 380px; --s: 1.3; --blink: 10s; --delay: -3s; }
+.lanterns .eyes:nth-child(13) { left: calc(100% - var(--gutter) * 0.5); --y: 520px; --s: 1.1; --blink: 7.5s; --delay: -5s; }
+
+@keyframes eyes-glow {
+  from { opacity: 0.25; }
+  to   { opacity: 0.6; }
+}
+
+@keyframes eyes-blink {
+  0%, 94%, 100% { scale: 1 1; }
+  96% { scale: 1 0.1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blood-drops,
+  .haunt .ghost,
+  .witching .witch,
+  .den .spider,
+  .bats .bat,
+  .storm { display: none; }
+  .haunt .chain,
+  .graveyard .fog,
+  .witching .twinkle,
+  .witching .moon,
+  .lanterns .eyes,
+  :root[data-theme="bats"] .header::before,
+  :root[data-theme="bats"] .header::after,
+  :root[data-theme="final"] .lock__body { animation: none; }
 }
