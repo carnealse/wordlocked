@@ -2352,48 +2352,49 @@ button {
   pointer-events: none;
 }
 
-/* Three bolts share a 73 second cycle, striking at 8, 32 and 56 seconds, so a player sees
-   about three during a full game. The screen flash peaks with each strike. */
+/* Six bolts share a 59 second cycle, striking at 3, 12, 19, 31, 39 and 52 seconds, so the
+   gaps between strikes are an uneven 7 to 13 seconds. Bolts are placed within the game column
+   (the phone-width area), in the gaps around the lock, and sit behind the game. */
 .storm .flash {
   position: absolute;
   inset: 0;
   opacity: 0;
-  background: radial-gradient(ellipse 100% 70% at 50% 20%, rgba(210, 255, 190, 0.4), transparent 75%);
-  animation: storm-flash 73s linear infinite;
+  background: radial-gradient(ellipse 100% 70% at 50% 20%, rgba(225, 235, 255, 0.35), transparent 75%);
+  animation: storm-flash 59s linear infinite;
 }
 
 .storm .bolt {
   position: absolute;
   top: var(--y);
-  left: var(--x);
+  left: calc(50% + (var(--x) - 0.5) * min(100%, var(--max-w)));
   height: var(--h);
-  aspect-ratio: var(--ar);
+  aspect-ratio: 1 / 3;
   opacity: 0;
-  background: var(--art) top / 100% 100% no-repeat;
-  filter: drop-shadow(0 0 8px rgba(210, 255, 190, 0.8));
-  animation: bolt-strike 73s linear var(--delay) infinite;
+  background: center / 100% 100% no-repeat;
+  filter: drop-shadow(0 0 4px rgba(220, 235, 255, 0.85));
+  animation: bolt-strike 59s linear var(--delay) infinite;
 }
 
-.storm .bolt--a { --x: 5%;  --y: 9vh;  --h: 26vh; --ar: 60 / 160; --delay: 8s;
-  --art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 160' fill='none' stroke-linecap='round' stroke-linejoin='round'><path d='M34 0L22 38L36 44L16 92L30 98L12 160' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='9'/><path d='M34 0L22 38L36 44L16 92L30 98L12 160' stroke='%23f4ffe9' stroke-width='3'/></svg>"); }
-.storm .bolt--b { --x: 72%; --y: 18vh; --h: 28vh; --ar: 80 / 160; --delay: 32s;
-  --art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 160' fill='none' stroke-linecap='round' stroke-linejoin='round'><path d='M40 0L46 26L36 48L48 70L38 98L50 124L44 160' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='6.6000000000000005'/><path d='M40 0L46 26L36 48L48 70L38 98L50 124L44 160' stroke='%23f4ffe9' stroke-width='2.2'/><path d='M36 48L20 62L24 80L10 96' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='4.199999999999999'/><path d='M36 48L20 62L24 80L10 96' stroke='%23f4ffe9' stroke-width='1.4'/><path d='M48 70L64 84L60 104' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='3.5999999999999996'/><path d='M48 70L64 84L60 104' stroke='%23f4ffe9' stroke-width='1.2'/></svg>"); }
-.storm .bolt--c { --x: 16%; --y: 82vh; --h: 20vh; --ar: 90 / 150; --delay: 56s;
-  --art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 150' fill='none' stroke-linecap='round' stroke-linejoin='round'><path d='M46 0L38 30L52 52L40 78' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='7.800000000000001'/><path d='M46 0L38 30L52 52L40 78' stroke='%23f4ffe9' stroke-width='2.6'/><path d='M40 78L22 104L28 120L14 150' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='6'/><path d='M40 78L22 104L28 120L14 150' stroke='%23f4ffe9' stroke-width='2'/><path d='M40 78L60 98L54 118L72 150' stroke='%23c8ff9e' stroke-opacity='0.45' stroke-width='6'/><path d='M40 78L60 98L54 118L72 150' stroke='%23f4ffe9' stroke-width='2'/></svg>"); }
+.storm .bolt:nth-child(2) { --x: 0.06; --y: 0px; --h: 300px; --delay: 3s; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M41 48.8L50.6 58.2L49.8 66.2L58.1 77.5L62.8 85.6L71.9 91.7' stroke-width='0.935'/><path d='M56.4 96.8L67.7 105.4L68 118.6L79.3 131.2L91.3 144.4L95.4 152.7' stroke-width='0.5142500000000001'/><path d='M42.1 61.2L47.4 68.1L53.9 82.7L56.4 96.8L63 103L72.7 112.2' stroke-width='0.935'/><path d='M47.8 113.1L47.3 122.2L53.1 131.6L57.7 138.6' stroke-width='0.935'/><path d='M77.7 262.4L73.5 271.1L72.8 279.9L69.8 294.8' stroke-width='0.5142500000000001'/><path d='M82.6 275.2L74 283.6L69 295.2L63.4 303.9' stroke-width='0.5142500000000001'/><path d='M87.5 285.8L92.4 296.8L93.4 309.8' stroke-width='0.5142500000000001'/><path d='M56.7 188.6L58.7 202L61.8 215.9L66.6 226.5L66 239.7L67.6 252.5L77.7 262.4L82.6 275.2L87.5 285.8' stroke-width='0.935'/><path d='M81.8 265.9L80 278.9L84.9 290.4L83 304' stroke-width='0.5142500000000001'/><path d='M59.2 212.8L67.4 221L69.3 229.1L71.7 243.4L77.6 253.2L81.8 265.9L93.4 279.9L93.8 289.3L105.8 302' stroke-width='0.935'/><path d='M61.7 232.7L71.4 239.4L77.5 251.9L87.5 262.4L88 276.6L88 287.6' stroke-width='0.935'/><path d='M81.7 280.1L85 289.2L90 297L89.2 307.7' stroke-width='0.5142500000000001'/><path d='M63.7 246.3L73 259.3L73.2 267.1L81.7 280.1L90.7 295L102.1 308.9' stroke-width='0.935'/><path d='M61.3 305.5L56.4 316.8' stroke-width='0.5142500000000001'/><path d='M72.1 270.1L64.7 285L62.4 299.4L61.3 305.5' stroke-width='0.935'/><path d='M50 0L43 10L40.4 16.4L45.4 26.1L45 36.4L41 48.8L42.1 61.2L35.1 73.2L35.8 85.3L40.7 95.2L47.7 105L47.8 113.1L43.3 124.2L49.2 131.1L56.1 144.1L54.3 157.8L54.3 166.6L50.9 181.2L56.7 188.6L54.9 195.5L53.3 203.3L59.2 212.8L54.8 223.9L61.7 232.7L63.7 246.3L69.4 256.6L72.1 270.1' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(3) { --x: 0.7; --y: 40px; --h: 320px; --delay: 12s; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M57.4 64.8L67.2 77.5L66.3 88.3L66.2 102.1L70.7 112.3L75 120.4' stroke-width='0.5142500000000001'/><path d='M44.7 37.6L55.3 47.7L56.8 55.9L57.4 64.8' stroke-width='0.935'/><path d='M34.6 112.7L32.4 120.3L28 135.3L18.7 147.5L12.3 157.4L10.7 165' stroke-width='0.5142500000000001'/><path d='M33.9 125.9L30.9 135.3L22.4 145.9L17.7 152.8' stroke-width='0.5142500000000001'/><path d='M47.7 86.2L42.1 95.2L32.8 101.7L34.6 112.7L33.9 125.9L35.7 135.1L27.4 147.1' stroke-width='0.935'/><path d='M22 233.1L21.4 242.6L10.5 254L3.2 262.3L-3.4 271.1' stroke-width='0.5142500000000001'/><path d='M34.6 195.5L28.3 203.7L21.4 216.1L22.5 222.3L22 233.1L18.7 240.9' stroke-width='0.935'/><path d='M41.6 216.4L33.8 223.9L35.2 236.4L31.4 247.1L24.5 255.7L18.3 265.6' stroke-width='0.935'/><path d='M81.9 305.5L77.5 313.1' stroke-width='0.5142500000000001'/><path d='M40.8 262.4L52.6 271.5L59.4 283.6L69.9 290.7L81.9 305.5' stroke-width='0.935'/><path d='M50 0L43 10.7L46.3 19.1L44.6 26.9L44.7 37.6L37.9 43.8L43.7 56.9L47.5 68.5L45.8 76.9L47.7 86.2L47.3 96.2L46.8 111L50.9 124.8L51.7 138.2L49 147.3L48.3 158.4L42.2 168.8L35.3 181.1L34.6 195.5L41.4 203.3L41.6 216.4L39.5 223.3L38.3 229.4L38.8 237.2L44.6 251.8L40.8 262.4L40.9 269.8' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(4) { --x: 0.12; --y: 120px; --h: 260px; --delay: 19s; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M8.2 129.2L15.2 135.3L15.6 146.7L22.5 153.8' stroke-width='0.5142500000000001'/><path d='M10.2 140.6L0.5 152.6L0 162.8L-10.3 168.9L-13 180.8L-13.1 193.6' stroke-width='0.5142500000000001'/><path d='M26.8 90.9L19.8 97.2L21.7 104.1L19.3 112L16.8 120.4L8.2 129.2L10.2 140.6' stroke-width='0.935'/><path d='M27.8 105.7L39.5 117.8L45.2 129L47.9 138.3L56.6 148.4L63.5 157.1' stroke-width='0.935'/><path d='M30.4 148.5L30.3 161L39.5 173.7L51.3 183L49.7 190.1' stroke-width='0.5142500000000001'/><path d='M28.6 162L28.7 171.4L34.6 183L42.5 194.3L42 207.8L44.3 217.2' stroke-width='0.5142500000000001'/><path d='M17.1 168.4L17.7 175L14.8 183L9.5 197.3' stroke-width='0.5142500000000001'/><path d='M29.9 113.7L27.6 127.4L29 137.2L30.4 148.5L28.6 162L17.1 168.4L11.4 177.1L7.4 187.2L7.4 197.5' stroke-width='0.935'/><path d='M72.7 241.6L74.8 254.2L75.3 265.4L77.9 280.3L79.5 288.9L81.5 303.5' stroke-width='0.5142500000000001'/><path d='M46.3 197.3L57.4 211.9L63.8 218.8L64.5 225.7L69.1 232.9L72.7 241.6' stroke-width='0.935'/><path d='M42.6 211.8L40.7 225.3L35.7 231.8L24.7 237.9L20.3 246.4L16.9 261L10.6 271.5' stroke-width='0.935'/><path d='M38.2 226.2L27.8 236.5L18.9 246.3L16.4 252.5L13.5 262.2L6.6 273.4L2 287.4' stroke-width='0.935'/><path d='M50 0L43 7.2L38.6 16L31.9 29.7L28.7 38.5L29.1 53.4L31.4 60.5L33.9 71.8L28.9 79.1L26.8 90.9L27.8 105.7L29.9 113.7L25.9 120.7L26.8 134.1L29.8 144.3L29.8 154.1L33 160.1L31.4 171.4L34.9 178.7L39.7 185.4L46.3 197.3L42.6 211.8L38.2 226.2L40.7 233.9L38.5 242.7L43.8 256.4L38.4 263.5' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(5) { --x: 0.74; --y: 0px; --h: 340px; --delay: 31s; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M61.7 94.3L55.8 101.8L47.2 116.5L45.7 125L45.4 135.9L38.7 149.2' stroke-width='0.5142500000000001'/><path d='M45 56.7L45.1 67.7L56.4 75.1L57.5 84.3L61.7 94.3' stroke-width='0.935'/><path d='M50.9 183.4L40 193L30.3 200.1L28.6 207.6L26 220.2' stroke-width='0.5142500000000001'/><path d='M40.8 126.9L44.6 140.4L48.9 148.8L47.7 159.4L50.7 172.2L50.9 183.4' stroke-width='0.935'/><path d='M29.7 196.2L30.8 210.4L23.2 222.6L12.1 235.3L7.3 241.6L3.1 255.3L0.2 262.9' stroke-width='0.935'/><path d='M2.3 262.7L6 270.7L17.2 279.2L21.5 289.5L19.6 296.3' stroke-width='0.5142500000000001'/><path d='M15.3 234.3L14.6 244.4L12.3 254.6L2.3 262.7L-8.6 270.6' stroke-width='0.935'/><path d='M50 0L43 7.6L49.2 17.3L49.6 31.7L49.6 42.7L45 56.7L38.5 70.8L36.9 84.5L39.2 91.7L41.9 105.1L44.4 113.6L40.8 126.9L45.3 136.7L47.8 149.8L48.6 157.9L45.7 170L41.2 177.2L35 189.4L29.7 196.2L23.3 203.9L21.5 218.6L18.8 227.8L15.3 234.3L16.3 242.7L17.5 249.7L21.4 260L26.8 275' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(6) { --x: 0.4; --y: 0px; --h: 220px; --delay: 39s; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M21.5 78.9L23.9 88.5L34.2 96.9L40.3 107.3L44.1 117.2' stroke-width='0.5142500000000001'/><path d='M34.6 55.7L24.9 66L22.6 72.3L21.5 78.9L12.1 88.6L12.8 94.7L1.5 109.4' stroke-width='0.935'/><path d='M14.2 144.7L21.4 155.1L31.6 166.9L41.1 178.9L42 191.8L51.2 205.9' stroke-width='0.5142500000000001'/><path d='M5.2 159.6L9.3 174.5L10.7 188.1L19.4 197.5' stroke-width='0.5142500000000001'/><path d='M40.6 81.6L42.3 94.2L33.8 105L30.7 119.2L19.1 132L14.2 144.7L5.2 159.6L6 170' stroke-width='0.935'/><path d='M34.8 140.6L35.6 155.4L29.3 166.3L17.7 179.9L8.4 191.4L10.4 200L2.8 215' stroke-width='0.935'/><path d='M42.1 160L32.6 172L26.7 181L18 190.5' stroke-width='0.935'/><path d='M52.1 227L63.1 233.4L65.9 246.4L64.9 260.3L75.6 266.8L74.7 273.1L86.3 286.4' stroke-width='0.935'/><path d='M50.3 240.7L48.7 255.6L37.2 269.9L25.4 283.7L24.4 293.8L22.8 300.6' stroke-width='0.935'/><path d='M50 0L43.1 9.7L48 17.4L44.3 30L39.9 41.6L34.6 55.7L35.5 70.1L40.6 81.6L40.1 93.8L33.3 105.8L33.6 113L36 119.4L39.7 129.5L34.8 140.6L39.7 147.5L42.1 160L45.3 170.6L46.5 176.7L44.6 188.8L49.8 195L44.7 209.1L50.7 220.9L52.1 227L50.3 240.7L49.1 247.6L54.4 256.3L49.6 266.4' stroke-width='1.7'/></svg>"); }
+.storm .bolt:nth-child(7) { --x: 0.66; --y: 150px; --h: 280px; --delay: 52s; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' fill='none' stroke='%23fff' stroke-linejoin='round' stroke-linecap='round'><path d='M61.8 54L60.3 62.6L72.2 68.9L71.4 76.7L78.4 87.2' stroke-width='0.5142500000000001'/><path d='M38.5 24.4L48 32.3L50.2 46.2L61.8 54' stroke-width='0.935'/><path d='M51.1 130.7L52.4 142L50.7 149.3L62.3 161.9L73.8 175.1L81.3 186.9' stroke-width='0.5142500000000001'/><path d='M28.1 72.4L37.2 84.4L36.9 94.3L43.9 109L47.3 123.3L51.1 130.7L52.9 139.1L58 152.5' stroke-width='0.935'/><path d='M22.3 100.1L13 107.2L4.3 121.3L-1.1 136.2L-6.8 150L-15 156.5' stroke-width='0.935'/><path d='M5.4 128.1L16.3 139.9L21.9 150.2L31.9 162.5L35 174L46.8 181.4L45.8 192.2L53.3 201L53.1 213.3' stroke-width='0.935'/><path d='M38 204.4L27.9 212.1L21.8 223.8L14 238.5L7.3 248.4' stroke-width='0.5142500000000001'/><path d='M9.1 136.6L13.8 148L18.3 158.1L21.6 170.8L31.6 178.7L30.2 187.9L38.8 195.6L38 204.4L49.8 212.5' stroke-width='0.935'/><path d='M-6.4 226.4L3.2 237.6L9.2 249.6L10 257.3' stroke-width='0.5142500000000001'/><path d='M17.5 167.9L13.1 177.8L7.4 186.6L5.4 200.9L0.3 212.9L-6.4 226.4' stroke-width='0.935'/><path d='M31.2 207.4L24.6 217.6L21.8 223.8L13.1 235.6L9.1 248.5L10.7 260.1L5.2 274.2' stroke-width='0.935'/><path d='M-5.3 282.3L-12.2 292.4L-17.9 306.7' stroke-width='0.5142500000000001'/><path d='M31.3 240.3L19.4 248.9L16.6 255.6L6.2 263.5L-4.2 273.9L-5.3 282.3L-5.4 291.1L-11.2 300.2' stroke-width='0.935'/><path d='M26.1 293.8L16.7 307.4' stroke-width='0.5142500000000001'/><path d='M36.1 248.3L35.7 254.8L36.2 269.4L36.6 278.8L25.4 285.5L26.1 293.8L20.3 299.9L11.8 311.1' stroke-width='0.935'/><path d='M50 0L43.2 8.1L41.1 16.9L38.5 24.4L33.5 35.2L29.4 45.6L25.3 52.2L23.1 62.4L28.1 72.4L24.1 78.7L22.3 87.5L22.3 100.1L16.7 113L10.6 121.8L5.4 128.1L9.1 136.6L12.1 146.8L12.8 157.9L17.5 167.9L17.4 176.3L20.7 191L24.2 199L31.2 207.4L31.8 217L35 227.5L31.3 240.3L36.1 248.3' stroke-width='1.7'/></svg>"); }
 
-/* 1% of the cycle is about 0.7 seconds: a strike, a quick dim, a second flicker, gone. */
+/* 1% of the cycle is about 0.6 seconds: a strike, a quick dim, a second flicker, gone. */
 @keyframes bolt-strike {
-  0%, 1.8%, 100% { opacity: 0; }
-  0.3% { opacity: 1; }
-  0.7% { opacity: 0.15; }
-  1%   { opacity: 0.9; }
+  0%, 2.2%, 100% { opacity: 0; }
+  0.4% { opacity: 1; }
+  0.9% { opacity: 0.1; }
+  1.3% { opacity: 0.85; }
 }
 
 @keyframes storm-flash {
-  0%, 10.9%, 12.8%, 43.8%, 45.7%, 76.7%, 78.6%, 100% { opacity: 0; }
-  11.3%, 44.2%, 77.1% { opacity: 0.35; }
-  11.7%, 44.6%, 77.5% { opacity: 0.05; }
-  12%,   44.9%, 77.8% { opacity: 0.45; }
+  0%, 5.03%, 7.28%, 20.29%, 22.54%, 32.15%, 34.4%, 52.49%, 54.74%, 66.05%, 68.3%, 88.09%, 90.34%, 100% { opacity: 0; }
+  5.48%, 20.74%, 32.6%, 52.94%, 66.5%, 88.54% { opacity: 0.3; }
+  5.98%, 21.24%, 33.1%, 53.44%, 67%, 89.04% { opacity: 0.05; }
+  6.38%, 21.64%, 33.5%, 53.84%, 67.4%, 89.44% { opacity: 0.4; }
 }
 
 /* The Final Lock: pitch black, an ember-rimmed lock, carved eyes blinking in the dark. */
@@ -2462,8 +2463,8 @@ button {
 
 .lanterns .eyes {
   position: absolute;
-  top: var(--y);
-  left: var(--x);
+  top: calc(var(--y) * var(--k, 1));
+  left: calc(50% + (var(--x) - 0.5) * var(--col));
   width: calc(46px * var(--s, 1));
   height: calc(17px * var(--s, 1));
   background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 24'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23ffe08a'/><stop offset='1' stop-color='%23ff7a10'/></linearGradient></defs><path d='M2 22L24 4L26 22Z' fill='url(%23g)'/><path d='M62 22L40 4L38 22Z' fill='url(%23g)'/></svg>") center / contain no-repeat;
@@ -2473,25 +2474,32 @@ button {
     eyes-blink var(--blink) linear var(--delay) infinite;
 }
 
-.lanterns .eyes:nth-child(1)  { --x: 4%;  --y: 21vh; --s: 0.7;  --blink: 7s;   --delay: -1s; }
-.lanterns .eyes:nth-child(2)  { --x: 76%; --y: 23vh; --s: 0.8;  --blink: 9s;   --delay: -4s; }
-.lanterns .eyes:nth-child(3)  { --x: 9%;  --y: 34vh; --s: 1;    --blink: 6s;   --delay: -2.5s; }
-.lanterns .eyes:nth-child(4)  { --x: 77%; --y: 37vh; --s: 0.9;  --blink: 8.5s; --delay: -6s; }
-.lanterns .eyes:nth-child(5)  { --x: 22%; --y: 28vh; --s: 0.55; --blink: 10s;  --delay: -3s; }
-.lanterns .eyes:nth-child(6)  { --x: 1%;  --y: 56vh; --s: 0.5;  --blink: 7.5s; --delay: -5s; }
-.lanterns .eyes:nth-child(7)  { --x: 93%; --y: 67vh; --s: 0.5;  --blink: 6.5s; --delay: -0.5s; }
-.lanterns .eyes:nth-child(8)  { --x: 10%; --y: 93vh; --s: 0.8;  --blink: 9.5s; --delay: -7s; }
-.lanterns .eyes:nth-child(9)  { --x: 70%; --y: 95vh; --s: 0.7;  --blink: 8s;   --delay: -2s; }
-.lanterns .eyes:nth-child(10) { --x: 42%; --y: 98vh; --s: 0.6;  --blink: 11s;  --delay: -8s; }
+.lanterns .eyes:nth-child(1) { --x: 0.05; --y: 182px; --s: 0.7; --blink: 7s; --delay: -1s; }
+.lanterns .eyes:nth-child(2) { --x: 0.72; --y: 186px; --s: 0.75; --blink: 9s; --delay: -4s; }
+.lanterns .eyes:nth-child(3) { --x: 0.1; --y: 238px; --s: 1; --blink: 6s; --delay: -2.5s; }
+.lanterns .eyes:nth-child(4) { --x: 0.74; --y: 252px; --s: 0.9; --blink: 8.5s; --delay: -6s; }
+.lanterns .eyes:nth-child(5) { --x: 0.2; --y: 300px; --s: 0.6; --blink: 10s; --delay: -3s; }
+.lanterns .eyes:nth-child(6) { --x: 0.8; --y: 318px; --s: 0.65; --blink: 7.5s; --delay: -5s; }
+.lanterns .eyes:nth-child(7) { --x: 0.015; --y: 420px; --s: 0.42; --blink: 6.5s; --delay: -0.5s; }
+.lanterns .eyes:nth-child(8) { --x: 0.93; --y: 520px; --s: 0.42; --blink: 9.5s; --delay: -7s; }
+.lanterns .eyes:nth-child(9) { --x: 0.12; --y: 770px; --s: 0.8; --blink: 8s; --delay: -2s; }
+.lanterns .eyes:nth-child(10) { --x: 0.68; --y: 785px; --s: 0.7; --blink: 11s; --delay: -8s; }
+.lanterns .eyes:nth-child(11) { --x: 0.42; --y: 805px; --s: 0.55; --blink: 7.2s; --delay: -4.5s; }
 
+/* The game is shorter on small phones, so the eyes move up with it. */
+@media (max-width: 360px) {
+  .lanterns { --k: 0.83; }
+}
+
+/* Desktop only: two more pairs in the empty space beside the game column. */
 .lanterns .eyes--side { display: none; }
 
 @media (min-width: 700px) {
   .lanterns .eyes--side { display: block; }
 }
 
-.lanterns .eyes:nth-child(11) { --x: calc(var(--gutter) * 0.4); --y: 42vh; --s: 1.3; --blink: 10s; --delay: -3s; }
-.lanterns .eyes:nth-child(12) { --x: calc(100% - var(--gutter) * 0.5); --y: 58vh; --s: 1.1; --blink: 7.5s; --delay: -5s; }
+.lanterns .eyes:nth-child(12) { left: calc(var(--gutter) * 0.4); --y: 380px; --s: 1.3; --blink: 10s; --delay: -3s; }
+.lanterns .eyes:nth-child(13) { left: calc(100% - var(--gutter) * 0.5); --y: 520px; --s: 1.1; --blink: 7.5s; --delay: -5s; }
 
 @keyframes eyes-glow {
   from { opacity: 0.25; }

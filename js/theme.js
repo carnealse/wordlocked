@@ -42,9 +42,9 @@ export const THEMES = Object.freeze([
   { id: 'bats',      name: 'Bat Swarm',     unlockedBy: 'october-streak-3',
     decor: { className: 'bats', children: ['bat', 'bat', 'bat'] } },
   { id: 'franken',   name: 'Frankenlock',   unlockedBy: 'october-efficient',
-    decor: { className: 'storm', children: ['flash', 'bolt bolt--a', 'bolt bolt--b', 'bolt bolt--c'] } },
+    decor: { className: 'storm', children: ['flash', ...Array(6).fill('bolt')] } },
   { id: 'final',     name: 'The Final Lock', unlockedBy: 'halloween-win',
-    decor: { className: 'lanterns', children: [...Array(10).fill('eyes'), 'eyes eyes--side', 'eyes eyes--side'] } },
+    decor: { className: 'lanterns', children: [...Array(11).fill('eyes'), 'eyes eyes--side', 'eyes eyes--side'] } },
 ])
 
 const isUnlocked = theme => !theme.unlockedBy || hasEarned(theme.unlockedBy)
