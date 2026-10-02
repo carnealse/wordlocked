@@ -424,6 +424,24 @@ function _trophyListHTML(trophies) {
           <ul class="trophy-list">${items}</ul>`
 }
 
+/** @param {import('./theme.js').ThemeEntry[]} themes */
+export function renderThemePicker(themes) {
+  document.getElementById('theme-list').innerHTML = themes.map(t => {
+    const meta = t.selected ? 'Selected' : t.unlocked ? 'Tap to use' : `Locked: ${t.hint}`
+    const state = t.selected ? ' theme-card--selected' : t.unlocked ? '' : ' theme-card--locked'
+    return `<li>
+      <button class="theme-card${state}" data-theme-id="${t.id}"
+              aria-pressed="${t.selected}"${t.unlocked ? '' : ' disabled'}>
+        <span class="theme-swatch theme-swatch--${t.id}" aria-hidden="true"></span>
+        <span class="theme-card__text">
+          <span class="theme-card__name">${t.name}</span>
+          <span class="theme-card__meta">${meta}</span>
+        </span>
+      </button>
+    </li>`
+  }).join('')
+}
+
 /** Opens the standalone trophy case modal. */
 export function openTrophyCase(trophies) {
   document.getElementById('trophy-list').innerHTML = _trophyListHTML(trophies)

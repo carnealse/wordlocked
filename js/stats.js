@@ -20,6 +20,7 @@ const DAY_MS = 86_400_000
  * @property {number}   streak         consecutive days won, reset by a loss or a missed day
  * @property {number}   maxStreak
  * @property {string[]} recordedDates  puzzle days already counted, oldest first
+ * @property {string[]} wonDates       puzzle days won, oldest first (tracked from this build on)
  * @property {Array<Record<number, number>>} dist  per lock: guesses -> solves
  */
 
@@ -48,6 +49,7 @@ export function loadStats() {
     streak:        count(saved.streak),
     maxStreak:     count(saved.maxStreak),
     recordedDates: Array.isArray(saved.recordedDates) ? saved.recordedDates : [],
+    wonDates:      Array.isArray(saved.wonDates) ? saved.wonDates : [],
     dist: isPerLockDist(saved.dist)
       ? saved.dist.map(lock => ({ ...emptyLockDist(), ...lock }))
       : emptyDist(),
@@ -90,6 +92,7 @@ export function recordResult(won, results, dateStr) {
   stats.played++
   if (won) {
     stats.wins++
+    if (dateStr) stats.wonDates.push(dateStr)
     stats.streak = missedDay ? 1 : stats.streak + 1
     stats.maxStreak = Math.max(stats.maxStreak, stats.streak)
   } else {

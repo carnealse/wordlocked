@@ -20,7 +20,9 @@ import {
   renderShackle, animateShake, flashCorrectDials,
   showToast, buildAndShowEndModal, showAchievementPages, startCountdownTimer,
   openModal, closeModal, navigateEndPage, openTrophyCase, revealStatsActions,
+  renderThemePicker,
 } from './ui.js'
+import { themeEntries, selectTheme } from './theme.js'
 import { recordResult, backfillDistribution, loadStats, renderStats } from './stats.js'
 import { shareResult } from './share.js'
 import { awardAchievements, trophyEntries } from './achievements.js'
@@ -311,6 +313,19 @@ function bindEvents() {
   document.getElementById('btn-trophies').addEventListener('click', () => {
     closeModal('modal-stats')
     openTrophyCase(trophyEntries())
+  })
+
+  document.getElementById('btn-themes').addEventListener('click', () => {
+    closeModal('modal-stats')
+    renderThemePicker(themeEntries())
+    openModal('modal-themes')
+  })
+
+  document.getElementById('theme-list').addEventListener('click', e => {
+    const card = e.target.closest('[data-theme-id]')
+    if (!card || card.disabled) return
+    selectTheme(card.dataset.themeId)
+    renderThemePicker(themeEntries())
   })
 
   document.querySelectorAll('[data-close]').forEach(btn =>

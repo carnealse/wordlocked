@@ -300,6 +300,9 @@ button {
   --shk-lo:  #4d4d68;
   --shk-in:  #34344a;
   --shk-r: calc(var(--shk-w) / 2);
+  /* Optional theme texture layers, drawn over the shading: one for the arc, one for the legs. */
+  --shk-tex-arc:  none;
+  --shk-tex-legs: none;
 
   width: var(--shk-w);
   height: 134px;
@@ -307,6 +310,8 @@ button {
   border-bottom: none;
   border-radius: 96px 96px 0 0;
   background:
+    var(--shk-tex-arc),
+    var(--shk-tex-legs),
     linear-gradient(to top, rgba(0,0,0,0.5), transparent) bottom / 100% 20px no-repeat,
     radial-gradient(circle at 50% 100%,
       var(--shk-in)  calc(var(--shk-r) - var(--shk-t)),
@@ -1112,7 +1117,13 @@ button {
 }
 
 /* ── TROPHY CASE ────────────────────────────────────────────────── */
-.stats-trophies { margin-top: 16px; }
+.stats-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.stats-links .btn-ghost { flex: 1 1 0; min-width: 0; }
 
 .end-page__reward { font-style: italic; }
 
@@ -1160,8 +1171,102 @@ button {
 .trophy--locked { opacity: 0.6; }
 .trophy--locked .trophy__name { letter-spacing: 3px; color: var(--c-text-muted); }
 
-/* ── SEASONAL THEMES (applied by js/theme.js) ───────────────────── */
-/* Halloween: October 1–31. Overrides tokens only; layout is untouched. */
+/* ── THEME PICKER ───────────────────────────────────────────────── */
+.theme-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  color: inherit;
+  text-align: left;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+
+.theme-card:hover:not(:disabled) { background: var(--c-surface-2); }
+.theme-card--selected { border-color: var(--c-gold); }
+.theme-card--locked { opacity: 0.6; cursor: default; }
+
+.theme-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.theme-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+.theme-card--selected .theme-card__name { color: var(--c-gold); }
+
+.theme-card__meta {
+  font-size: 11px;
+  color: var(--c-text-muted);
+}
+
+/* Mini padlock preview: a body block with a U shackle drawn by ::before. */
+.theme-swatch {
+  --sw-body: #4c4c65;
+  --sw-body-lo: #3c3c55;
+  --sw-shackle: #9a9ab8;
+  position: relative;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 40px;
+}
+
+.theme-swatch::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  width: 18px;
+  height: 22px;
+  border: 5px solid var(--sw-shackle);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+}
+
+.theme-swatch::after {
+  content: '';
+  position: absolute;
+  inset: 16px 0 0;
+  border-radius: 6px;
+  background: var(--sw-art, none), linear-gradient(180deg, var(--sw-body), var(--sw-body-lo));
+}
+
+.theme-swatch--halloween {
+  --sw-body: #f08a2a;
+  --sw-body-lo: #b94f0c;
+  --sw-shackle: #5f7f2f;
+}
+
+.theme-swatch--halloween::after { border-radius: 12px / 9px; }
+
+.theme-swatch--bloody {
+  --sw-body: #45434d;
+  --sw-body-lo: #2a2830;
+  --sw-shackle: #8a8794;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 48' preserveAspectRatio='none'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%239b0f17'/><stop offset='1' stop-color='%235c050b'/></linearGradient></defs><g fill='url(%23g)'><path d='M0 0H300V5Q225 9 150 6T0 6Z'/><rect x='5.5' y='2' width='7' height='40.5' rx='3.5'/><circle cx='9' cy='40.15' r='4.7250000000000005'/><rect x='30.5' y='2' width='5' height='13.5' rx='2.5'/><circle cx='33' cy='13.25' r='3.375'/><rect x='52.5' y='2' width='9' height='19.5' rx='4.5'/><circle cx='57' cy='19.05' r='6.075'/><rect x='84.5' y='2' width='5' height='9.5' rx='2.5'/><circle cx='87' cy='9.25' r='3.375'/><rect x='108' y='2' width='6' height='17' rx='3'/><circle cx='111' cy='16.7' r='4.050000000000001'/><rect x='125' y='2' width='8' height='42' rx='4'/><circle cx='129' cy='41.6' r='5.4'/><rect x='153.5' y='2' width='5' height='11.5' rx='2.5'/><circle cx='156' cy='11.25' r='3.375'/><rect x='176.5' y='2' width='7' height='18.5' rx='3.5'/><circle cx='180' cy='18.15' r='4.7250000000000005'/><rect x='201.5' y='2' width='5' height='7.5' rx='2.5'/><circle cx='204' cy='7.25' r='3.375'/><rect x='223.5' y='2' width='9' height='21.5' rx='4.5'/><circle cx='228' cy='21.05' r='6.075'/><rect x='252.5' y='2' width='5' height='12.5' rx='2.5'/><circle cx='255' cy='12.25' r='3.375'/><rect x='270' y='2' width='6' height='17' rx='3'/><circle cx='273' cy='16.7' r='4.050000000000001'/><rect x='287.5' y='2' width='7' height='36.5' rx='3.5'/><circle cx='291' cy='36.15' r='4.7250000000000005'/></g><g fill='rgba(255,170,170,0.35)'><ellipse cx='7.6' cy='37.7' rx='1.26' ry='2.1'/><ellipse cx='55.2' cy='15.9' rx='1.6199999999999999' ry='2.6999999999999997'/><ellipse cx='109.8' cy='14.6' rx='1.08' ry='1.7999999999999998'/><ellipse cx='127.4' cy='38.8' rx='1.44' ry='2.4'/><ellipse cx='178.6' cy='15.7' rx='1.26' ry='2.1'/><ellipse cx='226.2' cy='17.9' rx='1.6199999999999999' ry='2.6999999999999997'/><ellipse cx='271.8' cy='14.6' rx='1.08' ry='1.7999999999999998'/><ellipse cx='289.6' cy='33.7' rx='1.26' ry='2.1'/></g></svg>") top / 100% 70% no-repeat;
+}
+
+/* ── THEMES (selected on the Themes page, applied by js/theme.js) ── */
+/* Themes override tokens and add decoration only; layout is untouched. */
+
+/* Halloween: purple night, pumpkin-orange accents, a pumpkin lock with a stem shackle. */
 :root[data-theme="halloween"] {
   --c-bg:          #0b0810;
   --c-bg-2:        #130d1a;
@@ -1185,4 +1290,167 @@ button {
 
 :root[data-theme="halloween"] .wordmark {
   text-shadow: 0 0 18px rgba(251, 140, 30, 0.35);
+}
+
+:root[data-theme="halloween"] .lock {
+  --lock-body:        #e9761f;
+  --lock-body-hi:     #f7983a;
+  --lock-body-lo:     #b4500e;
+  --lock-well:        rgba(60, 22, 2, 0.72);
+  --lock-btn:         #5c2a09;
+  --lock-btn-hi:      #77380f;
+  --lock-btn-border:  #8f4a17;
+  --lock-drum:        #140803;
+  --lock-drum-border: #4d2409;
+  --lock-arrow:       #ffd3a3;
+}
+
+/* Rounder, gourd-like body. Each rib is a lit bulge with dark creases at its edges. */
+:root[data-theme="halloween"] .lock__body {
+  border-radius: 40px / 30px;
+  border-color: rgba(255, 200, 140, 0.12);
+  background:
+    radial-gradient(ellipse 70% 45% at 35% 12%, rgba(255, 225, 160, 0.30), transparent 70%),
+    radial-gradient(ellipse 50% 90% at 50% 45%,
+      rgba(255, 196, 120, 0.22) 0%, rgba(255, 196, 120, 0) 55%, rgba(105, 38, 0, 0.45) 100%
+    ) 0 0 / 20% 100% repeat-x,
+    linear-gradient(90deg, rgba(90, 30, 0, 0.45), transparent 9%, transparent 91%, rgba(90, 30, 0, 0.45)),
+    linear-gradient(180deg, var(--lock-body-hi), var(--lock-body) 45%, var(--lock-body-lo));
+}
+
+:root[data-theme="halloween"] .drum-btn:active,
+:root[data-theme="halloween"] .drum-btn--pressed {
+  background: linear-gradient(180deg, #a2531a 0%, #7c3d10 100%);
+  border-color: #c06a2a;
+}
+
+/* Green stem: fibers run along the bar, rings on the arc and stripes on the legs. */
+:root[data-theme="halloween"] .lock__shackle {
+  --shk-hi:  #a3c46a;
+  --shk-mid: #607f31;
+  --shk-lo:  #3a4f1b;
+  --shk-in:  #26340f;
+  --shk-tex-arc:
+    repeating-radial-gradient(circle at 50% 100%,
+      rgba(25, 35, 5, 0) 0 3px, rgba(25, 35, 5, 0.28) 3px 4.5px
+    ) top / 100% var(--shk-r) no-repeat;
+  --shk-tex-legs:
+    repeating-linear-gradient(90deg,
+      rgba(25, 35, 5, 0) 0 3px, rgba(25, 35, 5, 0.28) 3px 4.5px
+    ) bottom / 100% calc(100% - var(--shk-r)) no-repeat;
+}
+
+/* Bloody Scary: near-black red, drips falling behind the game, blood running off the lock. */
+:root[data-theme="bloody"] {
+  --c-bg:          #0a0507;
+  --c-bg-2:        #12080b;
+  --c-bg-3:        #1b0c10;
+  --c-surface:     #211015;
+  --c-surface-2:   #2c151b;
+  --c-border:      #4a1d26;
+  --c-border-2:    #6e2a36;
+  --c-text-muted:  #a1707b;
+  --c-text-faint:  #4d2a32;
+  --c-gold:        #f43f5e;
+  --c-gold-dim:    #7f1d2d;
+}
+
+:root[data-theme="bloody"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #3a0a12 0%, transparent 60%),
+    var(--c-bg);
+}
+
+:root[data-theme="bloody"] .wordmark {
+  text-shadow: 0 0 16px rgba(220, 20, 40, 0.45);
+}
+
+:root[data-theme="bloody"] .lock {
+  --lock-body:        #44424c;
+  --lock-body-hi:     #4e4b56;
+  --lock-body-lo:     #2e2c34;
+  --lock-well:        #16121a;
+  --lock-btn:         #2c2830;
+  --lock-btn-hi:      #3d3742;
+  --lock-btn-border:  #4a434f;
+}
+
+:root[data-theme="bloody"] .lock__shackle {
+  --shk-hi:  #a9a6b4;
+  --shk-mid: #6c6975;
+  --shk-lo:  #43404b;
+  --shk-in:  #2c2a32;
+}
+
+/* Blood runs off the top edge and behind the controls, so it never covers them. */
+:root[data-theme="bloody"] .lock__body::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  border-radius: 16px 16px 0 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 48' preserveAspectRatio='none'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%239b0f17'/><stop offset='1' stop-color='%235c050b'/></linearGradient></defs><g fill='url(%23g)'><path d='M0 0H300V5Q225 9 150 6T0 6Z'/><rect x='5.5' y='2' width='7' height='40.5' rx='3.5'/><circle cx='9' cy='40.15' r='4.7250000000000005'/><rect x='30.5' y='2' width='5' height='13.5' rx='2.5'/><circle cx='33' cy='13.25' r='3.375'/><rect x='52.5' y='2' width='9' height='19.5' rx='4.5'/><circle cx='57' cy='19.05' r='6.075'/><rect x='84.5' y='2' width='5' height='9.5' rx='2.5'/><circle cx='87' cy='9.25' r='3.375'/><rect x='108' y='2' width='6' height='17' rx='3'/><circle cx='111' cy='16.7' r='4.050000000000001'/><rect x='125' y='2' width='8' height='42' rx='4'/><circle cx='129' cy='41.6' r='5.4'/><rect x='153.5' y='2' width='5' height='11.5' rx='2.5'/><circle cx='156' cy='11.25' r='3.375'/><rect x='176.5' y='2' width='7' height='18.5' rx='3.5'/><circle cx='180' cy='18.15' r='4.7250000000000005'/><rect x='201.5' y='2' width='5' height='7.5' rx='2.5'/><circle cx='204' cy='7.25' r='3.375'/><rect x='223.5' y='2' width='9' height='21.5' rx='4.5'/><circle cx='228' cy='21.05' r='6.075'/><rect x='252.5' y='2' width='5' height='12.5' rx='2.5'/><circle cx='255' cy='12.25' r='3.375'/><rect x='270' y='2' width='6' height='17' rx='3'/><circle cx='273' cy='16.7' r='4.050000000000001'/><rect x='287.5' y='2' width='7' height='36.5' rx='3.5'/><circle cx='291' cy='36.15' r='4.7250000000000005'/></g><g fill='rgba(255,170,170,0.35)'><ellipse cx='7.6' cy='37.7' rx='1.26' ry='2.1'/><ellipse cx='55.2' cy='15.9' rx='1.6199999999999999' ry='2.6999999999999997'/><ellipse cx='109.8' cy='14.6' rx='1.08' ry='1.7999999999999998'/><ellipse cx='127.4' cy='38.8' rx='1.44' ry='2.4'/><ellipse cx='178.6' cy='15.7' rx='1.26' ry='2.1'/><ellipse cx='226.2' cy='17.9' rx='1.6199999999999999' ry='2.6999999999999997'/><ellipse cx='271.8' cy='14.6' rx='1.08' ry='1.7999999999999998'/><ellipse cx='289.6' cy='33.7' rx='1.26' ry='2.1'/></g></svg>") top / 100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Background drips. Uneven positions, speeds and delays keep the rain from looking like a pattern. */
+.blood-drops {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+.blood-drops span {
+  position: absolute;
+  top: -90px;
+  left: var(--x);
+  width: 4px;
+  height: 70px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(150, 10, 25, 0), #a10d1e 85%);
+  transform: scale(var(--s, 1));
+  animation: blood-fall var(--d) linear var(--delay) infinite;
+}
+
+.blood-drops span::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 9px;
+  height: 11px;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  background: #b3101f;
+}
+
+.blood-drops span:nth-child(1)  { --x:  4%; --d: 7.3s;  --delay: -1.2s; --s: 0.8; }
+.blood-drops span:nth-child(2)  { --x: 13%; --d: 9.7s;  --delay: -6.1s; }
+.blood-drops span:nth-child(3)  { --x: 21%; --d: 6.1s;  --delay: -3.4s; --s: 0.6; }
+.blood-drops span:nth-child(4)  { --x: 28%; --d: 11.3s; --delay: -8.8s; --s: 1.1; }
+.blood-drops span:nth-child(5)  { --x: 36%; --d: 8.3s;  --delay: -0.5s; --s: 0.7; }
+.blood-drops span:nth-child(6)  { --x: 44%; --d: 13.1s; --delay: -4.9s; }
+.blood-drops span:nth-child(7)  { --x: 51%; --d: 7.9s;  --delay: -7.2s; --s: 0.9; }
+.blood-drops span:nth-child(8)  { --x: 58%; --d: 10.1s; --delay: -2.3s; --s: 0.6; }
+.blood-drops span:nth-child(9)  { --x: 65%; --d: 6.7s;  --delay: -5.6s; --s: 1.2; }
+.blood-drops span:nth-child(10) { --x: 72%; --d: 12.7s; --delay: -9.9s; --s: 0.8; }
+.blood-drops span:nth-child(11) { --x: 79%; --d: 8.9s;  --delay: -1.8s; }
+.blood-drops span:nth-child(12) { --x: 86%; --d: 7.1s;  --delay: -4.1s; --s: 0.7; }
+.blood-drops span:nth-child(13) { --x: 92%; --d: 10.9s; --delay: -6.7s; --s: 1.1; }
+.blood-drops span:nth-child(14) { --x: 97%; --d: 9.1s;  --delay: -3.0s; --s: 0.6; }
+
+@keyframes blood-fall {
+  from { translate: 0 0; }
+  to   { translate: 0 calc(100dvh + 180px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blood-drops { display: none; }
 }

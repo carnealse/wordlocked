@@ -47,6 +47,11 @@ const lost   = ({ today }) => today.status === 'lost'
 const failed = length => ({ today }) => today.results[LOCK_LENGTHS.indexOf(length)]?.solved === false
 /** Won on a given calendar day, any year. monthDay is 'MM-DD'. */
 const wonOn  = monthDay => ctx => won(ctx) && ctx.today.date?.endsWith(`-${monthDay}`)
+/** Wins in the same October as today's puzzle, today included. */
+const octoberWins = ({ stats, today }) => {
+  const prefix = `${today.date?.slice(0, 4)}-10-`
+  return (stats.wonDates ?? []).filter(d => d.startsWith(prefix)).length
+}
 
 /** @type {readonly Achievement[]} */
 export const ACHIEVEMENTS = Object.freeze([
@@ -171,6 +176,22 @@ export const ACHIEVEMENTS = Object.freeze([
     check: wonOn('01-01'),
   },
   {
+    id: 'october-win',
+    name: 'Pumpkin Patch',
+    hint: 'Win a puzzle in October.',
+    body: ['An October win. The Lock has been carved, scooped out, and left on the porch to think about what it did.'],
+    reward: 'The Halloween theme. Your lock is now a gourd. Find it under Themes.',
+    check: ctx => octoberWins(ctx) >= 1,
+  },
+  {
+    id: 'october-two-wins',
+    name: 'Out for Blood',
+    hint: 'Win 2 puzzles in the same October.',
+    body: ['Two October wins. The Lock is now bleeding from places a lock should not have.'],
+    reward: 'The Bloody Scary theme. Mop not included. Find it under Themes.',
+    check: ctx => octoberWins(ctx) >= 2,
+  },
+  {
     id: 'influencer',
     name: 'Influencer',
     hint: 'Share your result with someone.',
@@ -203,6 +224,11 @@ export function awardAchievements({ stats, today }) {
     storage.set(KEY, { earned })
   }
   return unlocked
+}
+
+/** @param {string} id */
+export function hasEarned(id) {
+  return Object.hasOwn(loadEarned(), id)
 }
 
 /** @returns {Trophy[]} every achievement, earned or not, in definition order */
