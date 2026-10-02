@@ -28,7 +28,11 @@ export const THEMES = Object.freeze([
   { id: 'bloody',    name: 'Bloody Scary', unlockedBy: 'october-two-wins',
     decor: { className: 'blood-drops', children: Array(14).fill('') } },
   { id: 'haunted',   name: 'Haunted',      unlockedBy: 'october-three-wins',
-    decor: { className: 'haunt', children: ['chain', 'chain', 'chain', 'chain', 'chain', 'ghost'] } },
+    decor: { className: 'haunt', children: [
+      'chain', 'chain', 'chain', 'chain', 'chain',
+      'chain chain--side', 'chain chain--side', 'chain chain--side', 'chain chain--side', 'chain chain--side',
+      'ghost',
+    ] } },
 ])
 
 const isUnlocked = theme => !theme.unlockedBy || hasEarned(theme.unlockedBy)
