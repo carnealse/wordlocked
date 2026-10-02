@@ -1711,9 +1711,9 @@ button {
   height: var(--h);
   opacity: var(--o);
   background:
-    radial-gradient(ellipse 22% 45% at 15% 60%, rgba(205, 220, 214, 0.22), transparent 70%),
-    radial-gradient(ellipse 28% 38% at 48% 55%, rgba(205, 220, 214, 0.18), transparent 70%),
-    radial-gradient(ellipse 20% 50% at 80% 65%, rgba(205, 220, 214, 0.2), transparent 70%);
+    radial-gradient(ellipse 22% 45% at 15% 60%, rgba(205, 220, 214, 0.3), transparent 70%),
+    radial-gradient(ellipse 28% 38% at 48% 55%, rgba(205, 220, 214, 0.26), transparent 70%),
+    radial-gradient(ellipse 20% 50% at 80% 65%, rgba(205, 220, 214, 0.28), transparent 70%);
   background-size: 100vw 100%;
   background-repeat: repeat-x;
   animation: fog-drift var(--d) linear infinite;
@@ -1846,15 +1846,16 @@ button {
   to   { translate: 0 -10px; }
 }
 
-/* Flies across in front of the moon in the first third of the cycle, then waits off screen. */
+/* Flies across the lower half of the moon, the part left visible beside the shackle, in the
+   first third of the cycle, then waits off screen. */
 .witching .witch {
   position: absolute;
-  top: 17vh;
+  top: calc(9vh + 110px);
   left: 0;
-  width: 96px;
-  height: 48px;
+  width: 110px;
+  height: 55px;
   opacity: 0;
-  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'><g fill='%230a0610'><path d='M4 40L24 34L26 44Z'/><path d='M2 45L24 38L25 47Z'/><rect x='22' y='38' width='92' height='3.2' rx='1.6' transform='rotate(-6 68 40)'/><path d='M52 39Q50 26 60 22L70 24Q74 32 72 39Z'/><path d='M58 30Q44 30 34 22Q46 26 58 26Z'/><circle cx='68' cy='18' r='5.5'/><path d='M58 14L66 13L70 2Q74 9 78 13L82 14Q70 17 58 14Z'/><path d='M70 39L78 47L74 48L66 40Z'/></g></svg>") center / contain no-repeat;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'><g fill='%230a0610'><path d='M4 40L26 42L26 50L2 55Z'/><rect x='22' y='44' width='94' height='3.4' rx='1.7' transform='rotate(-5 68 46)'/><path d='M48 46Q46 30 58 21L72 21Q81 32 79 46Z'/><path d='M56 25Q40 27 28 41Q44 34 58 34Z'/><circle cx='69' cy='16' r='6.5'/><path d='M55 12L85 9L85 12.5L55 15.5Z'/><path d='M60 12Q65 5 55 0Q70 3 77 11Z'/><path d='M72 32L84 43L81 45L69 35Z'/><path d='M72 43L83 50L88 49L86 53L71 48Z'/></g></svg>") center / contain no-repeat;
   animation: witch-fly 36s linear 4s infinite;
 }
 
@@ -1963,6 +1964,7 @@ button {
   left: calc(50% + var(--col) * 0.36);
   width: 26px;
   height: 0;
+  filter: drop-shadow(0 0 4px rgba(230, 220, 210, 0.25));
   animation: spider-drop 22s ease-in-out 2s infinite;
 }
 
@@ -1979,12 +1981,11 @@ button {
 .den .spider::after {
   content: '';
   position: absolute;
-  bottom: -10px;
-  left: 0;
-  width: 26px;
-  height: 26px;
-  opacity: 0.9;
-  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><g stroke='%230b0b0d' stroke-width='2' fill='none' stroke-linecap='round'><path d='M16 18L8 12L4 16M16 21L6 20L2 25M17 24L9 28L6 34M18 26L14 32L13 38'/><path d='M24 18L32 12L36 16M24 21L34 20L38 25M23 24L31 28L34 34M22 26L26 32L27 38'/></g><ellipse cx='20' cy='25' rx='6' ry='7.5' fill='%230b0b0d'/><circle cx='20' cy='15.5' r='4' fill='%230b0b0d'/><circle cx='18.4' cy='15' r='0.9' fill='%23c22'/><circle cx='21.6' cy='15' r='0.9' fill='%23c22'/></svg>") center / contain no-repeat;
+  bottom: -14px;
+  left: -4px;
+  width: 34px;
+  height: 34px;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><g stroke='%234a423d' stroke-width='2' fill='none' stroke-linecap='round'><path d='M16 18L8 12L4 16M16 21L6 20L2 25M17 24L9 28L6 34M18 26L14 32L13 38'/><path d='M24 18L32 12L36 16M24 21L34 20L38 25M23 24L31 28L34 34M22 26L26 32L27 38'/></g><defs><radialGradient id='b' cx='0.4' cy='0.35' r='0.7'><stop offset='0' stop-color='%236b615b'/><stop offset='1' stop-color='%232a2522'/></radialGradient></defs><ellipse cx='20' cy='25' rx='6.5' ry='8' fill='url(%23b)'/><circle cx='20' cy='15.5' r='4.2' fill='url(%23b)'/><path d='M18 22L20 26L22 22Z' fill='%23b3261e'/><circle cx='18.4' cy='15' r='1' fill='%23e04030'/><circle cx='21.6' cy='15' r='1' fill='%23e04030'/></svg>") center / contain no-repeat;
   animation: spider-wiggle 1.6s ease-in-out infinite alternate;
 }
 
@@ -2061,7 +2062,7 @@ button {
   z-index: -1;
   width: 12px;
   height: 21px;
-  opacity: 0.9;
+  filter: drop-shadow(0 0 3px rgba(240, 165, 200, 0.5));
   background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 28'><g fill='%23140b16'><path d='M6 0V4M10 0V4' stroke='%23140b16' stroke-width='1.2'/><path d='M8 3Q2 4 2 12Q2 20 5 24L8 28L11 24Q14 20 14 12Q14 4 8 3Z'/><path d='M5 25L6 21L8 23L10 21L11 25Z' fill='%231c1020'/></g></svg>") top / contain no-repeat;
   transform-origin: 50% 0;
   pointer-events: none;
@@ -2103,6 +2104,7 @@ button {
   position: absolute;
   inset: 0;
   background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><path fill='%23120a14' d='M30 9Q27 4 26 8Q22 2 12 3Q14 8 8 9Q4 10 0 8Q6 14 10 22Q14 17 19 21Q22 16 26 20Q28 14 30 22Q32 14 34 20Q38 16 41 21Q46 17 50 22Q54 14 60 8Q56 10 52 9Q46 8 48 3Q38 2 34 8Q33 4 30 9Z'/></svg>") center / contain no-repeat;
+  filter: drop-shadow(0 0 3px rgba(240, 165, 200, 0.55));
   animation: bat-flap var(--flap, 0.22s) ease-in-out infinite alternate;
 }
 
@@ -2115,19 +2117,19 @@ button {
 
 @keyframes bat-cross {
   0%   { translate: -60px 0;                  opacity: 0; }
-  2%   { opacity: 0.7; }
+  2%   { opacity: 0.9; }
   10%  { translate: 30vw -30px; }
   20%  { translate: 65vw 10px; }
-  28%  { opacity: 0.7; }
+  28%  { opacity: 0.9; }
   30%  { translate: calc(100vw + 60px) -20px; opacity: 0; }
   100% { translate: calc(100vw + 60px) -20px; opacity: 0; }
 }
 
 @keyframes bat-cross-back {
   0%   { translate: calc(100vw + 60px) 0; opacity: 0; }
-  2%   { opacity: 0.6; }
+  2%   { opacity: 0.8; }
   14%  { translate: 50vw -40px; }
-  24%  { opacity: 0.6; }
+  24%  { opacity: 0.8; }
   26%  { translate: -60px -10px; opacity: 0; }
   100% { translate: -60px -10px; opacity: 0; }
 }
@@ -2333,10 +2335,10 @@ button {
     eyes-blink var(--blink) linear var(--delay) infinite;
 }
 
-.lanterns .eyes:nth-child(1) { --x: 6%;  --y: 13vh; --s: 0.8;  --blink: 7s;   --delay: -1s; }
+.lanterns .eyes:nth-child(1) { --x: 5%;  --y: 27vh; --s: 0.8;  --blink: 7s;   --delay: -1s; }
 .lanterns .eyes:nth-child(2) { --x: 80%; --y: 31vh; --s: 1;    --blink: 9s;   --delay: -4s; }
-.lanterns .eyes:nth-child(3) { --x: 3%;  --y: 64vh; --s: 0.65; --blink: 6s;   --delay: -2.5s; }
-.lanterns .eyes:nth-child(4) { --x: 76%; --y: 84vh; --s: 0.9;  --blink: 8.5s; --delay: -6s; }
+.lanterns .eyes:nth-child(3) { --x: 8%;  --y: 93vh; --s: 0.65; --blink: 6s;   --delay: -2.5s; }
+.lanterns .eyes:nth-child(4) { --x: 74%; --y: 95vh; --s: 0.9;  --blink: 8.5s; --delay: -6s; }
 
 .lanterns .eyes--side { display: none; }
 
