@@ -1270,6 +1270,48 @@ button {
   --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 72'><defs><radialGradient id='b' cx='0.4' cy='0.3' r='0.8'><stop offset='0' stop-color='%23ffffff'/><stop offset='0.7' stop-color='%23dbe9ee'/><stop offset='1' stop-color='%23a9c2cc'/></radialGradient></defs><path d='M6 34C6 14 17 4 30 4S54 14 54 34V64Q49.5 70 45 64T35 64Q30 70 25 64T15 64Q10.5 70 6 64Z' fill='url(%23b)'/><ellipse cx='22' cy='30' rx='3.6' ry='5' fill='%231c2a33'/><ellipse cx='38' cy='30' rx='3.6' ry='5' fill='%231c2a33'/><ellipse cx='30' cy='45' rx='3.2' ry='4.4' fill='%231c2a33'/></svg>") center 55% / 46% auto no-repeat;
 }
 
+.theme-swatch--graveyard {
+  --sw-body: #7a7f7a;
+  --sw-body-lo: #4f544f;
+  --sw-shackle: #3d423f;
+  --sw-art: radial-gradient(circle at 0 100%, #4f6b3a 0 9px, transparent 10px);
+}
+
+.theme-swatch--witching {
+  --sw-body: #5b3285;
+  --sw-body-lo: #301a4a;
+  --sw-shackle: #e8bf4a;
+  --sw-art: radial-gradient(circle at 70% 40%, #fff4c7 0 5px, transparent 6px);
+}
+
+.theme-swatch--spider {
+  --sw-body: #45403d;
+  --sw-body-lo: #2a2624;
+  --sw-shackle: #77706b;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><path d='M0 0L118.0 0.0M0 0L114.0 30.5M0 0L102.2 59.0M0 0L83.4 83.4M0 0L59.0 102.2M0 0L30.5 114.0M0 0L0.0 118.0M22.0 0.0Q18.6 2.4 21.3 5.7Q17.3 7.2 19.1 11.0Q14.9 11.4 15.6 15.6Q11.4 14.9 11.0 19.1Q7.2 17.3 5.7 21.3Q2.4 18.6 0.0 22.0M44.0 0.0Q37.2 4.9 42.5 11.4Q34.7 14.4 38.1 22.0Q29.8 22.8 31.1 31.1Q22.8 29.8 22.0 38.1Q14.4 34.7 11.4 42.5Q4.9 37.2 0.0 44.0M66.0 0.0Q55.8 7.3 63.8 17.1Q52.0 21.5 57.2 33.0Q44.6 34.3 46.7 46.7Q34.3 44.6 33.0 57.2Q21.5 52.0 17.1 63.8Q7.3 55.8 0.0 66.0M88.0 0.0Q74.4 9.8 85.0 22.8Q69.3 28.7 76.2 44.0Q59.5 45.7 62.2 62.2Q45.7 59.5 44.0 76.2Q28.7 69.3 22.8 85.0Q9.8 74.4 0.0 88.0M110.0 0.0Q93.0 12.2 106.3 28.5Q86.7 35.9 95.3 55.0Q74.4 57.1 77.8 77.8Q57.1 74.4 55.0 95.3Q35.9 86.7 28.5 106.3Q12.2 93.0 0.0 110.0' fill='none' stroke='%23d8d8d8' stroke-width='0.9'/></svg>") 0 0 / 70% auto no-repeat;
+}
+
+.theme-swatch--bats {
+  --sw-body: #4a2a45;
+  --sw-body-lo: #2b1528;
+  --sw-shackle: #8f6f8a;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><path fill='%23120a14' d='M30 9Q27 4 26 8Q22 2 12 3Q14 8 8 9Q4 10 0 8Q6 14 10 22Q14 17 19 21Q22 16 26 20Q28 14 30 22Q32 14 34 20Q38 16 41 21Q46 17 50 22Q54 14 60 8Q56 10 52 9Q46 8 48 3Q38 2 34 8Q33 4 30 9Z'/></svg>") center 60% / 80% auto no-repeat;
+}
+
+.theme-swatch--franken {
+  --sw-body: #5f8a4a;
+  --sw-body-lo: #3d5e2e;
+  --sw-shackle: #5b6168;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><g fill='none' stroke='%231d2a16' stroke-width='2' stroke-dasharray='4 3' vector-effect='non-scaling-stroke'><path d='M45 0V46M0 42H52M45 50H100M52 42V100' vector-effect='non-scaling-stroke'/></g></svg>") center / 100% 100% no-repeat;
+}
+
+.theme-swatch--final {
+  --sw-body: #1d1a18;
+  --sw-body-lo: #0c0b0a;
+  --sw-shackle: #3a3530;
+  --sw-art: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 24'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23ffe08a'/><stop offset='1' stop-color='%23ff7a10'/></linearGradient></defs><path d='M2 22L24 4L26 22Z' fill='url(%23g)'/><path d='M62 22L40 4L38 22Z' fill='url(%23g)'/></svg>") center 55% / 80% auto no-repeat;
+}
+
 /* ── THEMES (selected on the Themes page, applied by js/theme.js) ── */
 /* Themes override tokens and add decoration only; layout is untouched. */
 
@@ -1586,8 +1628,748 @@ button {
   to   { translate: 0 9px;  rotate: 4deg; }
 }
 
+/* Graveyard Fog: grey-green night, weathered stone lock, headstones and drifting fog. */
+:root[data-theme="graveyard"] {
+  --c-bg:          #070a09;
+  --c-bg-2:        #0e1311;
+  --c-bg-3:        #151c19;
+  --c-surface:     #1a221f;
+  --c-surface-2:   #222c28;
+  --c-border:      #2e3b36;
+  --c-border-2:    #45564f;
+  --c-text-muted:  #8a9a93;
+  --c-text-faint:  #3a4741;
+  --c-gold:        #b8d4c4;
+  --c-gold-dim:    #34483f;
+}
+
+:root[data-theme="graveyard"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #1b2622 0%, transparent 60%),
+    var(--c-bg);
+}
+
+:root[data-theme="graveyard"] .wordmark {
+  text-shadow: 0 0 16px rgba(190, 220, 205, 0.3);
+}
+
+:root[data-theme="graveyard"] .lock {
+  --lock-body:        #6c716d;
+  --lock-body-hi:     #7d827e;
+  --lock-body-lo:     #4c514d;
+  --lock-well:        #1a1e1c;
+  --lock-btn:         #383d3a;
+  --lock-btn-hi:      #4a504c;
+  --lock-btn-border:  #555c58;
+}
+
+/* Speckled granite with moss creeping in from the bottom corners. */
+:root[data-theme="graveyard"] .lock__body {
+  border-color: rgba(220, 230, 225, 0.08);
+  background:
+    radial-gradient(ellipse 30% 22% at 0% 100%, rgba(72, 104, 52, 0.75), transparent 70%),
+    radial-gradient(ellipse 22% 16% at 100% 100%, rgba(72, 104, 52, 0.6), transparent 70%),
+    radial-gradient(ellipse 14% 8% at 8% 0%, rgba(72, 104, 52, 0.45), transparent 70%),
+    radial-gradient(circle at 20% 30%, rgba(0, 0, 0, 0.25) 0 1px, transparent 1.5px) 0 0 / 13px 11px,
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.10) 0 1px, transparent 1.5px) 0 0 / 17px 15px,
+    linear-gradient(180deg, var(--lock-body-hi), var(--lock-body) 45%, var(--lock-body-lo));
+}
+
+:root[data-theme="graveyard"] .lock__shackle {
+  --shk-hi:  #8d938f;
+  --shk-mid: #555b57;
+  --shk-lo:  #363a37;
+  --shk-in:  #242725;
+}
+
+.graveyard {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.graveyard .tombs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80px;
+  opacity: 0.85;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 70'><g fill='%2318201d'><path d='M0 62Q60 54 120 60T240 62V70H0Z'/><path d='M18 60V30Q18 16 32 16T46 30V60Z' transform='rotate(-4 32 60)'/><path d='M78 60V34H70V26H78V16H86V26H94V34H86V60Z' transform='rotate(5 82 60)'/><path d='M128 60V24Q128 8 146 8T164 24V60Z'/><path d='M196 60V40Q196 30 206 30T216 40V60Z' transform='rotate(-7 206 60)'/></g></svg>") left bottom / 240px 70px repeat-x;
+}
+
+/* Each fog bank is two screens wide and tiles every screen width, so sliding it left by
+   one screen width loops seamlessly. Fog sits in front of the headstones. */
+.graveyard .fog {
+  position: absolute;
+  left: 0;
+  bottom: var(--b);
+  width: 200vw;
+  height: var(--h);
+  opacity: var(--o);
+  background:
+    radial-gradient(ellipse 22% 45% at 15% 60%, rgba(205, 220, 214, 0.22), transparent 70%),
+    radial-gradient(ellipse 28% 38% at 48% 55%, rgba(205, 220, 214, 0.18), transparent 70%),
+    radial-gradient(ellipse 20% 50% at 80% 65%, rgba(205, 220, 214, 0.2), transparent 70%);
+  background-size: 100vw 100%;
+  background-repeat: repeat-x;
+  animation: fog-drift var(--d) linear infinite;
+}
+
+.graveyard .fog:nth-child(2) { --b: -4vh; --h: 28vh; --o: 1;    --d: 70s; }
+.graveyard .fog:nth-child(3) { --b: 2vh;  --h: 22vh; --o: 0.7;  --d: 48s; animation-direction: reverse; }
+.graveyard .fog:nth-child(4) { --b: 10vh; --h: 18vh; --o: 0.45; --d: 95s; }
+
+@keyframes fog-drift {
+  from { translate: 0 0; }
+  to   { translate: -100vw 0; }
+}
+
+/* Witching Hour: indigo sky, a full moon rising behind the lock, a witch crossing it. */
+:root[data-theme="witching"] {
+  --c-bg:          #08061a;
+  --c-bg-2:        #100c26;
+  --c-bg-3:        #181232;
+  --c-surface:     #1e173c;
+  --c-surface-2:   #271e4a;
+  --c-border:      #382c63;
+  --c-border-2:    #52428a;
+  --c-text-muted:  #9b8fc7;
+  --c-text-faint:  #3f3566;
+  --c-gold:        #f5c84c;
+  --c-gold-dim:    #6b5216;
+}
+
+:root[data-theme="witching"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 90% 45% at 50% 0%, #241a52 0%, transparent 65%),
+    var(--c-bg);
+}
+
+:root[data-theme="witching"] .wordmark {
+  text-shadow: 0 0 18px rgba(245, 200, 76, 0.35);
+}
+
+:root[data-theme="witching"] .lock {
+  --lock-body:        #4f2d78;
+  --lock-body-hi:     #603a8f;
+  --lock-body-lo:     #33194f;
+  --lock-well:        #170b26;
+  --lock-btn:         #2f1a4a;
+  --lock-btn-hi:      #44275f;
+  --lock-btn-border:  #5c3a80;
+  --lock-arrow:       #f5d77f;
+}
+
+/* Potion glass: a glossy highlight and a gold rim. */
+:root[data-theme="witching"] .lock__body {
+  border-color: rgba(245, 200, 76, 0.45);
+  background:
+    radial-gradient(ellipse 50% 30% at 30% 8%, rgba(230, 200, 255, 0.28), transparent 70%),
+    radial-gradient(ellipse 80% 50% at 50% 110%, rgba(180, 90, 255, 0.25), transparent 70%),
+    linear-gradient(180deg, var(--lock-body-hi), var(--lock-body) 45%, var(--lock-body-lo));
+}
+
+:root[data-theme="witching"] .lock__shackle {
+  --shk-hi:  #fff0b0;
+  --shk-mid: #d9a93a;
+  --shk-lo:  #8a6416;
+  --shk-in:  #5c410c;
+}
+
+.witching {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.witching .stars {
+  position: absolute;
+  inset: 0 0 40%;
+  background:
+    radial-gradient(circle at 8% 12%,  #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 23% 31%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 41% 7%,  #fff 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 64% 22%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 82% 9%,  #fff 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 93% 36%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 15% 52%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 74% 48%, #fff 0 1px, transparent 1.6px);
+  opacity: 0.5;
+  animation: twinkle 3.4s ease-in-out infinite alternate;
+}
+
+.witching .stars:nth-child(2) {
+  background:
+    radial-gradient(circle at 4% 38%,  #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 32% 16%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 53% 40%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 70% 4%,  #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 88% 24%, #fff 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 46% 60%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 97% 58%, #fff 0 1px, transparent 1.6px);
+  animation-duration: 4.6s;
+  animation-delay: -2s;
+}
+
+@keyframes twinkle {
+  from { opacity: 0.2; }
+  to   { opacity: 0.65; }
+}
+
+/* Centered on the game column so the lock's shackle sits against it. */
+.witching .moon {
+  position: absolute;
+  top: 9vh;
+  left: calc(50% - 95px);
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 34% 40%, rgba(170, 150, 100, 0.35) 0 13px, transparent 14px),
+    radial-gradient(circle at 62% 30%, rgba(170, 150, 100, 0.3) 0 8px, transparent 9px),
+    radial-gradient(circle at 58% 66%, rgba(170, 150, 100, 0.3) 0 18px, transparent 19px),
+    radial-gradient(circle at 40% 38%, #fffbe8, #f3e3a8 60%, #d9c27a);
+  box-shadow: 0 0 60px 10px rgba(255, 236, 170, 0.25);
+  animation: moon-rise 26s ease-in-out infinite alternate;
+}
+
+@keyframes moon-rise {
+  from { translate: 0 40px; }
+  to   { translate: 0 -10px; }
+}
+
+/* Flies across in front of the moon in the first third of the cycle, then waits off screen. */
+.witching .witch {
+  position: absolute;
+  top: 17vh;
+  left: 0;
+  width: 96px;
+  height: 48px;
+  opacity: 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'><g fill='%230a0610'><path d='M4 40L24 34L26 44Z'/><path d='M2 45L24 38L25 47Z'/><rect x='22' y='38' width='92' height='3.2' rx='1.6' transform='rotate(-6 68 40)'/><path d='M52 39Q50 26 60 22L70 24Q74 32 72 39Z'/><path d='M58 30Q44 30 34 22Q46 26 58 26Z'/><circle cx='68' cy='18' r='5.5'/><path d='M58 14L66 13L70 2Q74 9 78 13L82 14Q70 17 58 14Z'/><path d='M70 39L78 47L74 48L66 40Z'/></g></svg>") center / contain no-repeat;
+  animation: witch-fly 36s linear 4s infinite;
+}
+
+@keyframes witch-fly {
+  0%   { translate: -120px 30px; rotate: -6deg; opacity: 0; }
+  2%   { opacity: 0.85; }
+  15%  { translate: 50vw -10px; rotate: -2deg; }
+  28%  { opacity: 0.85; }
+  30%  { translate: calc(100vw + 120px) 20px; rotate: 4deg; opacity: 0; }
+  100% { translate: calc(100vw + 120px) 20px; opacity: 0; }
+}
+
+/* Spider's Den: dusty brown-black, webs in the corners, a spider dropping on its thread. */
+:root[data-theme="spider"] {
+  --c-bg:          #0a0908;
+  --c-bg-2:        #12100e;
+  --c-bg-3:        #1a1715;
+  --c-surface:     #201c1a;
+  --c-surface-2:   #2a2522;
+  --c-border:      #3a3330;
+  --c-border-2:    #554b46;
+  --c-text-muted:  #a0958e;
+  --c-text-faint:  #463e3a;
+  --c-gold:        #e2d9cf;
+  --c-gold-dim:    #4b423c;
+}
+
+:root[data-theme="spider"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #241e1b 0%, transparent 60%),
+    var(--c-bg);
+}
+
+:root[data-theme="spider"] .wordmark {
+  text-shadow: 0 0 14px rgba(230, 220, 210, 0.25);
+}
+
+:root[data-theme="spider"] .lock {
+  --lock-body:        #45403d;
+  --lock-body-hi:     #514b47;
+  --lock-body-lo:     #2e2a28;
+  --lock-well:        #151211;
+  --lock-btn:         #2c2826;
+  --lock-btn-hi:      #3c3734;
+  --lock-btn-border:  #4a4441;
+}
+
+:root[data-theme="spider"] .lock__shackle {
+  --shk-hi:  #a49c96;
+  --shk-mid: #6b645f;
+  --shk-lo:  #45403c;
+  --shk-in:  #2d2926;
+}
+
+/* Strands across the top edge, behind the controls like the Bloody Scary drips. */
+:root[data-theme="spider"] .lock__body::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  border-radius: 16px 16px 0 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 48' preserveAspectRatio='none'><g fill='none' stroke='rgba(225,225,225,0.55)' stroke-width='0.8'><path d='M0 0Q40 26 92 0M60 0Q120 34 190 0M150 0Q210 22 262 0M230 0Q268 30 300 6'/><path d='M0 0L34 0M0 0L30 14M0 0L18 28M0 0L0 34M8 0Q9 6 7 9Q4 10 0 9M18 0Q19 12 14 19Q7 21 0 20M28 0Q30 18 22 28Q10 31 0 30'/></g></svg>") top / 100% 100% no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.den {
+  --col: min(100%, var(--max-w));
+  --gutter: calc((100% - var(--col)) / 2);
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.den .web {
+  position: absolute;
+  top: 0;
+  width: var(--w, 130px);
+  height: var(--w, 130px);
+  opacity: 0.32;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><path d='M0 0L118.0 0.0M0 0L114.0 30.5M0 0L102.2 59.0M0 0L83.4 83.4M0 0L59.0 102.2M0 0L30.5 114.0M0 0L0.0 118.0M22.0 0.0Q18.6 2.4 21.3 5.7Q17.3 7.2 19.1 11.0Q14.9 11.4 15.6 15.6Q11.4 14.9 11.0 19.1Q7.2 17.3 5.7 21.3Q2.4 18.6 0.0 22.0M44.0 0.0Q37.2 4.9 42.5 11.4Q34.7 14.4 38.1 22.0Q29.8 22.8 31.1 31.1Q22.8 29.8 22.0 38.1Q14.4 34.7 11.4 42.5Q4.9 37.2 0.0 44.0M66.0 0.0Q55.8 7.3 63.8 17.1Q52.0 21.5 57.2 33.0Q44.6 34.3 46.7 46.7Q34.3 44.6 33.0 57.2Q21.5 52.0 17.1 63.8Q7.3 55.8 0.0 66.0M88.0 0.0Q74.4 9.8 85.0 22.8Q69.3 28.7 76.2 44.0Q59.5 45.7 62.2 62.2Q45.7 59.5 44.0 76.2Q28.7 69.3 22.8 85.0Q9.8 74.4 0.0 88.0M110.0 0.0Q93.0 12.2 106.3 28.5Q86.7 35.9 95.3 55.0Q74.4 57.1 77.8 77.8Q57.1 74.4 55.0 95.3Q35.9 86.7 28.5 106.3Q12.2 93.0 0.0 110.0' fill='none' stroke='%23d8d8d8' stroke-width='0.9'/></svg>") 0 0 / 100% 100% no-repeat;
+}
+
+.den .web:nth-child(1) { left: 0; }
+.den .web:nth-child(2) { right: 0; scale: -1 1; --w: 110px; }
+
+/* Desktop only: webs strung in the empty space beside the game column. */
+.den .web--side { display: none; }
+
+@media (min-width: 700px) {
+  .den .web--side { display: block; }
+}
+
+.den .web:nth-child(3) { top: 46vh; left: calc(var(--gutter) * 0.25); --w: 150px; rotate: -20deg; opacity: 0.2; }
+.den .web:nth-child(4) { top: 62vh; left: auto; right: calc(var(--gutter) * 0.2); --w: 170px; scale: -1 1; rotate: 15deg; opacity: 0.2; }
+
+/* The element's height is the thread length; the spider rides its bottom end. */
+.den .spider {
+  position: absolute;
+  top: 0;
+  left: calc(50% + var(--col) * 0.36);
+  width: 26px;
+  height: 0;
+  animation: spider-drop 22s ease-in-out 2s infinite;
+}
+
+.den .spider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 12px;
+  left: 50%;
+  width: 1px;
+  background: rgba(220, 215, 210, 0.35);
+}
+
+.den .spider::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  opacity: 0.9;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><g stroke='%230b0b0d' stroke-width='2' fill='none' stroke-linecap='round'><path d='M16 18L8 12L4 16M16 21L6 20L2 25M17 24L9 28L6 34M18 26L14 32L13 38'/><path d='M24 18L32 12L36 16M24 21L34 20L38 25M23 24L31 28L34 34M22 26L26 32L27 38'/></g><ellipse cx='20' cy='25' rx='6' ry='7.5' fill='%230b0b0d'/><circle cx='20' cy='15.5' r='4' fill='%230b0b0d'/><circle cx='18.4' cy='15' r='0.9' fill='%23c22'/><circle cx='21.6' cy='15' r='0.9' fill='%23c22'/></svg>") center / contain no-repeat;
+  animation: spider-wiggle 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes spider-drop {
+  0%   { height: 0; }
+  22%  { height: 34vh; }
+  26%  { height: 31vh; }
+  30%  { height: 34vh; }
+  48%  { height: 34vh; }
+  70%  { height: 0; }
+  100% { height: 0; }
+}
+
+@keyframes spider-wiggle {
+  from { rotate: -8deg; }
+  to   { rotate: 8deg; }
+}
+
+/* Bat Swarm: dusk purple, bats roosting under the divider and flocks crossing the sky. */
+:root[data-theme="bats"] {
+  --c-bg:          #0b060c;
+  --c-bg-2:        #140a15;
+  --c-bg-3:        #1d0f1e;
+  --c-surface:     #241327;
+  --c-surface-2:   #2f1a32;
+  --c-border:      #452848;
+  --c-border-2:    #643b68;
+  --c-text-muted:  #ad8bb0;
+  --c-text-faint:  #4d3250;
+  --c-gold:        #f0a5c8;
+  --c-gold-dim:    #6b2f4c;
+}
+
+:root[data-theme="bats"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 90% 40% at 50% 0%, #3a1a3c 0%, transparent 60%),
+    radial-gradient(ellipse 90% 30% at 50% 100%, rgba(240, 120, 90, 0.08) 0%, transparent 70%),
+    var(--c-bg);
+}
+
+:root[data-theme="bats"] .wordmark {
+  text-shadow: 0 0 16px rgba(240, 165, 200, 0.35);
+}
+
+:root[data-theme="bats"] .lock {
+  --lock-body:        #4a2a45;
+  --lock-body-hi:     #573452;
+  --lock-body-lo:     #321a2e;
+  --lock-well:        #180b17;
+  --lock-btn:         #2f1a2c;
+  --lock-btn-hi:      #42263e;
+  --lock-btn-border:  #563351;
+}
+
+:root[data-theme="bats"] .lock__shackle {
+  --shk-hi:  #c4a3bf;
+  --shk-mid: #81637c;
+  --shk-lo:  #533e50;
+  --shk-in:  #382935;
+}
+
+/* Roosting bats hang from the header divider, behind the game content, and stretch their
+   wings now and then. They sit in the gaps of the guess row below. */
+:root[data-theme="bats"] .header {
+  position: relative;
+}
+
+:root[data-theme="bats"] .header::before,
+:root[data-theme="bats"] .header::after {
+  content: '';
+  position: absolute;
+  top: calc(100% + 1px);
+  z-index: -1;
+  width: 12px;
+  height: 21px;
+  opacity: 0.9;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 28'><g fill='%23140b16'><path d='M6 0V4M10 0V4' stroke='%23140b16' stroke-width='1.2'/><path d='M8 3Q2 4 2 12Q2 20 5 24L8 28L11 24Q14 20 14 12Q14 4 8 3Z'/><path d='M5 25L6 21L8 23L10 21L11 25Z' fill='%231c1020'/></g></svg>") top / contain no-repeat;
+  transform-origin: 50% 0;
+  pointer-events: none;
+  animation: roost-stretch 9s ease-in-out infinite;
+}
+
+:root[data-theme="bats"] .header::before { left: 29%; }
+:root[data-theme="bats"] .header::after  { left: 67%; height: 17px; width: 10px; animation-delay: -4.5s; animation-duration: 11s; }
+
+@keyframes roost-stretch {
+  0%, 88%, 100% { scale: 1 1; rotate: 0deg; }
+  91% { scale: 1.6 0.95; rotate: -6deg; }
+  94% { scale: 1 1; rotate: 4deg; }
+  96% { scale: 1.5 0.95; }
+}
+
+.bats {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Bats share one 18 second cycle with staggered delays, so they cross as a loose flock
+   and then the sky stays clear for a while. */
+.bats .bat {
+  position: absolute;
+  top: var(--y);
+  left: 0;
+  width: calc(40px * var(--s, 1));
+  height: calc(19px * var(--s, 1));
+  opacity: 0;
+  animation: bat-cross 18s cubic-bezier(0.4, 0.1, 0.6, 0.9) var(--delay) infinite;
+}
+
+.bats .bat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 28'><path fill='%23120a14' d='M30 9Q27 4 26 8Q22 2 12 3Q14 8 8 9Q4 10 0 8Q6 14 10 22Q14 17 19 21Q22 16 26 20Q28 14 30 22Q32 14 34 20Q38 16 41 21Q46 17 50 22Q54 14 60 8Q56 10 52 9Q46 8 48 3Q38 2 34 8Q33 4 30 9Z'/></svg>") center / contain no-repeat;
+  animation: bat-flap var(--flap, 0.22s) ease-in-out infinite alternate;
+}
+
+.bats .bat:nth-child(1) { --y: 14vh; --delay: 1s;   --s: 1;    }
+.bats .bat:nth-child(2) { --y: 20vh; --delay: 1.6s; --s: 0.7;  --flap: 0.18s; }
+.bats .bat:nth-child(3) { --y: 10vh; --delay: 2.3s; --s: 0.85; }
+.bats .bat:nth-child(4) { --y: 26vh; --delay: 2.8s; --s: 0.6;  --flap: 0.16s; }
+.bats .bat:nth-child(5) { --y: 17vh; --delay: 3.9s; --s: 0.9;  --flap: 0.25s; }
+.bats .bat:nth-child(6) { --y: 52vh; --delay: 10s;  --s: 0.75; animation-name: bat-cross-back; }
+
+@keyframes bat-cross {
+  0%   { translate: -60px 0;                  opacity: 0; }
+  2%   { opacity: 0.7; }
+  10%  { translate: 30vw -30px; }
+  20%  { translate: 65vw 10px; }
+  28%  { opacity: 0.7; }
+  30%  { translate: calc(100vw + 60px) -20px; opacity: 0; }
+  100% { translate: calc(100vw + 60px) -20px; opacity: 0; }
+}
+
+@keyframes bat-cross-back {
+  0%   { translate: calc(100vw + 60px) 0; opacity: 0; }
+  2%   { opacity: 0.6; }
+  14%  { translate: 50vw -40px; }
+  24%  { opacity: 0.6; }
+  26%  { translate: -60px -10px; opacity: 0; }
+  100% { translate: -60px -10px; opacity: 0; }
+}
+
+@keyframes bat-flap {
+  from { scale: 1 1; }
+  to   { scale: 0.9 0.35; }
+}
+
+/* Frankenlock: lab green, a stitched patchwork lock with bolts, lightning in the distance. */
+:root[data-theme="franken"] {
+  --c-bg:          #050a06;
+  --c-bg-2:        #0b130c;
+  --c-bg-3:        #111c13;
+  --c-surface:     #152218;
+  --c-surface-2:   #1c2c1f;
+  --c-border:      #273c2b;
+  --c-border-2:    #3a5840;
+  --c-text-muted:  #8fae94;
+  --c-text-faint:  #344a38;
+  --c-gold:        #b6f27a;
+  --c-gold-dim:    #3c5c22;
+}
+
+:root[data-theme="franken"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, #15301c 0%, transparent 60%),
+    var(--c-bg);
+}
+
+:root[data-theme="franken"] .wordmark {
+  text-shadow: 0 0 16px rgba(182, 242, 122, 0.35);
+}
+
+:root[data-theme="franken"] .lock {
+  --lock-body:        #5a8346;
+  --lock-body-hi:     #6a9554;
+  --lock-body-lo:     #3e5e30;
+  --lock-well:        #16220f;
+  --lock-btn:         #2d4223;
+  --lock-btn-hi:      #3d562f;
+  --lock-btn-border:  #4c6a3b;
+}
+
+/* Four mismatched patches of skin with stitched seams between them. */
+:root[data-theme="franken"] .lock__body {
+  border-color: rgba(20, 35, 15, 0.6);
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><g fill='none' stroke='%231d2a16' stroke-width='2' stroke-dasharray='4 3' vector-effect='non-scaling-stroke'><path d='M45 0V46M0 42H52M45 50H100M52 42V100' vector-effect='non-scaling-stroke'/></g></svg>") center / 100% 100% no-repeat,
+    linear-gradient(#64904e, #4f7a3c) 0 0 / 45% 42% no-repeat,
+    linear-gradient(#6d9a56, #577f42) 100% 0 / 55% 50% no-repeat,
+    linear-gradient(#557c42, #3f6131) 0 100% / 52% 58% no-repeat,
+    linear-gradient(#5f8a4a, #446a35) 100% 100% / 48% 50% no-repeat,
+    var(--lock-body);
+}
+
+/* Neck bolts on each side. They spark when a lock opens. */
+:root[data-theme="franken"] .lock__body::before,
+:root[data-theme="franken"] .lock__body::after {
+  content: '';
+  position: absolute;
+  top: calc(50% - 9px);
+  width: 10px;
+  height: 18px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #c9ced3, #7a8087 55%, #4a4f55);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+:root[data-theme="franken"] .lock__body::before { left: -9px; border-radius: 3px 0 0 3px; }
+:root[data-theme="franken"] .lock__body::after  { right: -9px; border-radius: 0 3px 3px 0; }
+
+:root[data-theme="franken"] .lock:has(.lock__shackle--open) .lock__body::before,
+:root[data-theme="franken"] .lock:has(.lock__shackle--open) .lock__body::after {
+  animation: bolt-spark 0.9s ease-out;
+}
+
+@keyframes bolt-spark {
+  0%, 100% { box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.3); filter: none; }
+  15% { box-shadow: 0 0 14px 4px rgba(190, 255, 130, 0.9); filter: brightness(1.8); }
+  30% { box-shadow: 0 0 2px rgba(190, 255, 130, 0.4); filter: none; }
+  45% { box-shadow: 0 0 10px 3px rgba(190, 255, 130, 0.8); filter: brightness(1.5); }
+}
+
+:root[data-theme="franken"] .lock__shackle {
+  --shk-hi:  #a3a9b0;
+  --shk-mid: #5d636a;
+  --shk-lo:  #3b4046;
+  --shk-in:  #272a2e;
+}
+
+.storm {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* A faint double flicker every 11 seconds, with the bolt showing during the flicker. */
+.storm .flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse 90% 60% at 75% 0%, rgba(210, 255, 190, 0.5), transparent 70%);
+  animation: storm-flash 11s linear 3s infinite;
+}
+
+.storm .bolt {
+  position: absolute;
+  top: 0;
+  left: calc(50% + min(100%, var(--max-w)) * 0.3);
+  width: 34px;
+  height: 22vh;
+  opacity: 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 120'><path d='M24 0L10 48H20L6 120L34 40H22L32 0Z' fill='%23e9ffd6'/></svg>") top / 100% 100% no-repeat;
+  filter: drop-shadow(0 0 8px rgba(210, 255, 190, 0.8));
+  animation: storm-flash 11s linear 3s infinite;
+}
+
+@keyframes storm-flash {
+  0%, 60%, 62%, 63.5%, 66%, 100% { opacity: 0; }
+  61%   { opacity: 0.35; }
+  64.5% { opacity: 0.5; }
+}
+
+/* The Final Lock: pitch black, an ember-rimmed lock, carved eyes blinking in the dark. */
+:root[data-theme="final"] {
+  --c-bg:          #050404;
+  --c-bg-2:        #0c0a09;
+  --c-bg-3:        #141110;
+  --c-surface:     #191513;
+  --c-surface-2:   #221c19;
+  --c-border:      #33291f;
+  --c-border-2:    #4f3c2b;
+  --c-text-muted:  #b0937a;
+  --c-text-faint:  #4a3a2d;
+  --c-gold:        #ff8a1f;
+  --c-gold-dim:    #6b330a;
+}
+
+:root[data-theme="final"] body {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 90% 35% at 50% 100%, rgba(255, 120, 20, 0.08) 0%, transparent 70%),
+    var(--c-bg);
+}
+
+:root[data-theme="final"] .wordmark {
+  text-shadow: 0 0 18px rgba(255, 138, 31, 0.5);
+}
+
+:root[data-theme="final"] .lock {
+  --lock-body:        #1a1715;
+  --lock-body-hi:     #24201d;
+  --lock-body-lo:     #0e0c0b;
+  --lock-well:        #060505;
+  --lock-btn:         #1c1816;
+  --lock-btn-hi:      #2a2421;
+  --lock-btn-border:  #3a2c22;
+  --lock-arrow:       #ffb066;
+}
+
+:root[data-theme="final"] .lock__body {
+  border-color: rgba(255, 138, 31, 0.35);
+  animation: ember-pulse 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes ember-pulse {
+  from { box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 14px rgba(255, 120, 20, 0.12), inset 0 1px 0 rgba(255, 160, 80, 0.12); }
+  to   { box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 120, 20, 0.32), inset 0 1px 0 rgba(255, 160, 80, 0.12); }
+}
+
+:root[data-theme="final"] .lock__shackle {
+  --shk-hi:  #6a5a4c;
+  --shk-mid: #2e2622;
+  --shk-lo:  #171311;
+  --shk-in:  #0e0b0a;
+}
+
+.lanterns {
+  --col: min(100%, var(--max-w));
+  --gutter: calc((100% - var(--col)) / 2);
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.lanterns .eyes {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: calc(46px * var(--s, 1));
+  height: calc(17px * var(--s, 1));
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 24'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23ffe08a'/><stop offset='1' stop-color='%23ff7a10'/></linearGradient></defs><path d='M2 22L24 4L26 22Z' fill='url(%23g)'/><path d='M62 22L40 4L38 22Z' fill='url(%23g)'/></svg>") center / contain no-repeat;
+  filter: drop-shadow(0 0 6px rgba(255, 140, 30, 0.8));
+  animation:
+    eyes-glow 4s ease-in-out var(--delay) infinite alternate,
+    eyes-blink var(--blink) linear var(--delay) infinite;
+}
+
+.lanterns .eyes:nth-child(1) { --x: 6%;  --y: 13vh; --s: 0.8;  --blink: 7s;   --delay: -1s; }
+.lanterns .eyes:nth-child(2) { --x: 80%; --y: 31vh; --s: 1;    --blink: 9s;   --delay: -4s; }
+.lanterns .eyes:nth-child(3) { --x: 3%;  --y: 64vh; --s: 0.65; --blink: 6s;   --delay: -2.5s; }
+.lanterns .eyes:nth-child(4) { --x: 76%; --y: 84vh; --s: 0.9;  --blink: 8.5s; --delay: -6s; }
+
+.lanterns .eyes--side { display: none; }
+
+@media (min-width: 700px) {
+  .lanterns .eyes--side { display: block; }
+}
+
+.lanterns .eyes:nth-child(5) { --x: calc(var(--gutter) * 0.4); --y: 42vh; --s: 1.3; --blink: 10s; --delay: -3s; }
+.lanterns .eyes:nth-child(6) { --x: calc(100% - var(--gutter) * 0.5); --y: 58vh; --s: 1.1; --blink: 7.5s; --delay: -5s; }
+
+@keyframes eyes-glow {
+  from { opacity: 0.25; }
+  to   { opacity: 0.6; }
+}
+
+@keyframes eyes-blink {
+  0%, 94%, 100% { scale: 1 1; }
+  96% { scale: 1 0.1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .blood-drops,
-  .haunt .ghost { display: none; }
-  .haunt .chain { animation: none; }
+  .haunt .ghost,
+  .witching .witch,
+  .den .spider,
+  .bats .bat,
+  .storm { display: none; }
+  .haunt .chain,
+  .graveyard .fog,
+  .witching .stars,
+  .witching .moon,
+  .lanterns .eyes,
+  :root[data-theme="bats"] .header::before,
+  :root[data-theme="bats"] .header::after,
+  :root[data-theme="final"] .lock__body { animation: none; }
 }
