@@ -29,6 +29,17 @@ import { createAchievementAwarder, trophyEntries } from './achievements.js'
 
 const STORAGE_DAILY = 'daily'
 
+/*
+ * Advertisement build: one fixed round for recording. None of these words are in
+ * any word bank, so the round can never match a real puzzle. Every load starts a
+ * fresh take, and nothing is saved, recorded, or awarded.
+ */
+const AD_WORDS = [
+  { word: 'HASP',   hint: 'Noun' },
+  { word: 'LATCH',  hint: 'Noun / Verb' },
+  { word: 'CIPHER', hint: 'Noun' },
+]
+
 // Swipe tracking — module-level, not state
 const _swipe = { active: false, startY: 0, lastY: 0, dialIdx: -1 }
 let _focusedDial = 0
@@ -65,7 +76,7 @@ export async function boot(vault) {
   const words    = wordObjs.map(o => o.word.toUpperCase())
   const hints    = wordObjs.map(o => o.hint)
 
-  const saved     = readSealed(STORAGE_DAILY)
+  const saved     = null
   const isSameDay = saved?.todayStr === todayStr && saved?.puzzleNumber === puzzleNumber
 
   if (isSameDay) {
@@ -120,17 +131,20 @@ async function fetchBank(length) {
 /** One word per lock, in LOCK_LENGTHS order. */
 async function loadWords(puzzleNumber) {
   const banks = await Promise.all(LOCK_LENGTHS.map(fetchBank))
-  return banks.map(bank => wordForPuzzle(bank, puzzleNumber))
+  const used = new Set(banks.flat().map(o => o.word.toUpperCase()))
+  if (AD_WORDS.some((o, i) => o.word.length !== LOCK_LENGTHS[i] || used.has(o.word))) {
+    throw new Error('Ad round words must fit the locks and be absent from every bank')
+  }
+  return AD_WORDS
 }
 
 // ── END OF DAY ────────────────────────────────────────────────────
 /** Records today's result, then shows the end modal. Call once, at the moment the day ends. */
 async function finishDay(won, delayMs) {
   setStatus(won ? 'won' : 'lost')
-  _rewarded = !loadStats().recordedDates.includes(_today.todayStr)
-  persist()
+  _rewarded = false
   const { results } = getState()
-  const stats = _stats.recordResult(won, results, _today.todayStr)
+  const stats = loadStats()
   renderStats(stats, results)
   await sleep(delayMs)
   showEndOfDay(stats)
@@ -286,14 +300,8 @@ async function submitGuess() {
 }
 
 // ── PERSIST ───────────────────────────────────────────────────────
-function persist() {
-  const { todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
-          positions, correct, results, status } = getState()
-  _vault.write(STORAGE_DAILY, {
-    todayStr, dayIndex, puzzleNumber, level, guessesUsed, totalGuesses,
-    positions, correct, results, status, rewarded: _rewarded,
-  })
-}
+/** The ad round never saves, so every load is a fresh take. */
+function persist() {}
 
 // ── SHARE ─────────────────────────────────────────────────────────
 async function handleShare() {
